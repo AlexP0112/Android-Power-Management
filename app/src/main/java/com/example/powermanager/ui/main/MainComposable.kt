@@ -86,6 +86,9 @@ fun PowerManagerApp(
     }
 }
 
+/*
+ * Navigation host that manages navigation between app screens (Home, Statistics, Control)
+ */
 @Composable
 fun ScreensNavHost(navController: NavHostController) {
     NavHost(
