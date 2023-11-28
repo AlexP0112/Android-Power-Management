@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Power Manager</string>
+    <string name="top_bar_title">Power Manager</string>
 </resources>
