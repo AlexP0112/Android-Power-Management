@@ -5,12 +5,12 @@ import android.content.Context
 import android.content.Intent
 import android.os.BatteryManager
 import java.util.Calendar
-import java.util.Date
 import kotlin.math.roundToInt
 
 data class BatteryLevelInfo(
     val level: Int,
-    val timestamp: Date
+    val hour: Int,
+    val minute: Int,
 )
 
 class BatteryBroadcastReceiver : BroadcastReceiver() {
@@ -22,9 +22,10 @@ class BatteryBroadcastReceiver : BroadcastReceiver() {
             return
 
         val percentage = ((batteryLevel * 100) / batteryScale.toFloat()).roundToInt()
-        val currentTime = Calendar.getInstance().time
+        val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+        val minute = Calendar.getInstance().get(Calendar.MINUTE)
 
-        BatteryLevelTracker.addRecord(BatteryLevelInfo(percentage, currentTime))
+        BatteryLevelTracker.addRecord(BatteryLevelInfo(percentage, hour, minute))
     }
 }
 

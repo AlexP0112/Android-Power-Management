@@ -1,6 +1,5 @@
 package com.example.powermanager.ui.main
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -31,6 +30,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -49,8 +49,6 @@ import com.example.powermanager.ui.screens.StatisticsScreen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PowerManagerApp(
@@ -86,7 +84,8 @@ fun PowerManagerApp(
                 }
             ) {
                 ScreensNavHost(
-                    navController = navController
+                    navController = navController,
+                    it.calculateTopPadding()
                 )
             }
         }
@@ -97,28 +96,34 @@ fun PowerManagerApp(
  * Navigation host that manages navigation between app screens (Home, Statistics, Control)
  */
 @Composable
-fun ScreensNavHost(navController: NavHostController) {
+fun ScreensNavHost(
+    navController: NavHostController,
+    topPadding: Dp
+) {
     NavHost(
         navController = navController,
         startDestination = HOME_SCREEN_NAME
     ) {
         composable(route = HOME_SCREEN_NAME) {
-            HomeScreen()
+            HomeScreen(topPadding)
         }
 
         composable(route = STATISTICS_SCREEN_NAME) {
-            StatisticsScreen()
+            StatisticsScreen(topPadding)
         }
 
         composable(route = CONTROL_SCREEN_NAME) {
-            ControlScreen()
+            ControlScreen(topPadding)
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopAppBar(scope: CoroutineScope, drawerState: DrawerState) {
+fun TopAppBar(
+    scope: CoroutineScope,
+    drawerState: DrawerState
+) {
     CenterAlignedTopAppBar(
         title = {
             Text(
