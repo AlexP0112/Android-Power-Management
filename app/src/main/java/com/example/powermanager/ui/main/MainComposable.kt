@@ -1,5 +1,7 @@
 package com.example.powermanager.ui.main
 
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -22,7 +24,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.rememberCoroutineScope
@@ -49,15 +50,12 @@ import com.example.powermanager.ui.screens.StatisticsScreen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PowerManagerApp(
     model: AppModel = viewModel(),
     navController: NavHostController = rememberNavController(),
     drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
 ) {
-    val state by model.uiState.collectAsState()
-
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
@@ -104,15 +102,57 @@ fun ScreensNavHost(
         navController = navController,
         startDestination = HOME_SCREEN_NAME
     ) {
-        composable(route = HOME_SCREEN_NAME) {
+        composable(
+            route = HOME_SCREEN_NAME,
+            enterTransition = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                    animationSpec = tween(300)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                    animationSpec = tween(300)
+                )
+            },
+        ) {
             HomeScreen(topPadding)
         }
 
-        composable(route = STATISTICS_SCREEN_NAME) {
+        composable(
+            route = STATISTICS_SCREEN_NAME,
+            enterTransition = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                    animationSpec = tween(300)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                    animationSpec = tween(300)
+                )
+            },
+        ) {
             StatisticsScreen(topPadding)
         }
 
-        composable(route = CONTROL_SCREEN_NAME) {
+        composable(
+            route = CONTROL_SCREEN_NAME,
+            enterTransition = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                    animationSpec = tween(300)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                    animationSpec = tween(300)
+                )
+            },
+        ) {
             ControlScreen(topPadding)
         }
     }
@@ -145,7 +185,6 @@ fun TopAppBar(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DrawerContent(
     navController: NavHostController,
@@ -166,12 +205,12 @@ fun DrawerContent(
                 },
                 selected = index == selectedNavigationItemIndex,
                 onClick = {
-                    selectedNavigationItemIndex = index
-                    navController.navigate(item.title)
-                    model.changeAppScreen(item.title)
                     scope.launch {
                         drawerState.close()
                     }
+                    selectedNavigationItemIndex = index
+                    navController.navigate(item.title)
+                    model.changeAppScreen(item.title)
                 },
                 icon = {
                     Icon(
