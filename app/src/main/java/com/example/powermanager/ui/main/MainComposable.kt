@@ -23,6 +23,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.rememberCoroutineScope
@@ -31,11 +32,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.powermanager.R
+import com.example.powermanager.ui.model.AppModel
 import com.example.powermanager.ui.navigation.CONTROL_SCREEN_NAME
 import com.example.powermanager.ui.navigation.HOME_SCREEN_NAME
 import com.example.powermanager.ui.navigation.STATISTICS_SCREEN_NAME
@@ -51,9 +54,12 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PowerManagerApp(
+    model: AppModel = viewModel(),
     navController: NavHostController = rememberNavController(),
     drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
 ) {
+    val state by model.uiState.collectAsState()
+
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
@@ -66,7 +72,8 @@ fun PowerManagerApp(
                 DrawerContent(
                     navController = navController,
                     scope = scope,
-                    drawerState = drawerState
+                    drawerState = drawerState,
+                    model = model
                 )
             },
         ) {
@@ -138,7 +145,8 @@ fun TopAppBar(scope: CoroutineScope, drawerState: DrawerState) {
 fun DrawerContent(
     navController: NavHostController,
     scope: CoroutineScope,
-    drawerState: DrawerState
+    drawerState: DrawerState,
+    model: AppModel
 ) {
     ModalDrawerSheet {
         var selectedNavigationItemIndex by rememberSaveable {
@@ -155,6 +163,7 @@ fun DrawerContent(
                 onClick = {
                     selectedNavigationItemIndex = index
                     navController.navigate(item.title)
+                    model.changeAppScreen(item.title)
                     scope.launch {
                         drawerState.close()
                     }
