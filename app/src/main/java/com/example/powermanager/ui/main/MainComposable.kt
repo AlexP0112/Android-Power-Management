@@ -30,6 +30,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -182,6 +183,12 @@ fun TopAppBar(
                 )
             }
         },
+        actions = {
+            Icon( // top right corner, use the icon of the app
+                painter = painterResource(id = R.mipmap.ic_launcher_foreground),
+                contentDescription = null
+            )
+        }
     )
 }
 
