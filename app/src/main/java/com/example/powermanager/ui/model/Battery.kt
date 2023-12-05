@@ -12,8 +12,8 @@ data class BatteryLevelInfo(
     val timestamp: Long
 )
 
-const val NUMBER_OF_MILLIS_IN_A_DAY = 1000L * 60 * 60 * 24;
-const val DEFAULT_NUMBER_OF_SAMPLES = 30;
+const val NUMBER_OF_MILLIS_IN_A_DAY = 1000L * 60 * 60 * 24
+const val DEFAULT_NUMBER_OF_SAMPLES = 30
 
 class BatteryBroadcastReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
@@ -58,21 +58,16 @@ object BatteryLevelTracker {
         // we need to have at least 2 records
         if (records.size == 1)
             finalRecords.add(BatteryLevelInfo(level = records[0].level, timestamp = currentTimeLong))
-        else if (finalRecords.isEmpty()) {
-            //todo: CHANGE THIS, it will raise an outofbounds exception
-            finalRecords.add(BatteryLevelInfo(level = records[0].level, timestamp = currentTimeLong - 1000))
-            finalRecords.add(BatteryLevelInfo(level = records[0].level, timestamp = currentTimeLong))
-        }
 
         // split the period of time that was recorded into equal time intervals (linear interpolation)
         val startTime = finalRecords[0].timestamp
         val endTime = finalRecords[finalRecords.size - 1].timestamp
-        val step = (endTime - startTime) / DEFAULT_NUMBER_OF_SAMPLES
+        val step = (endTime - startTime).toDouble() / DEFAULT_NUMBER_OF_SAMPLES.toDouble()
         val result: MutableList<BatteryLevelInfo> = mutableListOf()
 
         // add the timestamps
         for (i in 0 .. DEFAULT_NUMBER_OF_SAMPLES) {
-            result.add(BatteryLevelInfo(0, startTime + i * step))
+            result.add(BatteryLevelInfo(0, (startTime.toDouble() + i.toDouble() * step).toLong()) )
         }
 
         // determine the level for the timestamps that were added
@@ -84,6 +79,9 @@ object BatteryLevelTracker {
 
             result[index].level = finalRecords[if (levelIndex != 0) levelIndex - 1 else 0].level
         }
+
+        // last record should contain the last battery level that was measured
+        result[result.size - 1].level = finalRecords[finalRecords.size - 1].level
 
         return result
     }
