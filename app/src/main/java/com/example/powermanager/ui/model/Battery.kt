@@ -45,18 +45,17 @@ object BatteryLevelTracker {
             return
 
         records.add(info)
+
+        // only keep records from the last 24h
+        records = records.dropWhile { record -> info.timestamp - record.timestamp > NUMBER_OF_MILLIS_IN_A_DAY}.toMutableList()
     }
 
     fun getRecordsAtFixedTimeInterval(): MutableList<BatteryLevelInfo> {
-        // only keep records from the last 24h
         val currentTimeLong = Calendar.getInstance().time.time
-        records = records.filter { record -> currentTimeLong - record.timestamp < NUMBER_OF_MILLIS_IN_A_DAY}
-            .toMutableList()
-
-        val finalRecords = records
+        val finalRecords = records.toMutableList()
 
         // we need to have at least 2 records
-        if (records.size == 1)
+        if (finalRecords.size == 1)
             finalRecords.add(BatteryLevelInfo(level = records[0].level, timestamp = currentTimeLong))
 
         // split the period of time that was recorded into equal time intervals (linear interpolation)

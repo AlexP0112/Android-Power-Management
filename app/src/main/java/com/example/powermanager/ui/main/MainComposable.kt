@@ -184,10 +184,14 @@ fun TopAppBar(
             }
         },
         actions = {
-            Icon( // top right corner, use the icon of the app
-                painter = painterResource(id = R.mipmap.ic_launcher_foreground),
-                contentDescription = null
-            )
+            IconButton (
+               onClick = {}
+            ) {
+                Icon( // top right corner, use the icon of the app
+                    painter = painterResource(id = R.mipmap.ic_launcher_foreground),
+                    contentDescription = null
+                )
+            }
         }
     )
 }
