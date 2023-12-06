@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">Power Manager</string>
     <string name="top_bar_title">Power Manager</string>
-    <string name="battery_level_chart_name">Battery level</string>
+    <string name="battery_level_chart_title">Battery percentage over time</string>
 </resources>

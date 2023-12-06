@@ -13,7 +13,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,6 +48,8 @@ import kotlin.math.roundToInt
 fun StatisticsScreen(
     topPadding: Dp
 ) {
+    val batteryLevelChartRefresher: MutableState<Boolean> = remember { mutableStateOf(false) }
+
     Column(
         modifier = Modifier
             .padding(top = topPadding)
@@ -54,12 +58,14 @@ fun StatisticsScreen(
         Box(modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.Center
         ) {
+            // battery percentage chart title
             Text(
-                text = stringResource(R.string.battery_level_chart_name)
+                text = stringResource(R.string.battery_level_chart_title)
             )
+            // refresh button for battery percentage screen
             IconButton(
                 modifier = Modifier.align(Alignment.CenterEnd),
-                onClick = {}
+                onClick = { batteryLevelChartRefresher.value = !batteryLevelChartRefresher.value }
             ) {
                 Icon(
                     imageVector = Icons.Default.Refresh,
@@ -68,20 +74,22 @@ fun StatisticsScreen(
                 )
             }
         }
-        BatteryLevelChart()
+        BatteryLevelChart(batteryLevelChartRefresher)
     }
 }
 
 @Composable
-fun BatteryLevelChart() {
+fun BatteryLevelChart(refreshChart : MutableState<Boolean>) {
+    // retrieve the records from the battery tracker
     val records = BatteryLevelTracker.getRecordsAtFixedTimeInterval()
 
     val modelProducer = remember { ChartEntryModelProducer() }
-    val datasetForModel = remember { mutableStateListOf(listOf<FloatEntry>()) }
-    val datasetLineSpec = remember { arrayListOf<LineChart.LineSpec>() }
     val scrollState = rememberChartScrollState()
 
-    datasetLineSpec.add(
+    // for refresh purposes
+    LaunchedEffect(refreshChart.value) {}
+
+    val datasetLineSpec = listOf(
         LineChart.LineSpec(
             lineColor = MaterialTheme.colorScheme.tertiary.toArgb(),
             lineBackgroundShader = DynamicShaders.fromBrush(
@@ -100,9 +108,7 @@ fun BatteryLevelChart() {
     val dataPoints = records.mapIndexed { index, record ->
         FloatEntry(index.toFloat(), record.level.toFloat())
     }
-
-    datasetForModel.add(dataPoints)
-    modelProducer.setEntries(datasetForModel)
+    modelProducer.setEntries(listOf(dataPoints))
 
     Card (
         modifier = Modifier
