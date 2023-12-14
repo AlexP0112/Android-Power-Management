@@ -1,4 +1,4 @@
-package com.example.powermanager.utils
+package com.example.powermanager.ui.charts
 
 /* Source: https://github.com/patrykandpatrick/vico/blob/master/sample/src/main/java/com/patrykandpatrick/vico/sample/showcase/Marker.kt */
 

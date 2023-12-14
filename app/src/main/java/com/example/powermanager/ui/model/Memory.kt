@@ -4,43 +4,32 @@ import android.app.ActivityManager
 import android.content.Context
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
-import androidx.work.BackoffPolicy
-import androidx.work.Constraints
-import androidx.work.Data
-import androidx.work.ExistingWorkPolicy
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
-import androidx.work.WorkRequest
-import androidx.work.Worker
-import androidx.work.WorkerParameters
 import com.example.powermanager.utils.getGigaBytesFromBytes
-import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 const val NUMBER_OF_VALUES_TRACKED = 60
+const val SAMPLING_RATE_MILLIS = 1000L
 
-class MemoryWorker(context: Context, workerParams: WorkerParameters) : Worker(context, workerParams) {
-    override fun doWork(): Result {
-        val am = applicationContext.getSystemService(Context.ACTIVITY_SERVICE)
-        val info = ActivityManager.MemoryInfo()
+object MemoryService {
+    fun startSampling(applicationContext : Context) {
+        CoroutineScope(Dispatchers.IO).launch {
+            while (true) {
+                val am = applicationContext.getSystemService(Context.ACTIVITY_SERVICE)
+                val info = ActivityManager.MemoryInfo()
 
-        (am as ActivityManager).getMemoryInfo(info)
-        val usedMemory = info.totalMem - info.availMem
+                (am as ActivityManager).getMemoryInfo(info)
+                val usedMemory = info.totalMem - info.availMem
 
-        // add the value that was recorder in the tracker
-        MemoryLoadTracker.addValue(getGigaBytesFromBytes(usedMemory))
+                MemoryLoadTracker.addValue(getGigaBytesFromBytes(usedMemory))
 
-        // schedule another activity
-        val constraints = Constraints.Builder().build()
-        val workRequest = OneTimeWorkRequestBuilder<MemoryWorker>()
-            .setConstraints(constraints)
-            .setInitialDelay(1, TimeUnit.SECONDS)
-            .setInputData(Data.EMPTY)
-            .setBackoffCriteria(BackoffPolicy.LINEAR, WorkRequest.MIN_BACKOFF_MILLIS, TimeUnit.MILLISECONDS)
-            .build()
-
-        WorkManager.getInstance(applicationContext).beginUniqueWork("Memory sampling work", ExistingWorkPolicy.REPLACE, workRequest).enqueue()
-
-        return Result.success()
+                withContext(Dispatchers.IO) {
+                    Thread.sleep(SAMPLING_RATE_MILLIS)
+                }
+            }
+        }
     }
 }
 
