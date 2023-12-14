@@ -27,7 +27,8 @@ import com.example.powermanager.ui.charts.MemoryChart
 
 @Composable
 fun StatisticsScreen(
-    topPadding: Dp
+    topPadding: Dp,
+    totalMemoryGB: Float
 ) {
     val batteryLevelChartRefresher: MutableState<Boolean> = remember { mutableStateOf(false) }
 
@@ -67,7 +68,7 @@ fun StatisticsScreen(
                 text = stringResource(R.string.memory_chart_title)
             )
         }
-        MemoryChart()
+        MemoryChart(totalMemoryGB)
     }
 }
 

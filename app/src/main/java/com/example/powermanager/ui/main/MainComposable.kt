@@ -35,7 +35,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -54,10 +53,10 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun PowerManagerApp(
-    model: AppModel = viewModel(),
     navController: NavHostController = rememberNavController(),
     drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
-    context: Context
+    context: Context,
+    model: AppModel = AppModel(applicationContext = context),
 ) {
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -87,7 +86,8 @@ fun PowerManagerApp(
             ) {
                 ScreensNavHost(
                     navController = navController,
-                    it.calculateTopPadding()
+                    topPadding = it.calculateTopPadding(),
+                    totalMemory = model.getTotalMemory()
                 )
             }
         }
@@ -100,7 +100,8 @@ fun PowerManagerApp(
 @Composable
 fun ScreensNavHost(
     navController: NavHostController,
-    topPadding: Dp
+    topPadding: Dp,
+    totalMemory: Float
 ) {
     NavHost(
         navController = navController,
@@ -139,7 +140,7 @@ fun ScreensNavHost(
                 )
             },
         ) {
-            StatisticsScreen(topPadding)
+            StatisticsScreen(topPadding, totalMemory)
         }
 
         composable(

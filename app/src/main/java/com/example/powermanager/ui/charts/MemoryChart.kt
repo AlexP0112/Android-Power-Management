@@ -28,7 +28,7 @@ import com.patrykandpatrick.vico.core.entry.ChartEntryModelProducer
 import com.patrykandpatrick.vico.core.entry.FloatEntry
 
 @Composable
-fun MemoryChart() {
+fun MemoryChart(totalMemoryGB: Float) {
     // retrieve the records from the battery tracker
     val memoryTracker = remember { MemoryLoadTracker }
 
@@ -68,7 +68,7 @@ fun MemoryChart() {
             Chart(
                 chart = lineChart(
                     lines = datasetLineSpec,
-                    axisValuesOverrider = remember { CustomAxisValuesOverrider(0f, 5.5f) }
+                    axisValuesOverrider = remember { CustomAxisValuesOverrider(0f, totalMemoryGB) }
                 ),
                 startAxis = rememberStartAxis(
                     title = "Memory (GB)",
