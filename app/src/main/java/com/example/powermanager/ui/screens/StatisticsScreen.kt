@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.powermanager.R
 import com.example.powermanager.ui.model.BatteryLevelTracker
+import com.example.powermanager.ui.model.MemoryLoadTracker
 import com.example.powermanager.utils.getHourAndMinuteFromLongTimestamp
 import com.example.powermanager.utils.rememberMarker
 import com.patrykandpatrick.vico.compose.axis.horizontal.rememberBottomAxis
@@ -55,6 +56,7 @@ fun StatisticsScreen(
             .padding(top = topPadding)
             .fillMaxSize()
     ) {
+        // battery
         Box(modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.Center
         ) {
@@ -75,6 +77,16 @@ fun StatisticsScreen(
             }
         }
         BatteryLevelChart(batteryLevelChartRefresher)
+
+        // memory
+        Box(modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = stringResource(R.string.memory_chart_title)
+            )
+        }
+        MemoryChart()
     }
 }
 
@@ -135,6 +147,67 @@ fun BatteryLevelChart(refreshChart : MutableState<Boolean>) {
                     valueFormatter = {value, _ ->
                         getHourAndMinuteFromLongTimestamp(timestamp = records[value.roundToInt()].timestamp)
                     }
+                ),
+                marker = marker,
+                chartModelProducer = modelProducer,
+                chartScrollState = scrollState,
+                isZoomEnabled = true,
+            )
+        }
+    }
+}
+
+@Composable
+fun MemoryChart() {
+    // retrieve the records from the battery tracker
+    val memoryTracker = remember { MemoryLoadTracker }
+
+    val modelProducer = remember { ChartEntryModelProducer() }
+    val scrollState = rememberChartScrollState()
+
+    val datasetLineSpec = listOf(
+        LineChart.LineSpec(
+            lineColor = MaterialTheme.colorScheme.tertiary.toArgb(),
+            lineBackgroundShader = DynamicShaders.fromBrush(
+                // vertical color gradient under the chart line
+                brush = Brush.verticalGradient(
+                    listOf(
+                        MaterialTheme.colorScheme.tertiary.copy(DefaultAlpha.LINE_BACKGROUND_SHADER_START),
+                        MaterialTheme.colorScheme.tertiary.copy(DefaultAlpha.LINE_BACKGROUND_SHADER_END)
+                    )
+                )
+            )
+        )
+    )
+
+    // map the records to points on the chart
+    val dataPoints = memoryTracker.getValues().mapIndexed { index, value ->
+        FloatEntry(index.toFloat(), value)
+    }
+    modelProducer.setEntries(listOf(dataPoints))
+
+    Card (
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(15.dp)
+    ) {
+        ProvideChartStyle (
+            chartStyle = m3ChartStyle()
+        ){
+            val marker = rememberMarker()
+            Chart(
+                chart = lineChart(
+                    lines = datasetLineSpec
+                ),
+                startAxis = rememberStartAxis(
+                    title = "Memory (GB)",
+                    tickLength = 0.dp,
+                    itemPlacer = AxisItemPlacer.Vertical.default(
+                        maxItemCount = 10
+                    ),
+                ),
+                bottomAxis = rememberBottomAxis(
+                    title = "Time",
                 ),
                 marker = marker,
                 chartModelProducer = modelProducer,

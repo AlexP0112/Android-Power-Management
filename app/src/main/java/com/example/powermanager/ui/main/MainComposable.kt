@@ -1,5 +1,6 @@
 package com.example.powermanager.ui.main
 
+import android.content.Context
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Spacer
@@ -56,6 +57,7 @@ fun PowerManagerApp(
     model: AppModel = viewModel(),
     navController: NavHostController = rememberNavController(),
     drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
+    context: Context
 ) {
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -70,7 +72,8 @@ fun PowerManagerApp(
                     navController = navController,
                     scope = scope,
                     drawerState = drawerState,
-                    model = model
+                    model = model,
+                    applicationContext = context
                 )
             },
         ) {
@@ -197,7 +200,8 @@ fun DrawerContent(
     navController: NavHostController,
     scope: CoroutineScope,
     drawerState: DrawerState,
-    model: AppModel
+    model: AppModel,
+    applicationContext: Context
 ) {
     ModalDrawerSheet {
         var selectedNavigationItemIndex by rememberSaveable {
@@ -217,7 +221,7 @@ fun DrawerContent(
                     }
                     selectedNavigationItemIndex = index
                     navController.navigate(item.title)
-                    model.changeAppScreen(item.title)
+                    model.changeAppScreen(item.title, context = applicationContext)
                 },
                 icon = {
                     Icon(
