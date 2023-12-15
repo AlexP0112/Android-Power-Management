@@ -14,7 +14,7 @@ const val NUMBER_OF_VALUES_TRACKED = 60
 const val SAMPLING_RATE_MILLIS = 1000L
 
 object MemoryService {
-    fun startSampling(applicationContext : Context) {
+    fun startSampling(applicationContext : Context, model: AppModel) {
         CoroutineScope(Dispatchers.IO).launch {
             while (true) {
                 val am = applicationContext.getSystemService(Context.ACTIVITY_SERVICE)
@@ -27,6 +27,12 @@ object MemoryService {
 
                 withContext(Dispatchers.IO) {
                     Thread.sleep(SAMPLING_RATE_MILLIS)
+                }
+
+                // check if sampling should finish (after 3 minutes of background sampling)
+                if (model.shouldEndSampling()) {
+                    model.endSampling()
+                    break
                 }
             }
         }
@@ -46,5 +52,9 @@ object MemoryLoadTracker {
 
     fun getValues() : SnapshotStateList<Float> {
         return values
+    }
+
+    fun clearValues() {
+        values.clear()
     }
 }

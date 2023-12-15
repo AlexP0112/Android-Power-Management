@@ -80,7 +80,7 @@ fun MemoryChart(totalMemoryGB: Float) {
                 ),
                 bottomAxis = rememberBottomAxis(
                     title = "Time",
-                    valueFormatter = { _, _ -> ""}
+                    valueFormatter = { _, _ -> ""} // bottom axis should have no labels (time is implicit)
                 ),
                 marker = marker,
                 chartModelProducer = modelProducer,

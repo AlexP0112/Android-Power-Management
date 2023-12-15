@@ -10,6 +10,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import java.util.Calendar
+
+const val BACKGROUND_SAMPLING_THRESHOLD_MILLIS = 3L * 60L * 1000L // 3 minutes
 
 class AppModel(applicationContext: Context) : ViewModel() {
 
@@ -18,6 +21,8 @@ class AppModel(applicationContext: Context) : ViewModel() {
 
     private val totalMemory: Float
 
+    private var shutdownTimeForSampling: Long
+
     init {
         // determine the amount of the memory that the device has
         val am = applicationContext.getSystemService(Context.ACTIVITY_SERVICE)
@@ -25,24 +30,29 @@ class AppModel(applicationContext: Context) : ViewModel() {
 
         (am as ActivityManager).getMemoryInfo(info)
         totalMemory = getGigaBytesFromBytes(info.totalMem)
+
+        shutdownTimeForSampling = 0L
     }
 
     fun changeAppScreen(newScreenName: String, context: Context) {
+        if (uiState.value.currentScreenName == STATISTICS_SCREEN_NAME)
+            onLeaveStatisticsScreen()
+
+        if (newScreenName == STATISTICS_SCREEN_NAME)
+            onEnterStatisticScreen(context)
+
         _uiState.update { currentState ->
             currentState.copy(
                 currentScreenName = newScreenName,
                 isRecordingMemoryInfo = uiState.value.isRecordingMemoryInfo
             )
         }
-
-        if (newScreenName == STATISTICS_SCREEN_NAME)
-            onEnterStatisticScreen(context)
     }
 
-    private fun onEnterStatisticScreen(context: Context) {
+    fun onEnterStatisticScreen(context: Context) {
         if (!uiState.value.isRecordingMemoryInfo) {
             // start the coroutine that samples memory usage
-            MemoryService.startSampling(context)
+            MemoryService.startSampling(context, this)
 
             _uiState.update { currentState ->
                 currentState.copy(
@@ -50,6 +60,29 @@ class AppModel(applicationContext: Context) : ViewModel() {
                     currentScreenName = uiState.value.currentScreenName
                 )
             }
+        }
+    }
+
+    fun onLeaveStatisticsScreen() {
+        shutdownTimeForSampling = Calendar.getInstance().time.time + BACKGROUND_SAMPLING_THRESHOLD_MILLIS
+    }
+
+    fun shouldEndSampling() : Boolean {
+        if (shutdownTimeForSampling == 0L)
+            return false
+
+        return Calendar.getInstance().time.time >= shutdownTimeForSampling
+    }
+
+    fun endSampling() {
+        shutdownTimeForSampling = 0L
+        MemoryLoadTracker.clearValues()
+
+        _uiState.update { currentState ->
+            currentState.copy(
+                isRecordingMemoryInfo = false,
+                currentScreenName = uiState.value.currentScreenName
+            )
         }
     }
 

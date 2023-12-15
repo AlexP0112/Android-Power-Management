@@ -56,7 +56,7 @@ fun PowerManagerApp(
     navController: NavHostController = rememberNavController(),
     drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
     context: Context,
-    model: AppModel = AppModel(applicationContext = context),
+    model: AppModel,
 ) {
     Surface(
         modifier = Modifier.fillMaxSize(),
