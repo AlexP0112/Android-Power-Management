@@ -50,6 +50,9 @@ class AppModel(applicationContext: Context) : ViewModel() {
     }
 
     fun onEnterStatisticScreen(context: Context) {
+        // do not shutdown while on screen
+        shutdownTimeForSampling = 0L
+
         if (!uiState.value.isRecordingMemoryInfo) {
             // start the coroutine that samples memory usage
             MemoryService.startSampling(context, this)
