@@ -8,8 +8,8 @@ import com.example.powermanager.data.sampling.MemoryLoadTracker
 import com.example.powermanager.data.sampling.SamplingService
 import com.example.powermanager.ui.navigation.STATISTICS_SCREEN_NAME
 import com.example.powermanager.ui.state.AppUiState
+import com.example.powermanager.utils.determineNumberOfCPUCores
 import com.example.powermanager.utils.getGigaBytesFromBytes
-import com.example.powermanager.utils.getNumCores
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -39,7 +39,7 @@ class AppModel(applicationContext: Context) : ViewModel() {
         totalMemory = getGigaBytesFromBytes(info.totalMem)
 
         // determine the number of processors on the device
-        numberOfCores = getNumCores()
+        numberOfCores = determineNumberOfCPUCores()
 
         shutdownTimeForSampling = 0L
     }
@@ -56,6 +56,18 @@ class AppModel(applicationContext: Context) : ViewModel() {
                 currentScreenName = newScreenName,
                 isRecordingMemoryInfo = uiState.value.isRecordingMemoryInfo,
                 coreTracked = uiState.value.coreTracked
+            )
+        }
+    }
+
+    fun changeTrackedCore(coreNumber: Int) {
+        CPUFrequencyTracker.clearValues()
+
+        _uiState.update { currentState ->
+            currentState.copy(
+                isRecordingMemoryInfo = uiState.value.isRecordingMemoryInfo,
+                currentScreenName = uiState.value.currentScreenName,
+                coreTracked = coreNumber
             )
         }
     }
@@ -105,6 +117,10 @@ class AppModel(applicationContext: Context) : ViewModel() {
 
     fun getTotalMemory(): Float {
         return totalMemory
+    }
+
+    fun getNumCores(): Int {
+        return numberOfCores
     }
 
 }

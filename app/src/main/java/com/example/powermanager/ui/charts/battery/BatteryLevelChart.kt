@@ -1,16 +1,21 @@
-package com.example.powermanager.ui.charts
+package com.example.powermanager.ui.charts.battery
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
-import com.example.powermanager.data.sampling.CPUFrequencyTracker
+import com.example.powermanager.data.sampling.BatteryLevelTracker
+import com.example.powermanager.ui.charts.charts_utils.CustomAxisValuesOverrider
+import com.example.powermanager.ui.charts.charts_utils.rememberMarker
+import com.example.powermanager.utils.getHourAndMinuteFromLongTimestamp
 import com.patrykandpatrick.vico.compose.axis.horizontal.rememberBottomAxis
 import com.patrykandpatrick.vico.compose.axis.vertical.rememberStartAxis
 import com.patrykandpatrick.vico.compose.chart.Chart
@@ -21,19 +26,22 @@ import com.patrykandpatrick.vico.compose.m3.style.m3ChartStyle
 import com.patrykandpatrick.vico.compose.style.ProvideChartStyle
 import com.patrykandpatrick.vico.core.DefaultAlpha
 import com.patrykandpatrick.vico.core.axis.AxisItemPlacer
-import com.patrykandpatrick.vico.core.axis.vertical.VerticalAxis
 import com.patrykandpatrick.vico.core.chart.line.LineChart
 import com.patrykandpatrick.vico.core.component.shape.shader.DynamicShaders
 import com.patrykandpatrick.vico.core.entry.ChartEntryModelProducer
 import com.patrykandpatrick.vico.core.entry.FloatEntry
+import kotlin.math.roundToInt
 
 @Composable
-fun CPUFrequencyChart() {
-    // retrieve the records from the CPU frequency tracker
-    val cpuFreqTracker = remember { CPUFrequencyTracker }
+fun BatteryLevelChart(refreshChart : MutableState<Boolean>) {
+    // retrieve the records from the battery tracker
+    val records = BatteryLevelTracker.getRecordsAtFixedTimeInterval()
 
     val modelProducer = remember { ChartEntryModelProducer() }
     val scrollState = rememberChartScrollState()
+
+    // for refresh purposes
+    LaunchedEffect(refreshChart.value) {}
 
     val datasetLineSpec = listOf(
         LineChart.LineSpec(
@@ -51,8 +59,8 @@ fun CPUFrequencyChart() {
     )
 
     // map the records to points on the chart
-    val dataPoints = cpuFreqTracker.getValues().mapIndexed { index, value ->
-        FloatEntry(index.toFloat(), value)
+    val dataPoints = records.mapIndexed { index, record ->
+        FloatEntry(index.toFloat(), record.level.toFloat())
     }
     modelProducer.setEntries(listOf(dataPoints))
 
@@ -68,18 +76,20 @@ fun CPUFrequencyChart() {
             Chart(
                 chart = lineChart(
                     lines = datasetLineSpec,
+                    axisValuesOverrider = remember { CustomAxisValuesOverrider(0f, 100f) }
                 ),
                 startAxis = rememberStartAxis(
-                    title = "Frequency (GHz)",
+                    title = "Battery Percentage",
                     tickLength = 0.dp,
                     itemPlacer = AxisItemPlacer.Vertical.default(
                         maxItemCount = 10
                     ),
-                    verticalLabelPosition = VerticalAxis.VerticalLabelPosition.Center
                 ),
                 bottomAxis = rememberBottomAxis(
                     title = "Time",
-                    valueFormatter = { _, _ -> ""} // bottom axis should have no labels (time is implicit)
+                    valueFormatter = {value, _ ->
+                        getHourAndMinuteFromLongTimestamp(timestamp = records[value.roundToInt()].timestamp)
+                    }
                 ),
                 marker = marker,
                 chartModelProducer = modelProducer,

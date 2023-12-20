@@ -28,7 +28,7 @@ fun convertKHzToGHz(value: Int) : Float {
     return value.toFloat() / NUMBER_OF_KILOHERTZ_IN_A_GIGAHERTZ.toFloat()
 }
 
-fun getNumCores(): Int {
+fun determineNumberOfCPUCores(): Int {
 
     class CpuFilter : FileFilter {
         override fun accept(pathname: File): Boolean {

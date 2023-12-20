@@ -2,5 +2,6 @@
     <string name="app_name">Power Manager</string>
     <string name="top_bar_title">Power Manager</string>
     <string name="battery_level_chart_title">Battery percentage over time</string>
-    <string name="memory_chart_title">Memory usage (GB in the last 60 seconds)</string>
+    <string name="memory_chart_title">Memory usage (GB) in the last 60 seconds</string>
+    <string name="cpu_frequency_chart_title">CPU frequency (GHz) in the last 60 seconds</string>
 </resources>

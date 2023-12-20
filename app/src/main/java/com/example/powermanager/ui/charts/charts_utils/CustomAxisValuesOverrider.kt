@@ -1,4 +1,4 @@
-package com.example.powermanager.ui.charts
+package com.example.powermanager.ui.charts.charts_utils
 
 import com.patrykandpatrick.vico.core.chart.values.AxisValuesOverrider
 import com.patrykandpatrick.vico.core.entry.ChartEntryModel

@@ -87,7 +87,8 @@ fun PowerManagerApp(
                 ScreensNavHost(
                     navController = navController,
                     topPadding = it.calculateTopPadding(),
-                    totalMemory = model.getTotalMemory()
+                    totalMemory = model.getTotalMemory(),
+                    model = model
                 )
             }
         }
@@ -101,7 +102,8 @@ fun PowerManagerApp(
 fun ScreensNavHost(
     navController: NavHostController,
     topPadding: Dp,
-    totalMemory: Float
+    totalMemory: Float,
+    model: AppModel
 ) {
     NavHost(
         navController = navController,
@@ -140,7 +142,7 @@ fun ScreensNavHost(
                 )
             },
         ) {
-            StatisticsScreen(topPadding, totalMemory)
+            StatisticsScreen(topPadding, totalMemory, model)
         }
 
         composable(

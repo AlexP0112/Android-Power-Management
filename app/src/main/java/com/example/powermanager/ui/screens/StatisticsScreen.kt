@@ -2,6 +2,7 @@ package com.example.powermanager.ui.screens
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -20,16 +21,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.example.powermanager.R
-import com.example.powermanager.ui.charts.BatteryLevelChart
-import com.example.powermanager.ui.charts.CPUFrequencyChart
-import com.example.powermanager.ui.charts.MemoryChart
+import com.example.powermanager.ui.charts.battery.BatteryLevelChart
+import com.example.powermanager.ui.charts.frequency.CPUCoresDropdownMenu
+import com.example.powermanager.ui.charts.frequency.CPUFrequencyChart
+import com.example.powermanager.ui.charts.memory.MemoryChart
+import com.example.powermanager.ui.model.AppModel
 
 @Composable
 fun StatisticsScreen(
     topPadding: Dp,
-    totalMemoryGB: Float
+    totalMemoryGB: Float,
+    model: AppModel
 ) {
     val batteryLevelChartRefresher: MutableState<Boolean> = remember { mutableStateOf(false) }
 
@@ -40,7 +46,8 @@ fun StatisticsScreen(
             .verticalScroll(rememberScrollState())
     ) {
         // battery
-        Box(modifier = Modifier.fillMaxWidth(),
+        Box(
+            modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.Center
         ) {
             // battery percentage chart title
@@ -62,7 +69,8 @@ fun StatisticsScreen(
         BatteryLevelChart(refreshChart = batteryLevelChartRefresher)
 
         // memory
-        Box(modifier = Modifier.fillMaxWidth(),
+        Box(
+            modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.Center
         ) {
             Text(
@@ -72,7 +80,29 @@ fun StatisticsScreen(
         MemoryChart(totalMemoryGB)
 
         // cpu frequency
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+
+            Box(
+                modifier = Modifier.weight(2.5f).padding(horizontal = 15.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = stringResource(R.string.cpu_frequency_chart_title),
+                    textAlign = TextAlign.Center
+                )
+            }
+
+            Box(
+                modifier = Modifier.weight(1f)
+            ) {
+                CPUCoresDropdownMenu(model)
+            }
+        }
+
         CPUFrequencyChart()
     }
 }
+
 

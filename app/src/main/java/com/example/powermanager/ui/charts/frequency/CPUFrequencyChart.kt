@@ -1,4 +1,4 @@
-package com.example.powermanager.ui.charts
+package com.example.powermanager.ui.charts.frequency
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -10,7 +10,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
-import com.example.powermanager.data.sampling.MemoryLoadTracker
+import com.example.powermanager.data.sampling.CPUFrequencyTracker
+import com.example.powermanager.ui.charts.charts_utils.rememberMarker
 import com.patrykandpatrick.vico.compose.axis.horizontal.rememberBottomAxis
 import com.patrykandpatrick.vico.compose.axis.vertical.rememberStartAxis
 import com.patrykandpatrick.vico.compose.chart.Chart
@@ -28,9 +29,9 @@ import com.patrykandpatrick.vico.core.entry.ChartEntryModelProducer
 import com.patrykandpatrick.vico.core.entry.FloatEntry
 
 @Composable
-fun MemoryChart(totalMemoryGB: Float) {
-    // retrieve the records from the battery tracker
-    val memoryTracker = remember { MemoryLoadTracker }
+fun CPUFrequencyChart() {
+    // retrieve the records from the CPU frequency tracker
+    val cpuFreqTracker = remember { CPUFrequencyTracker }
 
     val modelProducer = remember { ChartEntryModelProducer() }
     val scrollState = rememberChartScrollState()
@@ -51,7 +52,7 @@ fun MemoryChart(totalMemoryGB: Float) {
     )
 
     // map the records to points on the chart
-    val dataPoints = memoryTracker.getValues().mapIndexed { index, value ->
+    val dataPoints = cpuFreqTracker.getValues().mapIndexed { index, value ->
         FloatEntry(index.toFloat(), value)
     }
     modelProducer.setEntries(listOf(dataPoints))
@@ -68,10 +69,9 @@ fun MemoryChart(totalMemoryGB: Float) {
             Chart(
                 chart = lineChart(
                     lines = datasetLineSpec,
-                    axisValuesOverrider = remember { CustomAxisValuesOverrider(0f, totalMemoryGB) }
                 ),
                 startAxis = rememberStartAxis(
-                    title = "Memory (GB)",
+                    title = "Frequency (GHz)",
                     tickLength = 0.dp,
                     itemPlacer = AxisItemPlacer.Vertical.default(
                         maxItemCount = 10
