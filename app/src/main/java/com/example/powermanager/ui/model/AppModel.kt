@@ -3,16 +3,21 @@ package com.example.powermanager.ui.model
 import android.app.ActivityManager
 import android.content.Context
 import androidx.lifecycle.ViewModel
+import com.example.powermanager.data.sampling.CPUFrequencyTracker
+import com.example.powermanager.data.sampling.MemoryLoadTracker
+import com.example.powermanager.data.sampling.SamplingService
 import com.example.powermanager.ui.navigation.STATISTICS_SCREEN_NAME
 import com.example.powermanager.ui.state.AppUiState
 import com.example.powermanager.utils.getGigaBytesFromBytes
+import com.example.powermanager.utils.getNumCores
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import java.util.Calendar
 
-const val BACKGROUND_SAMPLING_THRESHOLD_MILLIS = 3L * 60L * 1000L // 3 minutes
+
+const val BACKGROUND_SAMPLING_THRESHOLD_MILLIS = 100L * 1000L // 1min 40s
 
 class AppModel(applicationContext: Context) : ViewModel() {
 
@@ -20,16 +25,21 @@ class AppModel(applicationContext: Context) : ViewModel() {
     val uiState: StateFlow<AppUiState> = _uiState.asStateFlow()
 
     private val totalMemory: Float
+    private val numberOfCores : Int
 
     private var shutdownTimeForSampling: Long
 
+
     init {
-        // determine the amount of the memory that the device has
+        // determine the total amount of memory that the device has
         val am = applicationContext.getSystemService(Context.ACTIVITY_SERVICE)
         val info = ActivityManager.MemoryInfo()
 
         (am as ActivityManager).getMemoryInfo(info)
         totalMemory = getGigaBytesFromBytes(info.totalMem)
+
+        // determine the number of processors on the device
+        numberOfCores = getNumCores()
 
         shutdownTimeForSampling = 0L
     }
@@ -44,7 +54,8 @@ class AppModel(applicationContext: Context) : ViewModel() {
         _uiState.update { currentState ->
             currentState.copy(
                 currentScreenName = newScreenName,
-                isRecordingMemoryInfo = uiState.value.isRecordingMemoryInfo
+                isRecordingMemoryInfo = uiState.value.isRecordingMemoryInfo,
+                coreTracked = uiState.value.coreTracked
             )
         }
     }
@@ -55,12 +66,13 @@ class AppModel(applicationContext: Context) : ViewModel() {
 
         if (!uiState.value.isRecordingMemoryInfo) {
             // start the coroutine that samples memory usage
-            MemoryService.startSampling(context, this)
+            SamplingService.startSampling(context, this)
 
             _uiState.update { currentState ->
                 currentState.copy(
                     isRecordingMemoryInfo = true,
-                    currentScreenName = uiState.value.currentScreenName
+                    currentScreenName = uiState.value.currentScreenName,
+                    coreTracked = uiState.value.coreTracked
                 )
             }
         }
@@ -80,11 +92,13 @@ class AppModel(applicationContext: Context) : ViewModel() {
     fun endSampling() {
         shutdownTimeForSampling = 0L
         MemoryLoadTracker.clearValues()
+        CPUFrequencyTracker.clearValues()
 
         _uiState.update { currentState ->
             currentState.copy(
                 isRecordingMemoryInfo = false,
-                currentScreenName = uiState.value.currentScreenName
+                currentScreenName = uiState.value.currentScreenName,
+                coreTracked = uiState.value.coreTracked
             )
         }
     }

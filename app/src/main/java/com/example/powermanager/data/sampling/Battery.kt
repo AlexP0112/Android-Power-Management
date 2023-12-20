@@ -1,4 +1,4 @@
-package com.example.powermanager.ui.model
+package com.example.powermanager.data.sampling
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -47,7 +47,7 @@ object BatteryLevelTracker {
         records.add(info)
 
         // only keep records from the last 24h
-        records = records.dropWhile { record -> info.timestamp - record.timestamp > NUMBER_OF_MILLIS_IN_A_DAY}.toMutableList()
+        records = records.dropWhile { record -> info.timestamp - record.timestamp > NUMBER_OF_MILLIS_IN_A_DAY }.toMutableList()
     }
 
     fun getRecordsAtFixedTimeInterval(): MutableList<BatteryLevelInfo> {

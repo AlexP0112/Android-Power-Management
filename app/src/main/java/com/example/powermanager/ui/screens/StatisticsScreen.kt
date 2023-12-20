@@ -23,6 +23,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import com.example.powermanager.R
 import com.example.powermanager.ui.charts.BatteryLevelChart
+import com.example.powermanager.ui.charts.CPUFrequencyChart
 import com.example.powermanager.ui.charts.MemoryChart
 
 @Composable
@@ -69,6 +70,9 @@ fun StatisticsScreen(
             )
         }
         MemoryChart(totalMemoryGB)
+
+        // cpu frequency
+        CPUFrequencyChart()
     }
 }
 
