@@ -3,11 +3,13 @@ package com.example.powermanager.ui.model
 import android.app.ActivityManager
 import android.content.Context
 import androidx.lifecycle.ViewModel
-import com.example.powermanager.data.sampling.CPUFrequencyTracker
-import com.example.powermanager.data.sampling.MemoryLoadTracker
-import com.example.powermanager.data.sampling.SamplingService
-import com.example.powermanager.ui.navigation.STATISTICS_SCREEN_NAME
+import com.example.powermanager.data.data_trackers.CPUFrequencyTracker
+import com.example.powermanager.data.data_trackers.CPULoadTracker
+import com.example.powermanager.data.data_trackers.MemoryLoadTracker
+import com.example.powermanager.data.sampling.StatisticsScreenSamplingService
 import com.example.powermanager.ui.state.AppUiState
+import com.example.powermanager.utils.BACKGROUND_SAMPLING_THRESHOLD_MILLIS
+import com.example.powermanager.utils.STATISTICS_SCREEN_NAME
 import com.example.powermanager.utils.determineNumberOfCPUCores
 import com.example.powermanager.utils.getGigaBytesFromBytes
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,9 +17,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import java.util.Calendar
-
-
-const val BACKGROUND_SAMPLING_THRESHOLD_MILLIS = 100L * 1000L // 1min 40s
 
 class AppModel(applicationContext: Context) : ViewModel() {
 
@@ -78,7 +77,7 @@ class AppModel(applicationContext: Context) : ViewModel() {
 
         if (!uiState.value.isRecordingMemoryInfo) {
             // start the coroutine that samples memory usage
-            SamplingService.startSampling(context, this)
+            StatisticsScreenSamplingService.startSampling(context, this)
 
             _uiState.update { currentState ->
                 currentState.copy(
@@ -105,6 +104,7 @@ class AppModel(applicationContext: Context) : ViewModel() {
         shutdownTimeForSampling = 0L
         MemoryLoadTracker.clearValues()
         CPUFrequencyTracker.clearValues()
+        CPULoadTracker.clearValues()
 
         _uiState.update { currentState ->
             currentState.copy(

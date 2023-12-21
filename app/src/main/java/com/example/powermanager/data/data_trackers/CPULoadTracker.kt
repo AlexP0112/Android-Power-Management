@@ -1,9 +1,10 @@
-package com.example.powermanager.data.sampling
+package com.example.powermanager.data.data_trackers
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import com.example.powermanager.utils.NUMBER_OF_VALUES_TRACKED
 
-object CPUFrequencyTracker {
+object CPULoadTracker {
     private var values: SnapshotStateList<Float> = mutableStateListOf()
 
     fun addValue(value: Float) {

@@ -8,8 +8,8 @@ import androidx.activity.compose.setContent
 import com.example.powermanager.data.sampling.BatteryBroadcastReceiver
 import com.example.powermanager.ui.main.PowerManagerApp
 import com.example.powermanager.ui.model.AppModel
-import com.example.powermanager.ui.navigation.STATISTICS_SCREEN_NAME
 import com.example.powermanager.ui.theme.PowerManagerTheme
+import com.example.powermanager.utils.STATISTICS_SCREEN_NAME
 
 class MainActivity : ComponentActivity() {
     private lateinit var appModel: AppModel

@@ -41,13 +41,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.powermanager.R
 import com.example.powermanager.ui.model.AppModel
-import com.example.powermanager.ui.navigation.CONTROL_SCREEN_NAME
-import com.example.powermanager.ui.navigation.HOME_SCREEN_NAME
-import com.example.powermanager.ui.navigation.STATISTICS_SCREEN_NAME
 import com.example.powermanager.ui.navigation.navigationItems
 import com.example.powermanager.ui.screens.ControlScreen
 import com.example.powermanager.ui.screens.HomeScreen
 import com.example.powermanager.ui.screens.StatisticsScreen
+import com.example.powermanager.utils.CONTROL_SCREEN_NAME
+import com.example.powermanager.utils.HOME_SCREEN_NAME
+import com.example.powermanager.utils.STATISTICS_SCREEN_NAME
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 

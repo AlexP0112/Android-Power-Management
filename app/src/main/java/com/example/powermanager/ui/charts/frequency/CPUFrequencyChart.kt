@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
-import com.example.powermanager.data.sampling.CPUFrequencyTracker
+import com.example.powermanager.data.data_trackers.CPUFrequencyTracker
 import com.example.powermanager.ui.charts.charts_utils.rememberMarker
 import com.patrykandpatrick.vico.compose.axis.horizontal.rememberBottomAxis
 import com.patrykandpatrick.vico.compose.axis.vertical.rememberStartAxis

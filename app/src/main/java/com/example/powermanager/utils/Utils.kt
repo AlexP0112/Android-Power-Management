@@ -5,11 +5,6 @@ import java.io.FileFilter
 import java.util.Date
 import java.util.regex.Pattern
 
-const val NUMBER_OF_BYTES_IN_A_GIGABYTE : Long = 1024 * 1024 * 1024
-const val NUMBER_OF_KILOHERTZ_IN_A_GIGAHERTZ : Int = 1000 * 1000
-const val DEVICES_SYSTEM_CPU_PATH = "/sys/devices/system/cpu/"
-const val CPU_REGEX = "cpu[0-9]+"
-
 fun getHourAndMinuteFromLongTimestamp(timestamp: Long): String {
     val date = Date(timestamp)
     val timeOfDay = date.toString().split(" ")[3]
@@ -43,4 +38,8 @@ fun determineNumberOfCPUCores(): Int {
     } catch (e: Exception) {
         1
     }
+}
+
+fun parseLoadAvgFileContent(fileContent: String): Float {
+    return fileContent.split(" ")[0].toFloat()
 }

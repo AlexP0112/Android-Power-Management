@@ -1,9 +1,8 @@
-package com.example.powermanager.data.sampling
+package com.example.powermanager.data.data_trackers
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
-
-const val NUMBER_OF_VALUES_TRACKED = 60
+import com.example.powermanager.utils.NUMBER_OF_VALUES_TRACKED
 
 object MemoryLoadTracker {
     private var values: SnapshotStateList<Float> = mutableStateListOf()

@@ -28,6 +28,7 @@ import com.example.powermanager.R
 import com.example.powermanager.ui.charts.battery.BatteryLevelChart
 import com.example.powermanager.ui.charts.frequency.CPUCoresDropdownMenu
 import com.example.powermanager.ui.charts.frequency.CPUFrequencyChart
+import com.example.powermanager.ui.charts.load.CPULoadChart
 import com.example.powermanager.ui.charts.memory.MemoryChart
 import com.example.powermanager.ui.model.AppModel
 
@@ -85,7 +86,9 @@ fun StatisticsScreen(
         ) {
 
             Box(
-                modifier = Modifier.weight(2.5f).padding(horizontal = 15.dp),
+                modifier = Modifier
+                    .weight(2.5f)
+                    .padding(horizontal = 15.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
@@ -100,8 +103,18 @@ fun StatisticsScreen(
                 CPUCoresDropdownMenu(model)
             }
         }
-
         CPUFrequencyChart()
+
+        // cpu load
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = stringResource(R.string.cpu_load_chart_title)
+            )
+        }
+        CPULoadChart()
     }
 }
 
