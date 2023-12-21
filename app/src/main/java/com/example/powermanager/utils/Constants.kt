@@ -10,6 +10,7 @@ const val NUMBER_OF_KILOHERTZ_IN_A_GIGAHERTZ : Int = 1000 * 1000
 
 const val DEVICES_SYSTEM_CPU_PATH = "/sys/devices/system/cpu/"
 const val CPU_REGEX = "cpu[0-9]+"
+const val LOAD_AVERAGE_SEMICOLON = "load average:"
 
 // sampling
 const val BACKGROUND_SAMPLING_THRESHOLD_MILLIS = 100L * 1000L // 1min 40s
@@ -20,4 +21,6 @@ const val NUMBER_OF_VALUES_TRACKED = 60
 
 // useful paths for sampling
 const val CORE_FREQUENCY_PATH = "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_cur_freq"
-const val CPU_LOAD_PATH = "/proc/loadavg"
+
+// linux commands
+const val UPTIME_COMMAND = "uptime"

@@ -40,6 +40,9 @@ fun determineNumberOfCPUCores(): Int {
     }
 }
 
-fun parseLoadAvgFileContent(fileContent: String): Float {
-    return fileContent.split(" ")[0].toFloat()
+fun parseUptimeCommandOutput(commandOutput: String): Float {
+    val allLoads = commandOutput.split(LOAD_AVERAGE_SEMICOLON)[1].trim()
+    val lastMinuteLoad = allLoads.split(",")[0]
+
+    return lastMinuteLoad.toFloat()
 }

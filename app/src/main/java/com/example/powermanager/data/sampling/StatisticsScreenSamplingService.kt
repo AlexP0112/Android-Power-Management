@@ -8,13 +8,17 @@ import com.example.powermanager.data.data_trackers.MemoryLoadTracker
 import com.example.powermanager.ui.model.AppModel
 import com.example.powermanager.utils.CORE_FREQUENCY_PATH
 import com.example.powermanager.utils.STATISTICS_SCREEN_SAMPLING_RATE_MILLIS
+import com.example.powermanager.utils.UPTIME_COMMAND
 import com.example.powermanager.utils.convertKHzToGHz
 import com.example.powermanager.utils.getGigaBytesFromBytes
+import com.example.powermanager.utils.parseUptimeCommandOutput
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.BufferedReader
 import java.io.File
+import java.io.InputStreamReader
 
 object StatisticsScreenSamplingService {
     fun startSampling(applicationContext : Context, model: AppModel) {
@@ -37,17 +41,14 @@ object StatisticsScreenSamplingService {
                 val frequencyKHz = File(path).readText().trim().toInt()
                 CPUFrequencyTracker.addValue(convertKHzToGHz(frequencyKHz))
 
-                // cpu load sampling
-//                var loadAvgFileContent: String
-//                withContext(Dispatchers.IO) {
-//                    val process = Runtime.getRuntime().exec(READ_CPU_LOAD_AVG_FILE_COMMAND)
-//                    val reader = BufferedReader(InputStreamReader(process.inputStream))
-//                    loadAvgFileContent = reader.readText()
-//                    process.waitFor()
-//                }
-//                val loadAverage = parseLoadAvgFileContent(loadAvgFileContent)
-                // TODO
-                CPULoadTracker.addValue(1.5f)
+                // cpu load sampling, parse the output of the "uptime" Linux command
+                var uptimeOutput: String
+                withContext(Dispatchers.IO) {
+                    val process = Runtime.getRuntime().exec(UPTIME_COMMAND)
+                    uptimeOutput = BufferedReader(InputStreamReader(process.inputStream)).readText()
+                    process.waitFor()
+                }
+                CPULoadTracker.addValue(parseUptimeCommandOutput(uptimeOutput))
 
                 withContext(Dispatchers.IO) {
                     Thread.sleep(STATISTICS_SCREEN_SAMPLING_RATE_MILLIS)
