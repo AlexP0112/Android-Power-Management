@@ -1,5 +1,7 @@
 package com.example.powermanager
 
+import android.app.ActivityManager
+import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
@@ -17,14 +19,12 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        appModel = AppModel(applicationContext)
+        appModel = AppModel(applicationContext.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager)
         applicationContext.registerReceiver(BatteryBroadcastReceiver(), IntentFilter(Intent.ACTION_BATTERY_CHANGED))
+
         setContent {
             PowerManagerTheme {
-                PowerManagerApp(
-                    context = applicationContext,
-                    model = appModel
-                )
+                PowerManagerApp(model = appModel)
             }
         }
     }
@@ -40,6 +40,6 @@ class MainActivity : ComponentActivity() {
         super.onRestart()
 
         if (appModel.uiState.value.currentScreenName == STATISTICS_SCREEN_NAME)
-            appModel.onEnterStatisticScreen(applicationContext)
+            appModel.onEnterStatisticScreen()
     }
 }

@@ -1,6 +1,5 @@
 package com.example.powermanager.ui.main
 
-import android.content.Context
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Spacer
@@ -25,11 +24,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -55,7 +50,6 @@ import kotlinx.coroutines.launch
 fun PowerManagerApp(
     navController: NavHostController = rememberNavController(),
     drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
-    context: Context,
     model: AppModel,
 ) {
     Surface(
@@ -72,7 +66,6 @@ fun PowerManagerApp(
                     scope = scope,
                     drawerState = drawerState,
                     model = model,
-                    applicationContext = context
                 )
             },
         ) {
@@ -87,8 +80,14 @@ fun PowerManagerApp(
                 ScreensNavHost(
                     navController = navController,
                     topPadding = it.calculateTopPadding(),
-                    totalMemory = model.getTotalMemory(),
-                    model = model
+                    model = model,
+                    onBack = {
+                        val lastScreenName = navController.previousBackStackEntry?.destination?.route
+                        if (lastScreenName != null) {
+                            navController.navigate(lastScreenName)
+                            model.changeAppScreen(lastScreenName)
+                        }
+                    }
                 )
             }
         }
@@ -102,8 +101,8 @@ fun PowerManagerApp(
 fun ScreensNavHost(
     navController: NavHostController,
     topPadding: Dp,
-    totalMemory: Float,
-    model: AppModel
+    model: AppModel,
+    onBack : () -> Unit
 ) {
     NavHost(
         navController = navController,
@@ -124,7 +123,10 @@ fun ScreensNavHost(
                 )
             },
         ) {
-            HomeScreen(topPadding)
+            HomeScreen(
+                topPadding = topPadding,
+                onBack = onBack
+            )
         }
 
         composable(
@@ -142,7 +144,11 @@ fun ScreensNavHost(
                 )
             },
         ) {
-            StatisticsScreen(topPadding, totalMemory, model)
+            StatisticsScreen(
+                topPadding = topPadding,
+                model = model,
+                onBack = onBack
+            )
         }
 
         composable(
@@ -160,7 +166,10 @@ fun ScreensNavHost(
                 )
             },
         ) {
-            ControlScreen(topPadding)
+            ControlScreen(
+                topPadding = topPadding,
+                onBack = onBack
+            )
         }
     }
 }
@@ -204,27 +213,22 @@ fun DrawerContent(
     scope: CoroutineScope,
     drawerState: DrawerState,
     model: AppModel,
-    applicationContext: Context
 ) {
     ModalDrawerSheet {
-        var selectedNavigationItemIndex by rememberSaveable {
-            mutableIntStateOf(0)
-        }
-
         Spacer(modifier = Modifier.height(16.dp))
-        navigationItems.forEachIndexed{ index, item ->
+        navigationItems.forEachIndexed{ _, item ->
             NavigationDrawerItem(
                 label = {
                     Text(text = item.title)
                 },
-                selected = index == selectedNavigationItemIndex,
+                selected = false,
                 onClick = {
                     scope.launch {
                         drawerState.close()
                     }
-                    selectedNavigationItemIndex = index
+
                     navController.navigate(item.title)
-                    model.changeAppScreen(item.title, context = applicationContext)
+                    model.changeAppScreen(item.title)
                 },
                 icon = {
                     Icon(

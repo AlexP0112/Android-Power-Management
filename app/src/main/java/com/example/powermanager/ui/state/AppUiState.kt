@@ -4,6 +4,6 @@ import com.example.powermanager.utils.HOME_SCREEN_NAME
 
 data class AppUiState(
     val currentScreenName: String = HOME_SCREEN_NAME,
-    val isRecordingMemoryInfo : Boolean = false,
+    val isSamplingForStatisticsScreen : Boolean = false,
     val coreTracked : Int = 0
 )

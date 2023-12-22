@@ -1,5 +1,6 @@
 package com.example.powermanager.ui.screens
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -35,11 +36,11 @@ import com.example.powermanager.ui.model.AppModel
 @Composable
 fun StatisticsScreen(
     topPadding: Dp,
-    totalMemoryGB: Float,
-    model: AppModel
+    model: AppModel,
+    onBack: () -> Unit
 ) {
     val batteryLevelChartRefresher: MutableState<Boolean> = remember { mutableStateOf(false) }
-
+    BackHandler(enabled = true, onBack = onBack)
     Column(
         modifier = Modifier
             .padding(top = topPadding)
@@ -78,7 +79,7 @@ fun StatisticsScreen(
                 text = stringResource(R.string.memory_chart_title)
             )
         }
-        MemoryChart(totalMemoryGB)
+        MemoryChart(model.getTotalMemory())
 
         // cpu frequency
         Row(
