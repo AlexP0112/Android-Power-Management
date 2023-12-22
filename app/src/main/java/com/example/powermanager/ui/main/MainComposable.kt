@@ -83,7 +83,7 @@ fun PowerManagerApp(
                     model = model,
                     onBack = {
                         val lastScreenName = navController.previousBackStackEntry?.destination?.route
-                        if (lastScreenName != null) {
+                        if (lastScreenName != null && lastScreenName != model.uiState.value.currentScreenName) {
                             navController.navigate(lastScreenName)
                             model.changeAppScreen(lastScreenName)
                         }
@@ -227,8 +227,10 @@ fun DrawerContent(
                         drawerState.close()
                     }
 
-                    navController.navigate(item.title)
-                    model.changeAppScreen(item.title)
+                    if (item.title != model.uiState.value.currentScreenName) {
+                        navController.navigate(item.title)
+                        model.changeAppScreen(item.title)
+                    }
                 },
                 icon = {
                     Icon(
