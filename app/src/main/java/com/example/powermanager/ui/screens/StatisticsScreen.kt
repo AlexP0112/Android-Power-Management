@@ -22,6 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -54,7 +55,8 @@ fun StatisticsScreen(
         ) {
             // battery percentage chart title
             Text(
-                text = stringResource(R.string.battery_level_chart_title)
+                text = stringResource(R.string.battery_level_chart_title),
+                fontWeight = FontWeight.Bold
             )
             // refresh button for battery percentage screen
             IconButton(
@@ -76,7 +78,8 @@ fun StatisticsScreen(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = stringResource(R.string.memory_chart_title)
+                text = stringResource(R.string.memory_chart_title),
+                fontWeight = FontWeight.Bold
             )
         }
         MemoryChart(model.getTotalMemory())
@@ -94,6 +97,7 @@ fun StatisticsScreen(
             ) {
                 Text(
                     text = stringResource(R.string.cpu_frequency_chart_title),
+                    fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center
                 )
             }
@@ -112,7 +116,8 @@ fun StatisticsScreen(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = stringResource(R.string.cpu_load_chart_title)
+                text = stringResource(R.string.cpu_load_chart_title),
+                fontWeight = FontWeight.Bold
             )
         }
         CPULoadChart()

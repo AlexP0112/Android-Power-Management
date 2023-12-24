@@ -38,13 +38,13 @@ fun CPULoadChart() {
 
     val datasetLineSpec = listOf(
         LineChart.LineSpec(
-            lineColor = MaterialTheme.colorScheme.tertiary.toArgb(),
+            lineColor = MaterialTheme.colorScheme.onSecondaryContainer.toArgb(),
             lineBackgroundShader = DynamicShaders.fromBrush(
                 // vertical color gradient under the chart line
                 brush = Brush.verticalGradient(
                     listOf(
-                        MaterialTheme.colorScheme.tertiary.copy(DefaultAlpha.LINE_BACKGROUND_SHADER_START),
-                        MaterialTheme.colorScheme.tertiary.copy(DefaultAlpha.LINE_BACKGROUND_SHADER_END)
+                        MaterialTheme.colorScheme.onSecondaryContainer.copy(DefaultAlpha.LINE_BACKGROUND_SHADER_START),
+                        MaterialTheme.colorScheme.onSecondaryContainer.copy(DefaultAlpha.LINE_BACKGROUND_SHADER_END)
                     )
                 )
             )

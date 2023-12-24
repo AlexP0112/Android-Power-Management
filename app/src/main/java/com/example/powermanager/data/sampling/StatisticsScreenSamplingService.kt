@@ -30,14 +30,11 @@ object StatisticsScreenSamplingService {
                 activityManager.getMemoryInfo(info)
                 val usedMemory = info.totalMem - info.availMem
 
-                MemoryLoadTracker.addValue(getGigaBytesFromBytes(usedMemory))
-
                 // cpu frequency sampling
                 val trackedCore = model.uiState.value.coreTracked
                 val path = String.format(CORE_FREQUENCY_PATH, trackedCore)
 
                 val frequencyKHz = File(path).readText().trim().toInt()
-                CPUFrequencyTracker.addValue(convertKHzToGHz(frequencyKHz))
 
                 // cpu load sampling, parse the output of the "uptime" Linux command
                 var uptimeOutput: String
@@ -47,10 +44,14 @@ object StatisticsScreenSamplingService {
                     process.waitFor()
                 }
 
+                // add the values to the trackers on the main thread, to avoid thread conflicts
                 withContext(Dispatchers.Main) {
+                    MemoryLoadTracker.addValue(getGigaBytesFromBytes(usedMemory))
+                    CPUFrequencyTracker.addValue(convertKHzToGHz(frequencyKHz))
                     CPULoadTracker.addValue(parseUptimeCommandOutput(uptimeOutput))
                 }
 
+                // sleep until next sampling cycle
                 delay(STATISTICS_SCREEN_SAMPLING_RATE_MILLIS)
 
                 // check if sampling should finish (after 100 seconds of background sampling)
