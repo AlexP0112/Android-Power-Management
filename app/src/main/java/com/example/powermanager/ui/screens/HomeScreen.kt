@@ -7,16 +7,18 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
+import com.example.powermanager.ui.state.AppUiState
 
 @Composable
 fun HomeScreen(
     topPadding: Dp,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    uiState: AppUiState
 ) {
     BackHandler(enabled = true, onBack = onBack)
     Box (
     ) {
         Text(modifier = Modifier.padding(top = topPadding),
-            text = "Home screen")
+            text = uiState.batteryChargeOrDischargePrediction.toString())
     }
 }

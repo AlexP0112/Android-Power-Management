@@ -55,8 +55,8 @@ object StatisticsScreenSamplingService {
                 delay(STATISTICS_SCREEN_SAMPLING_RATE_MILLIS)
 
                 // check if sampling should finish (after 100 seconds of background sampling)
-                if (model.shouldEndSampling()) {
-                    model.endSampling()
+                if (model.shouldEndStatisticsSampling()) {
+                    model.endStatisticsSampling()
                     break
                 }
             }

@@ -24,6 +24,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -124,9 +126,11 @@ fun ScreensNavHost(
                 )
             },
         ) {
+            val uiState by model.uiState.collectAsState()
             HomeScreen(
                 topPadding = topPadding,
-                onBack = onBack
+                onBack = onBack,
+                uiState = uiState
             )
         }
 
