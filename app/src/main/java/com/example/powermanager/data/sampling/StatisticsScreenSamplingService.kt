@@ -44,11 +44,15 @@ object StatisticsScreenSamplingService {
                     process.waitFor()
                 }
 
+                val usedMemoryGiga = getGigaBytesFromBytes(usedMemory)
+                val frequencyGHz = convertKHzToGHz(frequencyKHz)
+                val cpuLoad = parseUptimeCommandOutput(uptimeOutput)
+
                 // add the values to the trackers on the main thread, to avoid thread conflicts
                 withContext(Dispatchers.Main) {
-                    MemoryLoadTracker.addValue(getGigaBytesFromBytes(usedMemory))
-                    CPUFrequencyTracker.addValue(convertKHzToGHz(frequencyKHz))
-                    CPULoadTracker.addValue(parseUptimeCommandOutput(uptimeOutput))
+                    MemoryLoadTracker.addValue(usedMemoryGiga)
+                    CPUFrequencyTracker.addValue(frequencyGHz)
+                    CPULoadTracker.addValue(cpuLoad)
                 }
 
                 // sleep until next sampling cycle

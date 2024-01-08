@@ -13,8 +13,6 @@ import com.example.powermanager.data.sampling.BatteryBroadcastReceiver
 import com.example.powermanager.ui.main.PowerManagerApp
 import com.example.powermanager.ui.model.AppModel
 import com.example.powermanager.ui.theme.PowerManagerTheme
-import com.example.powermanager.utils.HOME_SCREEN_NAME
-import com.example.powermanager.utils.STATISTICS_SCREEN_NAME
 
 class MainActivity : ComponentActivity() {
     private lateinit var appModel: AppModel
@@ -29,7 +27,7 @@ class MainActivity : ComponentActivity() {
         )
 
         applicationContext.registerReceiver(BatteryBroadcastReceiver(), IntentFilter(Intent.ACTION_BATTERY_CHANGED))
-        appModel.changeAppScreen(HOME_SCREEN_NAME)
+        appModel.onEnterApp()
 
         setContent {
             PowerManagerTheme {
@@ -40,15 +38,11 @@ class MainActivity : ComponentActivity() {
 
     override fun onStop() {
         super.onStop()
-
-        if (appModel.uiState.value.currentScreenName == STATISTICS_SCREEN_NAME)
-            appModel.onLeaveStatisticsScreen()
+        appModel.onLeaveApp()
     }
 
     override fun onRestart() {
         super.onRestart()
-
-        if (appModel.uiState.value.currentScreenName == STATISTICS_SCREEN_NAME)
-            appModel.onEnterStatisticScreen()
+        appModel.onEnterApp()
     }
 }

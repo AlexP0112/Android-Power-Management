@@ -5,4 +5,11 @@
     <string name="memory_chart_title">Memory usage (GB) in the last 60 seconds</string>
     <string name="cpu_frequency_chart_title">CPU frequency (GHz) in the last 60 seconds</string>
     <string name="cpu_load_chart_title">CPU load in the last 60 seconds</string>
+    <string name="battery_information">Battery information</string>
+    <string name="charging_status">Charging status</string>
+    <string name="charging">Charging</string>
+    <string name="not_charging">Not charging</string>
+    <string name="current_battery_level">Current battery level</string>
+    <string name="time_until_full_charge">Time until full charge</string>
+    <string name="remaining_battery_life">Remaining battery life</string>
 </resources>

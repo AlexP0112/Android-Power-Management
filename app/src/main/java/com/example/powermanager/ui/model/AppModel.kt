@@ -10,7 +10,9 @@ import com.example.powermanager.data.data_trackers.MemoryLoadTracker
 import com.example.powermanager.data.sampling.HomeScreenSamplingService
 import com.example.powermanager.data.sampling.StatisticsScreenSamplingService
 import com.example.powermanager.ui.state.AppUiState
+import com.example.powermanager.ui.state.HomeScreenInfo
 import com.example.powermanager.utils.HOME_SCREEN_NAME
+import com.example.powermanager.utils.NO_SCREEN
 import com.example.powermanager.utils.STATISTICS_BACKGROUND_SAMPLING_THRESHOLD_MILLIS
 import com.example.powermanager.utils.STATISTICS_SCREEN_NAME
 import com.example.powermanager.utils.determineNumberOfCPUCores
@@ -19,7 +21,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import java.time.Duration
 import java.util.Calendar
 
 class AppModel(
@@ -39,6 +40,7 @@ class AppModel(
     private val batteryManager: BatteryManager
 
     private var shutdownTimeForStatisticsSampling: Long
+    private var previousScreenName : String = HOME_SCREEN_NAME
 
     init {
         activityManager = am
@@ -69,7 +71,7 @@ class AppModel(
                 currentScreenName = newScreenName,
                 isSamplingForStatisticsScreen = uiState.value.isSamplingForStatisticsScreen,
                 coreTracked = uiState.value.coreTracked,
-                batteryChargeOrDischargePrediction = uiState.value.batteryChargeOrDischargePrediction
+                homeScreenInfo = uiState.value.homeScreenInfo
             )
         }
 
@@ -90,12 +92,31 @@ class AppModel(
                 isSamplingForStatisticsScreen = uiState.value.isSamplingForStatisticsScreen,
                 currentScreenName = uiState.value.currentScreenName,
                 coreTracked = coreNumber,
-                batteryChargeOrDischargePrediction = uiState.value.batteryChargeOrDischargePrediction
+                homeScreenInfo = uiState.value.homeScreenInfo
             )
         }
     }
 
-    fun onEnterStatisticScreen() {
+    fun onLeaveApp() {
+        previousScreenName = uiState.value.currentScreenName
+        if (uiState.value.currentScreenName == STATISTICS_SCREEN_NAME)
+            onLeaveStatisticsScreen()
+
+        _uiState.update { currentState ->
+            currentState.copy(
+                currentScreenName = NO_SCREEN,
+                isSamplingForStatisticsScreen = uiState.value.isSamplingForStatisticsScreen,
+                coreTracked = uiState.value.coreTracked,
+                homeScreenInfo = uiState.value.homeScreenInfo
+            )
+        }
+    }
+
+    fun onEnterApp() {
+        changeAppScreen(previousScreenName)
+    }
+
+    private fun onEnterStatisticScreen() {
         // do not shutdown while on screen
         shutdownTimeForStatisticsSampling = 0L
 
@@ -108,13 +129,13 @@ class AppModel(
                     isSamplingForStatisticsScreen = true,
                     currentScreenName = uiState.value.currentScreenName,
                     coreTracked = uiState.value.coreTracked,
-                    batteryChargeOrDischargePrediction = uiState.value.batteryChargeOrDischargePrediction
+                    homeScreenInfo = uiState.value.homeScreenInfo
                 )
             }
         }
     }
 
-    fun onLeaveStatisticsScreen() {
+    private fun onLeaveStatisticsScreen() {
         shutdownTimeForStatisticsSampling = Calendar.getInstance().time.time + STATISTICS_BACKGROUND_SAMPLING_THRESHOLD_MILLIS
     }
 
@@ -136,18 +157,18 @@ class AppModel(
                 isSamplingForStatisticsScreen = false,
                 currentScreenName = uiState.value.currentScreenName,
                 coreTracked = uiState.value.coreTracked,
-                batteryChargeOrDischargePrediction = uiState.value.batteryChargeOrDischargePrediction
+                homeScreenInfo = uiState.value.homeScreenInfo
             )
         }
     }
 
-    fun saveChargeOrDischargePrediction(prediction: Duration?) {
+    fun saveHomeScreenInfo(info: HomeScreenInfo) {
         _uiState.update { currentState ->
             currentState.copy(
-                isSamplingForStatisticsScreen = false,
+                isSamplingForStatisticsScreen = uiState.value.isSamplingForStatisticsScreen,
                 currentScreenName = uiState.value.currentScreenName,
                 coreTracked = uiState.value.coreTracked,
-                batteryChargeOrDischargePrediction = prediction
+                homeScreenInfo = info
             )
         }
     }

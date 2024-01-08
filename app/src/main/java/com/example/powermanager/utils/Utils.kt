@@ -2,6 +2,7 @@ package com.example.powermanager.utils
 
 import java.io.File
 import java.io.FileFilter
+import java.time.Duration
 import java.util.Date
 import java.util.regex.Pattern
 
@@ -45,4 +46,22 @@ fun parseUptimeCommandOutput(commandOutput: String): Float {
     val lastMinuteLoad = allLoads.split(",")[0]
 
     return lastMinuteLoad.toFloat()
+}
+
+fun formatDuration(duration: Duration?) : String {
+    if (duration == null)
+        return NO_VALUE_STRING
+
+    var result = ""
+
+    if (duration.toDays() > 0)
+        result += "${duration.toDays()}d "
+
+    if (duration.toHours() % HOURS_IN_A_DAY != 0L)
+        result += "${duration.toHours() % HOURS_IN_A_DAY}h "
+
+    if (duration.toMinutes() % MINUTES_IN_AN_HOUR != 0L)
+        result += "${duration.toMinutes() % MINUTES_IN_AN_HOUR}min"
+
+    return if (result != "") result else "0 min"
 }
