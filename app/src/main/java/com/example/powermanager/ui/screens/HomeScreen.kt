@@ -20,18 +20,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.powermanager.R
-import com.example.powermanager.ui.state.AppUiState
-import com.example.powermanager.ui.state.HomeScreenInfo
+import com.example.powermanager.ui.model.AppModel
+import com.example.powermanager.ui.model.HomeScreenInfo
 import com.example.powermanager.utils.formatDuration
 
 @Composable
 fun HomeScreen(
     topPadding: Dp,
     onBack: () -> Unit,
-    uiState: AppUiState
+    model: AppModel
 ) {
-    val homeScreenInfo : HomeScreenInfo = uiState.homeScreenInfo
+    val homeScreenInfo = model.homeScreenInfoFlow.collectAsStateWithLifecycle(initialValue = HomeScreenInfo())
 
     BackHandler(enabled = true, onBack = onBack)
     Column(
@@ -56,7 +57,7 @@ fun HomeScreen(
                 text = stringResource(R.string.charging_status)
             )
             Text(
-                text = if (homeScreenInfo.isBatteryCharging) stringResource(R.string.charging) else stringResource(
+                text = if (homeScreenInfo.value.isBatteryCharging) stringResource(R.string.charging) else stringResource(
                     R.string.not_charging
                 )
             )
@@ -71,7 +72,7 @@ fun HomeScreen(
                 text = stringResource(R.string.current_battery_level)
             )
             Text(
-                text = "${homeScreenInfo.currentBatteryLevel}%"
+                text = "${homeScreenInfo.value.currentBatteryLevel}%"
             )
         }
 
@@ -81,12 +82,12 @@ fun HomeScreen(
             horizontalArrangement = Arrangement.SpaceBetween
         ){
             Text(
-                text = if (homeScreenInfo.isBatteryCharging)
+                text = if (homeScreenInfo.value.isBatteryCharging)
                         stringResource(R.string.time_until_full_charge)
                         else stringResource(R.string.remaining_battery_life)
             )
             Text(
-                text = formatDuration(homeScreenInfo.chargeOrDischargePrediction)
+                text = formatDuration(homeScreenInfo.value.chargeOrDischargePrediction)
             )
         }
     }
