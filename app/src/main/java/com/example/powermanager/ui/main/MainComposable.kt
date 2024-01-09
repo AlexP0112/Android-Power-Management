@@ -24,6 +24,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -34,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.powermanager.R
 import com.example.powermanager.ui.model.PowerManagerAppModel
@@ -73,7 +75,7 @@ fun PowerManagerApp(
                 topBar = {
                     TopAppBar(
                         scope = scope,
-                        drawerState = drawerState
+                        drawerState = drawerState,
                     )
                 }
             ) {
@@ -168,7 +170,7 @@ fun ScreensNavHost(
 @Composable
 fun TopAppBar(
     scope: CoroutineScope,
-    drawerState: DrawerState
+    drawerState: DrawerState,
 ) {
     CenterAlignedTopAppBar(
         title = {
@@ -204,6 +206,9 @@ fun DrawerContent(
     scope: CoroutineScope,
     drawerState: DrawerState,
 ) {
+    val currentBackStack by navController.currentBackStackEntryAsState()
+    val currentScreen = currentBackStack?.destination?.route ?: HOME_SCREEN_NAME
+
     ModalDrawerSheet {
         Spacer(modifier = Modifier.height(16.dp))
         navigationItems.forEachIndexed{ _, item ->
@@ -211,7 +216,7 @@ fun DrawerContent(
                 label = {
                     Text(text = item.title)
                 },
-                selected = false,
+                selected = item.title == currentScreen,
                 onClick = {
                     scope.launch {
                         drawerState.close()
