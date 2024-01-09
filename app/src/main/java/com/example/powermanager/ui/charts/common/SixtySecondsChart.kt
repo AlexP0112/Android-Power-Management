@@ -1,21 +1,16 @@
-package com.example.powermanager.ui.charts.battery
+package com.example.powermanager.ui.charts.common
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
-import com.example.powermanager.data.data_trackers.BatteryLevelTracker
-import com.example.powermanager.ui.charts.common.CustomAxisValuesOverrider
-import com.example.powermanager.ui.charts.common.rememberMarker
-import com.example.powermanager.utils.getHourAndMinuteFromLongTimestamp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.patrykandpatrick.vico.compose.axis.horizontal.rememberBottomAxis
 import com.patrykandpatrick.vico.compose.axis.vertical.rememberStartAxis
 import com.patrykandpatrick.vico.compose.chart.Chart
@@ -26,32 +21,35 @@ import com.patrykandpatrick.vico.compose.m3.style.m3ChartStyle
 import com.patrykandpatrick.vico.compose.style.ProvideChartStyle
 import com.patrykandpatrick.vico.core.DefaultAlpha
 import com.patrykandpatrick.vico.core.axis.AxisItemPlacer
+import com.patrykandpatrick.vico.core.axis.vertical.VerticalAxis
 import com.patrykandpatrick.vico.core.chart.line.LineChart
 import com.patrykandpatrick.vico.core.component.shape.shader.DynamicShaders
 import com.patrykandpatrick.vico.core.entry.ChartEntryModelProducer
 import com.patrykandpatrick.vico.core.entry.FloatEntry
-import kotlin.math.roundToInt
+import kotlinx.coroutines.flow.StateFlow
 
 @Composable
-fun BatteryLevelChart(refreshChart : MutableState<Boolean>) {
-    // retrieve the records from the battery tracker
-    val records = BatteryLevelTracker.getRecordsAtFixedTimeInterval()
+fun SixtySecondsChart(
+    inputDataFlow: StateFlow<MutableList<Float>>,
+    chartLineColor: Color,
+    chartYAxisName: String,
+    customAxisValuesOverrider: CustomAxisValuesOverrider?
+) {
+    // retrieve the records from the flow
+    val inputDataState = inputDataFlow.collectAsStateWithLifecycle(initialValue = mutableListOf())
 
     val modelProducer = remember { ChartEntryModelProducer() }
     val scrollState = rememberChartScrollState()
 
-    // for refresh purposes
-    LaunchedEffect(refreshChart.value) {}
-
     val datasetLineSpec = listOf(
         LineChart.LineSpec(
-            lineColor = MaterialTheme.colorScheme.tertiary.toArgb(),
+            lineColor = chartLineColor.toArgb(),
             lineBackgroundShader = DynamicShaders.fromBrush(
                 // vertical color gradient under the chart line
                 brush = Brush.verticalGradient(
                     listOf(
-                        MaterialTheme.colorScheme.tertiary.copy(DefaultAlpha.LINE_BACKGROUND_SHADER_START),
-                        MaterialTheme.colorScheme.tertiary.copy(DefaultAlpha.LINE_BACKGROUND_SHADER_END)
+                        chartLineColor.copy(DefaultAlpha.LINE_BACKGROUND_SHADER_START),
+                        chartLineColor.copy(DefaultAlpha.LINE_BACKGROUND_SHADER_END)
                     )
                 )
             )
@@ -59,8 +57,8 @@ fun BatteryLevelChart(refreshChart : MutableState<Boolean>) {
     )
 
     // map the records to points on the chart
-    val dataPoints = records.mapIndexed { index, record ->
-        FloatEntry(index.toFloat(), record.level.toFloat())
+    val dataPoints = inputDataState.value.mapIndexed { index, value ->
+        FloatEntry(index.toFloat(), value)
     }
     modelProducer.setEntries(listOf(dataPoints))
 
@@ -74,22 +72,23 @@ fun BatteryLevelChart(refreshChart : MutableState<Boolean>) {
         ){
             val marker = rememberMarker()
             Chart(
-                chart = lineChart(
+                chart = if (customAxisValuesOverrider != null) lineChart(
                     lines = datasetLineSpec,
-                    axisValuesOverrider = remember { CustomAxisValuesOverrider(0f, 100f) }
+                    axisValuesOverrider = remember {customAxisValuesOverrider}
+                ) else lineChart(
+                    lines = datasetLineSpec
                 ),
                 startAxis = rememberStartAxis(
-                    title = "Battery Percentage",
+                    title = chartYAxisName,
                     tickLength = 0.dp,
                     itemPlacer = AxisItemPlacer.Vertical.default(
                         maxItemCount = 10
                     ),
+                    verticalLabelPosition = VerticalAxis.VerticalLabelPosition.Center
                 ),
                 bottomAxis = rememberBottomAxis(
                     title = "Time",
-                    valueFormatter = {value, _ ->
-                        getHourAndMinuteFromLongTimestamp(timestamp = records[value.roundToInt()].timestamp)
-                    }
+                    valueFormatter = { _, _ -> ""} // bottom axis should have no labels (time is implicit)
                 ),
                 marker = marker,
                 chartModelProducer = modelProducer,
