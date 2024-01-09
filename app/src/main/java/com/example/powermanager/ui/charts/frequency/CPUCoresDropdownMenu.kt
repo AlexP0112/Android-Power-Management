@@ -14,12 +14,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import com.example.powermanager.ui.model.AppModel
+import com.example.powermanager.ui.model.PowerManagerAppModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CPUCoresDropdownMenu(
-    model: AppModel
+    model: PowerManagerAppModel
 ) {
     val maxCoreNumber = model.getNumCores() - 1
     val cpuNames = (0 .. maxCoreNumber).map { "cpu${it}" }

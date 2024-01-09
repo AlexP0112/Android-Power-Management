@@ -1,6 +1,5 @@
 package com.example.powermanager.ui.screens
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -32,16 +31,15 @@ import com.example.powermanager.ui.charts.frequency.CPUCoresDropdownMenu
 import com.example.powermanager.ui.charts.frequency.CPUFrequencyChart
 import com.example.powermanager.ui.charts.load.CPULoadChart
 import com.example.powermanager.ui.charts.memory.MemoryChart
-import com.example.powermanager.ui.model.AppModel
+import com.example.powermanager.ui.model.PowerManagerAppModel
 
 @Composable
 fun StatisticsScreen(
     topPadding: Dp,
-    model: AppModel,
-    onBack: () -> Unit
+    model: PowerManagerAppModel,
 ) {
     val batteryLevelChartRefresher: MutableState<Boolean> = remember { mutableStateOf(false) }
-    BackHandler(enabled = true, onBack = onBack)
+
     Column(
         modifier = Modifier
             .padding(top = topPadding)
@@ -82,7 +80,10 @@ fun StatisticsScreen(
                 fontWeight = FontWeight.Bold
             )
         }
-        MemoryChart(model.getTotalMemory())
+        MemoryChart(
+            totalMemoryGB = model.getTotalMemory(),
+            model = model
+        )
 
         // cpu frequency
         Row(
@@ -108,7 +109,9 @@ fun StatisticsScreen(
                 CPUCoresDropdownMenu(model)
             }
         }
-        CPUFrequencyChart()
+        CPUFrequencyChart(
+            model = model
+        )
 
         // cpu load
         Box(
@@ -120,7 +123,9 @@ fun StatisticsScreen(
                 fontWeight = FontWeight.Bold
             )
         }
-        CPULoadChart()
+        CPULoadChart(
+            model = model
+        )
     }
 }
 

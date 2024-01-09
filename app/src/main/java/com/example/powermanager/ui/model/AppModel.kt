@@ -2,31 +2,44 @@ package com.example.powermanager.ui.model
 
 import android.annotation.SuppressLint
 import android.app.ActivityManager
+import android.app.Application
+import android.content.Context
 import android.os.BatteryManager
 import android.os.PowerManager
-import androidx.lifecycle.ViewModel
-import com.example.powermanager.data.data_trackers.CPUFrequencyTracker
-import com.example.powermanager.data.data_trackers.CPULoadTracker
-import com.example.powermanager.data.data_trackers.MemoryLoadTracker
-import com.example.powermanager.data.sampling.StatisticsScreenSamplingService
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.powermanager.ui.state.AppUiState
-import com.example.powermanager.utils.HOME_SCREEN_NAME
+import com.example.powermanager.utils.CORE_FREQUENCY_PATH
 import com.example.powermanager.utils.HOME_SCREEN_SAMPLING_RATE_MILLIS
-import com.example.powermanager.utils.NO_SCREEN
+import com.example.powermanager.utils.NUMBER_OF_VALUES_TRACKED
 import com.example.powermanager.utils.STATISTICS_BACKGROUND_SAMPLING_THRESHOLD_MILLIS
-import com.example.powermanager.utils.STATISTICS_SCREEN_NAME
+import com.example.powermanager.utils.STATISTICS_SCREEN_SAMPLING_RATE_MILLIS
+import com.example.powermanager.utils.UPTIME_COMMAND
+import com.example.powermanager.utils.convertKHzToGHz
 import com.example.powermanager.utils.determineNumberOfCPUCores
 import com.example.powermanager.utils.getGigaBytesFromBytes
+import com.example.powermanager.utils.parseUptimeCommandOutput
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import java.io.BufferedReader
+import java.io.File
+import java.io.InputStreamReader
 import java.time.Duration
 import java.util.Calendar
+
+enum class FlowType {
+    MEMORY,
+    FREQUENCY,
+    LOAD
+}
 
 data class HomeScreenInfo(
     val isBatteryCharging : Boolean = false,
@@ -34,11 +47,14 @@ data class HomeScreenInfo(
     val chargeOrDischargePrediction: Duration? = null
 )
 
-class AppModel(
-    am: ActivityManager,
-    pm: PowerManager,
-    bm: BatteryManager
-) : ViewModel() {
+data class FlowSample(
+    val value : Float = 0f,
+    val timestamp : Long = 0L
+)
+
+class PowerManagerAppModel(
+    application: Application
+) : AndroidViewModel(application) {
 
     private val _uiState = MutableStateFlow(AppUiState())
     val uiState: StateFlow<AppUiState> = _uiState.asStateFlow()
@@ -50,40 +66,40 @@ class AppModel(
     private val powerManager: PowerManager
     private val batteryManager: BatteryManager
 
-    private var shutdownTimeForStatisticsSampling: Long
-    private var previousScreenName : String = HOME_SCREEN_NAME
+    private var memoryUsageSamples: MutableList<FlowSample> = mutableListOf()
+    private var cpuFrequencySamples: MutableList<FlowSample> = mutableListOf()
+    private var cpuLoadSamples: MutableList<FlowSample> = mutableListOf()
 
     init {
-        activityManager = am
-        powerManager = pm
-        batteryManager = bm
+        activityManager = application.applicationContext.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        powerManager = application.applicationContext.getSystemService(Context.POWER_SERVICE) as PowerManager
+        batteryManager = application.applicationContext.getSystemService(Context.BATTERY_SERVICE) as BatteryManager
 
         // determine the total amount of memory that the device has
         val info = ActivityManager.MemoryInfo()
-
-        am.getMemoryInfo(info)
+        activityManager.getMemoryInfo(info)
         totalMemory = getGigaBytesFromBytes(info.totalMem)
 
         // determine the number of processors on the device
         numberOfCores = determineNumberOfCPUCores()
-
-        shutdownTimeForStatisticsSampling = 0L
     }
 
+    // sampling for home screen information
     @SuppressLint("NewApi")
     val homeScreenInfoFlow = flow {
         while (true) {
-            val currentBatteryLevel = bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
-            val chargeOrDischargePrediction: Duration? = if (!bm.isCharging) {
-                pm.batteryDischargePrediction
+            // battery info
+            val currentBatteryLevel = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
+            val chargeOrDischargePrediction: Duration? = if (!batteryManager.isCharging) {
+                powerManager.batteryDischargePrediction
             } else {
-                val chargeTimeRemainingMillis = bm.computeChargeTimeRemaining()
+                val chargeTimeRemainingMillis = batteryManager.computeChargeTimeRemaining()
                 if (chargeTimeRemainingMillis == -1L) null else Duration.ofMillis(chargeTimeRemainingMillis)
             }
 
             emit(
                 HomeScreenInfo(
-                    isBatteryCharging = bm.isCharging,
+                    isBatteryCharging = batteryManager.isCharging,
                     currentBatteryLevel = currentBatteryLevel,
                     chargeOrDischargePrediction = chargeOrDischargePrediction
                 )
@@ -93,93 +109,132 @@ class AppModel(
         }
     }.flowOn(Dispatchers.IO)
 
-    fun changeAppScreen(newScreenName: String) {
-        if (uiState.value.currentScreenName == STATISTICS_SCREEN_NAME)
-            onLeaveStatisticsScreen()
+    // sampling for statistics screen charts
 
-        if (newScreenName == STATISTICS_SCREEN_NAME)
-            onEnterStatisticScreen()
+    // memory info sampling
+    val memoryUsageFlow = flow {
+        while (true) {
+            val info = ActivityManager.MemoryInfo()
 
-        _uiState.update { currentState ->
-            currentState.copy(
-                currentScreenName = newScreenName,
-                isSamplingForStatisticsScreen = uiState.value.isSamplingForStatisticsScreen,
-                coreTracked = uiState.value.coreTracked,
+            activityManager.getMemoryInfo(info)
+            val usedMemory = info.totalMem - info.availMem
+
+            filterFlowSamples(FlowType.MEMORY)
+            memoryUsageSamples.add(
+                FlowSample(
+                    value = getGigaBytesFromBytes(usedMemory),
+                    timestamp = Calendar.getInstance().timeInMillis
+                )
             )
+
+            emit(memoryUsageSamples.map {
+                it.value
+            }.toMutableList())
+
+            delay(STATISTICS_SCREEN_SAMPLING_RATE_MILLIS)
         }
-    }
+    }.flowOn(Dispatchers.IO)
+        .stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(stopTimeoutMillis = STATISTICS_BACKGROUND_SAMPLING_THRESHOLD_MILLIS),
+        initialValue = mutableListOf()
+    )
+
+    // cpu frequency sampling
+    val cpuFrequencyFlow = flow {
+        while (true) {
+            val trackedCore = uiState.value.coreTracked
+            val path = String.format(CORE_FREQUENCY_PATH, trackedCore)
+
+            val frequencyKHz = File(path).readText().trim().toInt()
+
+            filterFlowSamples(FlowType.FREQUENCY)
+            cpuFrequencySamples.add(
+                FlowSample(
+                    value = convertKHzToGHz(frequencyKHz),
+                    timestamp = Calendar.getInstance().timeInMillis
+                )
+            )
+
+            emit(cpuFrequencySamples.map {
+                it.value
+            }.toMutableList())
+
+            delay(STATISTICS_SCREEN_SAMPLING_RATE_MILLIS)
+        }
+    }.flowOn(Dispatchers.IO)
+        .stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(stopTimeoutMillis = STATISTICS_BACKGROUND_SAMPLING_THRESHOLD_MILLIS),
+        initialValue = mutableListOf()
+    )
+
+    // cpu load sampling
+    val cpuLoadFlow = flow {
+        while (true) {
+            val process = Runtime.getRuntime().exec(UPTIME_COMMAND)
+            val uptimeOutput = BufferedReader(InputStreamReader(process.inputStream)).readText()
+            process.waitFor()
+
+            filterFlowSamples(FlowType.LOAD)
+            cpuLoadSamples.add(
+                FlowSample(
+                    value = parseUptimeCommandOutput(uptimeOutput),
+                    timestamp = Calendar.getInstance().timeInMillis
+                )
+            )
+
+            emit(cpuLoadSamples.map {
+                it.value
+            }.toMutableList())
+
+            delay(STATISTICS_SCREEN_SAMPLING_RATE_MILLIS)
+        }
+    }.flowOn(Dispatchers.IO)
+        .stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(stopTimeoutMillis = STATISTICS_BACKGROUND_SAMPLING_THRESHOLD_MILLIS),
+        initialValue = mutableListOf()
+    )
 
     fun changeTrackedCore(coreNumber: Int) {
-        CPUFrequencyTracker.clearValues()
-
         _uiState.update { currentState ->
             currentState.copy(
-                isSamplingForStatisticsScreen = uiState.value.isSamplingForStatisticsScreen,
-                currentScreenName = uiState.value.currentScreenName,
-                coreTracked = coreNumber,
+                coreTracked = coreNumber
             )
         }
+
+        cpuFrequencySamples.clear()
     }
 
-    fun onLeaveApp() {
-        previousScreenName = uiState.value.currentScreenName
-        if (uiState.value.currentScreenName == STATISTICS_SCREEN_NAME)
-            onLeaveStatisticsScreen()
+    private fun filterFlowSamples(flowType: FlowType) {
+        when (flowType) {
+            FlowType.MEMORY -> {
+                if (memoryUsageSamples.isNotEmpty() &&
+                    Calendar.getInstance().timeInMillis - memoryUsageSamples[memoryUsageSamples.size - 1].timestamp > 5L * STATISTICS_SCREEN_SAMPLING_RATE_MILLIS)
+                    memoryUsageSamples.clear()
 
-        _uiState.update { currentState ->
-            currentState.copy(
-                currentScreenName = NO_SCREEN,
-                isSamplingForStatisticsScreen = uiState.value.isSamplingForStatisticsScreen,
-                coreTracked = uiState.value.coreTracked,
-            )
-        }
-    }
-
-    fun onEnterApp() {
-        changeAppScreen(previousScreenName)
-    }
-
-    private fun onEnterStatisticScreen() {
-        // do not shutdown while on screen
-        shutdownTimeForStatisticsSampling = 0L
-
-        if (!uiState.value.isSamplingForStatisticsScreen) {
-            // start the coroutine that samples memory usage
-            StatisticsScreenSamplingService.startSampling(activityManager, this)
-
-            _uiState.update { currentState ->
-                currentState.copy(
-                    isSamplingForStatisticsScreen = true,
-                    currentScreenName = uiState.value.currentScreenName,
-                    coreTracked = uiState.value.coreTracked,
-                )
+                if (memoryUsageSamples.size >= NUMBER_OF_VALUES_TRACKED)
+                    memoryUsageSamples.removeAt(0)
             }
-        }
-    }
 
-    private fun onLeaveStatisticsScreen() {
-        shutdownTimeForStatisticsSampling = Calendar.getInstance().time.time + STATISTICS_BACKGROUND_SAMPLING_THRESHOLD_MILLIS
-    }
+            FlowType.FREQUENCY -> {
+                if (cpuFrequencySamples.isNotEmpty() &&
+                    Calendar.getInstance().timeInMillis - cpuFrequencySamples[cpuFrequencySamples.size - 1].timestamp > 5L * STATISTICS_SCREEN_SAMPLING_RATE_MILLIS)
+                    cpuFrequencySamples.clear()
 
-    fun shouldEndStatisticsSampling() : Boolean {
-        if (shutdownTimeForStatisticsSampling == 0L)
-            return false
+                if (cpuFrequencySamples.size >= NUMBER_OF_VALUES_TRACKED)
+                    cpuFrequencySamples.removeAt(0)
+            }
 
-        return Calendar.getInstance().time.time >= shutdownTimeForStatisticsSampling
-    }
+            FlowType.LOAD -> {
+                if (cpuLoadSamples.isNotEmpty() &&
+                    Calendar.getInstance().timeInMillis - cpuLoadSamples[cpuLoadSamples.size - 1].timestamp > 5L * STATISTICS_SCREEN_SAMPLING_RATE_MILLIS)
+                    cpuLoadSamples.clear()
 
-    fun endStatisticsSampling() {
-        shutdownTimeForStatisticsSampling = 0L
-        MemoryLoadTracker.clearValues()
-        CPUFrequencyTracker.clearValues()
-        CPULoadTracker.clearValues()
-
-        _uiState.update { currentState ->
-            currentState.copy(
-                isSamplingForStatisticsScreen = false,
-                currentScreenName = uiState.value.currentScreenName,
-                coreTracked = uiState.value.coreTracked,
-            )
+                if (cpuLoadSamples.size >= NUMBER_OF_VALUES_TRACKED)
+                    cpuLoadSamples.removeAt(0)
+            }
         }
     }
 

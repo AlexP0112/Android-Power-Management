@@ -10,8 +10,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
-import com.example.powermanager.data.data_trackers.CPULoadTracker
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.powermanager.ui.charts.charts_utils.rememberMarker
+import com.example.powermanager.ui.model.PowerManagerAppModel
 import com.patrykandpatrick.vico.compose.axis.horizontal.rememberBottomAxis
 import com.patrykandpatrick.vico.compose.axis.vertical.rememberStartAxis
 import com.patrykandpatrick.vico.compose.chart.Chart
@@ -29,9 +30,11 @@ import com.patrykandpatrick.vico.core.entry.ChartEntryModelProducer
 import com.patrykandpatrick.vico.core.entry.FloatEntry
 
 @Composable
-fun CPULoadChart() {
-    // retrieve the records from the CPU load tracker
-    val cpuLoadTracker = remember { CPULoadTracker }
+fun CPULoadChart(
+    model: PowerManagerAppModel
+) {
+    // retrieve the records from the flow
+    val cpuLoadState = model.cpuLoadFlow.collectAsStateWithLifecycle(initialValue = mutableListOf())
 
     val modelProducer = remember { ChartEntryModelProducer() }
     val scrollState = rememberChartScrollState()
@@ -52,7 +55,7 @@ fun CPULoadChart() {
     )
 
     // map the records to points on the chart
-    val dataPoints = cpuLoadTracker.getValues().mapIndexed { index, value ->
+    val dataPoints = cpuLoadState.value.mapIndexed { index, value ->
         FloatEntry(index.toFloat(), value)
     }
     modelProducer.setEntries(listOf(dataPoints))

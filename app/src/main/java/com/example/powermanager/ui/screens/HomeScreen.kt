@@ -1,6 +1,5 @@
 package com.example.powermanager.ui.screens
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,19 +21,17 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.powermanager.R
-import com.example.powermanager.ui.model.AppModel
 import com.example.powermanager.ui.model.HomeScreenInfo
+import com.example.powermanager.ui.model.PowerManagerAppModel
 import com.example.powermanager.utils.formatDuration
 
 @Composable
 fun HomeScreen(
     topPadding: Dp,
-    onBack: () -> Unit,
-    model: AppModel
+    model: PowerManagerAppModel
 ) {
     val homeScreenInfo = model.homeScreenInfoFlow.collectAsStateWithLifecycle(initialValue = HomeScreenInfo())
 
-    BackHandler(enabled = true, onBack = onBack)
     Column(
         modifier = Modifier
             .padding(

@@ -36,7 +36,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.powermanager.R
-import com.example.powermanager.ui.model.AppModel
+import com.example.powermanager.ui.model.PowerManagerAppModel
 import com.example.powermanager.ui.navigation.navigationItems
 import com.example.powermanager.ui.screens.ControlScreen
 import com.example.powermanager.ui.screens.HomeScreen
@@ -51,7 +51,7 @@ import kotlinx.coroutines.launch
 fun PowerManagerApp(
     navController: NavHostController = rememberNavController(),
     drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
-    model: AppModel,
+    model: PowerManagerAppModel,
 ) {
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -66,7 +66,6 @@ fun PowerManagerApp(
                     navController = navController,
                     scope = scope,
                     drawerState = drawerState,
-                    model = model,
                 )
             },
         ) {
@@ -82,13 +81,6 @@ fun PowerManagerApp(
                     navController = navController,
                     topPadding = it.calculateTopPadding(),
                     model = model,
-                    onBack = {
-                        val lastScreenName = navController.previousBackStackEntry?.destination?.route
-                        if (lastScreenName != null && lastScreenName != model.uiState.value.currentScreenName) {
-                            navController.navigate(lastScreenName)
-                            model.changeAppScreen(lastScreenName)
-                        }
-                    }
                 )
             }
         }
@@ -102,8 +94,7 @@ fun PowerManagerApp(
 fun ScreensNavHost(
     navController: NavHostController,
     topPadding: Dp,
-    model: AppModel,
-    onBack : () -> Unit
+    model: PowerManagerAppModel,
 ) {
     NavHost(
         navController = navController,
@@ -126,7 +117,6 @@ fun ScreensNavHost(
         ) {
             HomeScreen(
                 topPadding = topPadding,
-                onBack = onBack,
                 model = model
             )
         }
@@ -149,7 +139,6 @@ fun ScreensNavHost(
             StatisticsScreen(
                 topPadding = topPadding,
                 model = model,
-                onBack = onBack
             )
         }
 
@@ -170,7 +159,6 @@ fun ScreensNavHost(
         ) {
             ControlScreen(
                 topPadding = topPadding,
-                onBack = onBack
             )
         }
     }
@@ -215,7 +203,6 @@ fun DrawerContent(
     navController: NavHostController,
     scope: CoroutineScope,
     drawerState: DrawerState,
-    model: AppModel,
 ) {
     ModalDrawerSheet {
         Spacer(modifier = Modifier.height(16.dp))
@@ -230,10 +217,7 @@ fun DrawerContent(
                         drawerState.close()
                     }
 
-                    if (item.title != model.uiState.value.currentScreenName) {
-                        navController.navigate(item.title)
-                        model.changeAppScreen(item.title)
-                    }
+                    navController.navigate(item.title)
                 },
                 icon = {
                     Icon(
