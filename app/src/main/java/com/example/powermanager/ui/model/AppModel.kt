@@ -18,7 +18,7 @@ import com.example.powermanager.utils.UPTIME_COMMAND
 import com.example.powermanager.utils.convertKHzToGHz
 import com.example.powermanager.utils.determineNumberOfCPUCores
 import com.example.powermanager.utils.getGigaBytesFromBytes
-import com.example.powermanager.utils.parseUptimeCommandOutput
+import com.example.powermanager.utils.getLastMinuteLoadFromUptimeCommandOutput
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -44,8 +44,10 @@ enum class FlowType {
 data class HomeScreenInfo(
     val isBatteryCharging : Boolean = false,
     val currentBatteryLevel : Int = 0,
-    val chargeOrDischargePrediction: Duration? = null,
-    val usedMemoryGB: Float = 0f
+    val chargeOrDischargePrediction : Duration? = null,
+    val usedMemoryGB : Float = 0f,
+    val cpuLoad : Float = 0f,
+    val cpuFrequenciesGHz : List<Float> = listOf()
 )
 
 data class FlowSample(
@@ -104,12 +106,27 @@ class PowerManagerAppModel(
             val usedMemory = info.totalMem - info.availMem
             val usedMemoryGB = getGigaBytesFromBytes(usedMemory)
 
+            // cpu info
+            val cpuFrequenciesGHz : List<Float> = (0 until numberOfCores).map { core ->
+                val path = String.format(CORE_FREQUENCY_PATH, core)
+                val frequencyKHz = File(path).readText().trim().toInt()
+                convertKHzToGHz(frequencyKHz)
+            }
+
+            val process = Runtime.getRuntime().exec(UPTIME_COMMAND)
+            val uptimeOutput = BufferedReader(InputStreamReader(process.inputStream)).readText()
+            process.waitFor()
+            val load = getLastMinuteLoadFromUptimeCommandOutput(uptimeOutput)
+
+            // emit a single object that contains all the information
             emit(
                 HomeScreenInfo(
                     isBatteryCharging = batteryManager.isCharging,
                     currentBatteryLevel = currentBatteryLevel,
                     chargeOrDischargePrediction = chargeOrDischargePrediction,
-                    usedMemoryGB = usedMemoryGB
+                    usedMemoryGB = usedMemoryGB,
+                    cpuFrequenciesGHz = cpuFrequenciesGHz,
+                    cpuLoad = load
                 )
             )
 
@@ -187,7 +204,7 @@ class PowerManagerAppModel(
             filterFlowSamples(FlowType.LOAD)
             cpuLoadSamples.add(
                 FlowSample(
-                    value = parseUptimeCommandOutput(uptimeOutput),
+                    value = getLastMinuteLoadFromUptimeCommandOutput(uptimeOutput),
                     timestamp = Calendar.getInstance().timeInMillis
                 )
             )

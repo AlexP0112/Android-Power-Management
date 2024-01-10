@@ -41,7 +41,7 @@ fun determineNumberOfCPUCores(): Int {
     }
 }
 
-fun parseUptimeCommandOutput(commandOutput: String): Float {
+fun getLastMinuteLoadFromUptimeCommandOutput(commandOutput: String): Float {
     val allLoads = commandOutput.split(LOAD_AVERAGE_SEMICOLON)[1].trim()
     val lastMinuteLoad = allLoads.split(",")[0]
 

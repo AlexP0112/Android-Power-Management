@@ -19,4 +19,7 @@
     <string name="total_memory">Total memory</string>
     <string name="used_memory">Used memory</string>
     <string name="available_memory">Available memory</string>
+    <string name="cpu_information">CPU information</string>
+    <string name="number_of_cores">Number of cores</string>
+    <string name="cpu_load">CPU load</string>
 </resources>

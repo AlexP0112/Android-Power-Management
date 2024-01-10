@@ -98,6 +98,33 @@ fun HomeScreen(
             leftText = stringResource(R.string.available_memory),
             rightText = "${String.format("%.2f", model.getTotalMemory() - homeScreenInfo.value.usedMemoryGB)}GB (${freeMemoryPercentage}%)"
         )
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        // ==============  CPU info section  ===================== //
+        SectionHeader(
+            sectionName = stringResource(R.string.cpu_information)
+        )
+
+        // number of cores
+        SectionMember(
+            leftText = stringResource(R.string.number_of_cores),
+            rightText = model.getNumCores().toString()
+        )
+
+        // cores frequencies
+        homeScreenInfo.value.cpuFrequenciesGHz.forEachIndexed { index, frequency ->
+            SectionMember(
+                leftText = "Cpu${index} frequency",
+                rightText = "${frequency}GHz"
+            )
+        }
+
+        // cpu load
+        SectionMember(
+            leftText = stringResource(R.string.cpu_load),
+            rightText = homeScreenInfo.value.cpuLoad.toString()
+        )
     }
 }
 
