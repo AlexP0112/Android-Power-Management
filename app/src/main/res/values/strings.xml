@@ -15,4 +15,8 @@
     <string name="load">Load</string>
     <string name="memory_gb">Memory (GB)</string>
     <string name="frequency_ghz">Frequency (GHz)</string>
+    <string name="memory_information">Memory information</string>
+    <string name="total_memory">Total memory</string>
+    <string name="used_memory">Used memory</string>
+    <string name="available_memory">Available memory</string>
 </resources>

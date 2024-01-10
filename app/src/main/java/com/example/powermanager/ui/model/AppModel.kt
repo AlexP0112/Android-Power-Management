@@ -44,7 +44,8 @@ enum class FlowType {
 data class HomeScreenInfo(
     val isBatteryCharging : Boolean = false,
     val currentBatteryLevel : Int = 0,
-    val chargeOrDischargePrediction: Duration? = null
+    val chargeOrDischargePrediction: Duration? = null,
+    val usedMemoryGB: Float = 0f
 )
 
 data class FlowSample(
@@ -97,11 +98,18 @@ class PowerManagerAppModel(
                 if (chargeTimeRemainingMillis == -1L) null else Duration.ofMillis(chargeTimeRemainingMillis)
             }
 
+            // memory usage info
+            val info = ActivityManager.MemoryInfo()
+            activityManager.getMemoryInfo(info)
+            val usedMemory = info.totalMem - info.availMem
+            val usedMemoryGB = getGigaBytesFromBytes(usedMemory)
+
             emit(
                 HomeScreenInfo(
                     isBatteryCharging = batteryManager.isCharging,
                     currentBatteryLevel = currentBatteryLevel,
-                    chargeOrDischargePrediction = chargeOrDischargePrediction
+                    chargeOrDischargePrediction = chargeOrDischargePrediction,
+                    usedMemoryGB = usedMemoryGB
                 )
             )
 

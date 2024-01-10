@@ -3,8 +3,10 @@ package com.example.powermanager.ui.screens
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -24,6 +26,7 @@ import com.example.powermanager.R
 import com.example.powermanager.ui.model.HomeScreenInfo
 import com.example.powermanager.ui.model.PowerManagerAppModel
 import com.example.powermanager.utils.formatDuration
+import kotlin.math.roundToInt
 
 @Composable
 fun HomeScreen(
@@ -31,6 +34,8 @@ fun HomeScreen(
     model: PowerManagerAppModel
 ) {
     val homeScreenInfo = model.homeScreenInfoFlow.collectAsStateWithLifecycle(initialValue = HomeScreenInfo())
+    val usedMemoryPercentage = ((homeScreenInfo.value.usedMemoryGB / model.getTotalMemory()) * 100f).roundToInt()
+    val freeMemoryPercentage = 100 - usedMemoryPercentage
 
     Column(
         modifier = Modifier
@@ -42,51 +47,57 @@ fun HomeScreen(
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
     ) {
-        // battery info section
-        SectionHeader(sectionName = stringResource(R.string.battery_information))
+        // ==============  battery info section  ===================== //
+        SectionHeader(
+            sectionName = stringResource(R.string.battery_information)
+        )
 
         // charging status
-        Row (
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ){
-            Text(
-                text = stringResource(R.string.charging_status)
-            )
-            Text(
-                text = if (homeScreenInfo.value.isBatteryCharging) stringResource(R.string.charging) else stringResource(
-                    R.string.not_charging
-                )
-            )
-        }
+        SectionMember(
+            leftText = stringResource(R.string.charging_status),
+            rightText = if (homeScreenInfo.value.isBatteryCharging)
+                    stringResource(R.string.charging) else
+                    stringResource(R.string.not_charging)
+        )
 
         // battery level
-        Row (
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ){
-            Text(
-                text = stringResource(R.string.current_battery_level)
-            )
-            Text(
-                text = "${homeScreenInfo.value.currentBatteryLevel}%"
-            )
-        }
+        SectionMember(
+            leftText = stringResource(R.string.current_battery_level),
+            rightText = "${homeScreenInfo.value.currentBatteryLevel}%"
+        )
 
         // battery charge/discharge prediction
-        Row (
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ){
-            Text(
-                text = if (homeScreenInfo.value.isBatteryCharging)
-                        stringResource(R.string.time_until_full_charge)
-                        else stringResource(R.string.remaining_battery_life)
-            )
-            Text(
-                text = formatDuration(homeScreenInfo.value.chargeOrDischargePrediction)
-            )
-        }
+        SectionMember(
+            leftText = if (homeScreenInfo.value.isBatteryCharging)
+                    stringResource(R.string.time_until_full_charge) else
+                    stringResource(R.string.remaining_battery_life),
+            rightText = formatDuration(homeScreenInfo.value.chargeOrDischargePrediction)
+        )
+        
+        Spacer(modifier = Modifier.height(10.dp))
+
+        // ==============  memory info section  ===================== //
+        SectionHeader(
+            sectionName = stringResource(R.string.memory_information)
+        )
+
+        // total memory
+        SectionMember(
+            leftText = stringResource(R.string.total_memory),
+            rightText = "${String.format("%.2f", model.getTotalMemory())}GB"
+        )
+
+        // used memory
+        SectionMember(
+            leftText = stringResource(R.string.used_memory),
+            rightText = "${String.format("%.2f", homeScreenInfo.value.usedMemoryGB)}GB (${usedMemoryPercentage}%)"
+        )
+
+        // available memory
+        SectionMember(
+            leftText = stringResource(R.string.available_memory),
+            rightText = "${String.format("%.2f", model.getTotalMemory() - homeScreenInfo.value.usedMemoryGB)}GB (${freeMemoryPercentage}%)"
+        )
     }
 }
 
@@ -119,6 +130,24 @@ fun SectionHeader(
                 .weight(1f),
             thickness = 1.dp,
             color = MaterialTheme.colorScheme.onPrimaryContainer
+        )
+    }
+}
+
+@Composable
+fun SectionMember(
+    leftText : String,
+    rightText : String
+) {
+    Row (
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ){
+        Text(
+            text = leftText
+        )
+        Text(
+            text = rightText
         )
     }
 }
