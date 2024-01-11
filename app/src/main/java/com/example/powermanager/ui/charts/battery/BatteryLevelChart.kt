@@ -33,7 +33,9 @@ import com.patrykandpatrick.vico.core.entry.FloatEntry
 import kotlin.math.roundToInt
 
 @Composable
-fun BatteryLevelChart(refreshChart : MutableState<Boolean>) {
+fun BatteryLevelChart(
+    refreshChart : MutableState<Boolean>
+) {
     // retrieve the records from the battery tracker
     val records = BatteryLevelTracker.getRecordsAtFixedTimeInterval()
 

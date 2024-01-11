@@ -121,7 +121,8 @@ fun ScreensNavHost(
         ) {
             HomeScreen(
                 topPadding = topPadding,
-                model = model
+                model = model,
+                navController = navController
             )
         }
 

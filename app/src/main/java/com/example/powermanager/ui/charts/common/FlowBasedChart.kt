@@ -29,7 +29,7 @@ import com.patrykandpatrick.vico.core.entry.FloatEntry
 import kotlinx.coroutines.flow.StateFlow
 
 @Composable
-fun SixtySecondsChart(
+fun FlowBasedChart(
     inputDataFlow: StateFlow<MutableList<Float>>,
     chartLineColor: Color,
     chartYAxisName: String,

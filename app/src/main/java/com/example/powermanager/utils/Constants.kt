@@ -4,7 +4,6 @@ package com.example.powermanager.utils
 const val HOME_SCREEN_NAME          = "Home";
 const val STATISTICS_SCREEN_NAME    = "Statistics";
 const val CONTROL_SCREEN_NAME       = "Control"
-const val NO_SCREEN                 = ""
 
 const val NUMBER_OF_BYTES_IN_A_GIGABYTE : Long = 1024 * 1024 * 1024
 const val NUMBER_OF_KILOHERTZ_IN_A_GIGAHERTZ : Int = 1000 * 1000

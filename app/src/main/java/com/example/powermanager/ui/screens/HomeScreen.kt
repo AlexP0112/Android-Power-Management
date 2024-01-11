@@ -12,6 +12,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -23,16 +24,19 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import com.example.powermanager.R
 import com.example.powermanager.ui.model.HomeScreenInfo
 import com.example.powermanager.ui.model.PowerManagerAppModel
+import com.example.powermanager.utils.STATISTICS_SCREEN_NAME
 import com.example.powermanager.utils.formatDuration
 import kotlin.math.roundToInt
 
 @Composable
 fun HomeScreen(
     topPadding: Dp,
-    model: PowerManagerAppModel
+    model: PowerManagerAppModel,
+    navController: NavController
 ) {
     val homeScreenInfo = model.homeScreenInfoFlow.collectAsStateWithLifecycle(initialValue = HomeScreenInfo())
     val usedMemoryPercentage = ((homeScreenInfo.value.usedMemoryGB / model.getTotalMemory()) * 100f).roundToInt()
@@ -46,7 +50,8 @@ fun HomeScreen(
                 end = 6.dp
             )
             .fillMaxSize()
-            .verticalScroll(rememberScrollState())
+            .verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // ==============  battery info section  ===================== //
         SectionHeader(
@@ -82,7 +87,7 @@ fun HomeScreen(
                 stringResource(R.string.enabled) else
                 stringResource(R.string.not_enabled)
         )
-        
+
         Spacer(modifier = Modifier.height(10.dp))
 
         // ==============  memory info section  ===================== //
@@ -107,7 +112,7 @@ fun HomeScreen(
             leftText = stringResource(R.string.available_memory),
             rightText = "${String.format("%.2f", model.getTotalMemory() - homeScreenInfo.value.usedMemoryGB)}GB (${freeMemoryPercentage}%)"
         )
-
+        
         Spacer(modifier = Modifier.height(10.dp))
 
         // ==============  CPU info section  ===================== //
@@ -133,6 +138,12 @@ fun HomeScreen(
         SectionMember(
             leftText = stringResource(R.string.cpu_load),
             rightText = homeScreenInfo.value.cpuLoad.toString()
+        )
+
+        GoToChartButton(
+            onClick = {
+                navController.navigate(STATISTICS_SCREEN_NAME)
+            }
         )
     }
 }
@@ -189,6 +200,20 @@ fun SectionMember(
             text = rightText,
             textAlign = TextAlign.Center,
             fontSize = 18.sp
+        )
+    }
+}
+
+@Composable
+fun GoToChartButton(
+    onClick: () -> Unit
+) {
+    OutlinedButton(
+        onClick = onClick,
+    ) {
+        Text(
+            text = stringResource(R.string.go_to_charts),
+            textAlign = TextAlign.Center
         )
     }
 }

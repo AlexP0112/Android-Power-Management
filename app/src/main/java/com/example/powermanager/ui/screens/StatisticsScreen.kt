@@ -81,7 +81,6 @@ fun StatisticsScreen(
             )
         }
         MemoryChart(
-            totalMemoryGB = model.getTotalMemory(),
             model = model
         )
 
