@@ -21,6 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.powermanager.R
 import com.example.powermanager.ui.model.HomeScreenInfo
@@ -147,15 +148,16 @@ fun SectionHeader(
             modifier = Modifier
                 .align(Alignment.CenterVertically)
                 .weight(1f),
-            thickness = 1.dp,
+            thickness = 2.dp,
             color = MaterialTheme.colorScheme.onPrimaryContainer
         )
 
         Text(
             modifier = Modifier
-                .weight(2f),
+                .weight(3f),
             text = sectionName,
             fontWeight = FontWeight.Bold,
+            fontSize = 20.sp,
             textAlign = TextAlign.Center
         )
 
@@ -163,7 +165,7 @@ fun SectionHeader(
             modifier = Modifier
                 .align(Alignment.CenterVertically)
                 .weight(1f),
-            thickness = 1.dp,
+            thickness = 2.dp,
             color = MaterialTheme.colorScheme.onPrimaryContainer
         )
     }
@@ -179,10 +181,14 @@ fun SectionMember(
         horizontalArrangement = Arrangement.SpaceBetween
     ){
         Text(
-            text = leftText
+            text = leftText,
+            textAlign = TextAlign.Center,
+            fontSize = 18.sp
         )
         Text(
-            text = rightText
+            text = rightText,
+            textAlign = TextAlign.Center,
+            fontSize = 18.sp
         )
     }
 }
