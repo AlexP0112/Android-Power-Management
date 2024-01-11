@@ -73,6 +73,14 @@ fun HomeScreen(
                     stringResource(R.string.remaining_battery_life),
             rightText = formatDuration(homeScreenInfo.value.chargeOrDischargePrediction)
         )
+
+        // power save mode status
+        SectionMember(
+            leftText = stringResource(R.string.power_save_mode_status),
+            rightText = if (homeScreenInfo.value.powerSaveState)
+                stringResource(R.string.enabled) else
+                stringResource(R.string.not_enabled)
+        )
         
         Spacer(modifier = Modifier.height(10.dp))
 

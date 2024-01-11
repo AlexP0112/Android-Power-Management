@@ -45,6 +45,8 @@ data class HomeScreenInfo(
     val isBatteryCharging : Boolean = false,
     val currentBatteryLevel : Int = 0,
     val chargeOrDischargePrediction : Duration? = null,
+    val powerSaveState : Boolean = false,
+    val lowPowerStandbyEnabled : Boolean = false,
     val usedMemoryGB : Float = 0f,
     val cpuLoad : Float = 0f,
     val cpuFrequenciesGHz : List<Float> = listOf()
@@ -124,6 +126,7 @@ class PowerManagerAppModel(
                     isBatteryCharging = batteryManager.isCharging,
                     currentBatteryLevel = currentBatteryLevel,
                     chargeOrDischargePrediction = chargeOrDischargePrediction,
+                    powerSaveState = powerManager.isPowerSaveMode,
                     usedMemoryGB = usedMemoryGB,
                     cpuFrequenciesGHz = cpuFrequenciesGHz,
                     cpuLoad = load
