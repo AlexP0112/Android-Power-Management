@@ -1,9 +1,12 @@
 package com.example.powermanager.utils
 
 import com.example.powermanager.preferences.LoadAverageTypes
+import java.io.BufferedReader
 import java.io.File
 import java.io.FileFilter
+import java.io.InputStreamReader
 import java.time.Duration
+import java.util.Calendar
 import java.util.Date
 import java.util.regex.Pattern
 
@@ -42,9 +45,31 @@ fun determineNumberOfCPUCores(): Int {
     }
 }
 
+fun determineSystemUptimeTimestamp() : Long {
+    val process = Runtime.getRuntime().exec(UPTIME_COMMAND)
+    val uptimeOutput = BufferedReader(InputStreamReader(process.inputStream)).readText()
+    process.waitFor()
+
+    var systemUptimeMillis = 0L
+
+    val uptimeParts = uptimeOutput.split(UP)[1].split(USERS)[0].split(COMMA).dropLast(1)
+
+    for (part in uptimeParts) {
+        if (part.contains(MIN))
+            systemUptimeMillis += part.split(SPACE)[0].trim().toLong() * MILLIS_IN_A_MINUTE
+        if (part.contains(DAYS))
+            systemUptimeMillis += part.split(SPACE)[0].trim().toLong() * MILLIS_IN_A_DAY
+        if (part.contains(SEMICOLON))
+            systemUptimeMillis += part.split(SEMICOLON)[0].trim().toLong() * MINUTES_IN_AN_HOUR +
+                    part.split(SEMICOLON)[1].trim().toLong() * MILLIS_IN_A_MINUTE
+    }
+
+    return Calendar.getInstance().timeInMillis - systemUptimeMillis
+}
+
 fun getLoadAverageFromUptimeCommandOutput(commandOutput: String, loadAverageType: LoadAverageTypes): Float {
     val allLoads = commandOutput.split(LOAD_AVERAGE_SEMICOLON)[1].trim()
-    val load = allLoads.split(",")[loadAverageType.ordinal]
+    val load = allLoads.split(COMMA)[loadAverageType.ordinal]
 
     return load.toFloat()
 }

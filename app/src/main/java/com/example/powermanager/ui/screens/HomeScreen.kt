@@ -53,9 +53,9 @@ fun HomeScreen(
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // ==============  battery info section  ===================== //
+        // ==============  battery and uptime section  ===================== //
         SectionHeader(
-            sectionName = stringResource(R.string.battery_information)
+            sectionName = stringResource(R.string.battery_and_uptime)
         )
 
         // charging status
@@ -86,6 +86,11 @@ fun HomeScreen(
             rightText = if (homeScreenInfo.value.powerSaveState)
                 stringResource(R.string.enabled) else
                 stringResource(R.string.not_enabled)
+        )
+
+        SectionMember(
+            leftText = stringResource(R.string.system_uptime),
+            rightText = homeScreenInfo.value.systemUptimeString
         )
 
         Spacer(modifier = Modifier.height(10.dp))

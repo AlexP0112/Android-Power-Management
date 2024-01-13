@@ -12,12 +12,15 @@ import com.example.powermanager.preferences.LoadAverageTypes
 import com.example.powermanager.ui.state.AppUiState
 import com.example.powermanager.utils.CORE_FREQUENCY_PATH
 import com.example.powermanager.utils.HOME_SCREEN_SAMPLING_RATE_MILLIS
+import com.example.powermanager.utils.NO_VALUE_STRING
 import com.example.powermanager.utils.NUMBER_OF_VALUES_TRACKED
 import com.example.powermanager.utils.STATISTICS_BACKGROUND_SAMPLING_THRESHOLD_MILLIS
 import com.example.powermanager.utils.STATISTICS_SCREEN_SAMPLING_RATE_MILLIS
 import com.example.powermanager.utils.UPTIME_COMMAND
 import com.example.powermanager.utils.convertKHzToGHz
 import com.example.powermanager.utils.determineNumberOfCPUCores
+import com.example.powermanager.utils.determineSystemUptimeTimestamp
+import com.example.powermanager.utils.formatDuration
 import com.example.powermanager.utils.getGigaBytesFromBytes
 import com.example.powermanager.utils.getLoadAverageFromUptimeCommandOutput
 import kotlinx.coroutines.Dispatchers
@@ -50,7 +53,8 @@ data class HomeScreenInfo(
     val lowPowerStandbyEnabled : Boolean = false,
     val usedMemoryGB : Float = 0f,
     val cpuLoad : Float = 0f,
-    val cpuFrequenciesGHz : List<Float> = listOf()
+    val cpuFrequenciesGHz : List<Float> = listOf(),
+    val systemUptimeString : String = NO_VALUE_STRING
 )
 
 data class FlowSample(
@@ -67,6 +71,7 @@ class PowerManagerAppModel(
 
     private val totalMemory: Float
     private val numberOfCores : Int
+    private val systemBootTimestamp : Long
 
     private val activityManager : ActivityManager
     private val powerManager: PowerManager
@@ -86,15 +91,16 @@ class PowerManagerAppModel(
         activityManager.getMemoryInfo(info)
         totalMemory = getGigaBytesFromBytes(info.totalMem)
 
-        // determine the number of processors on the device
+        // determine the number of processors on the device and the timestamp of the system boot
         numberOfCores = determineNumberOfCPUCores()
+        systemBootTimestamp = determineSystemUptimeTimestamp()
     }
 
     // sampling for home screen information
     @SuppressLint("NewApi")
     val homeScreenInfoFlow = flow {
         while (true) {
-            // battery info
+            // battery and uptime
             val currentBatteryLevel = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
             val chargeOrDischargePrediction: Duration? = if (!batteryManager.isCharging) {
                 powerManager.batteryDischargePrediction
@@ -102,6 +108,7 @@ class PowerManagerAppModel(
                 val chargeTimeRemainingMillis = batteryManager.computeChargeTimeRemaining()
                 if (chargeTimeRemainingMillis == -1L) null else Duration.ofMillis(chargeTimeRemainingMillis)
             }
+            val uptimeString = formatDuration(Duration.ofMillis(Calendar.getInstance().timeInMillis - systemBootTimestamp))
 
             // memory usage info
             val info = ActivityManager.MemoryInfo()
@@ -130,7 +137,8 @@ class PowerManagerAppModel(
                     powerSaveState = powerManager.isPowerSaveMode,
                     usedMemoryGB = usedMemoryGB,
                     cpuFrequenciesGHz = cpuFrequenciesGHz,
-                    cpuLoad = load
+                    cpuLoad = load,
+                    systemUptimeString = uptimeString
                 )
             )
 
