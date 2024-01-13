@@ -8,6 +8,7 @@ import android.os.BatteryManager
 import android.os.PowerManager
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.powermanager.preferences.LoadAverageTypes
 import com.example.powermanager.ui.state.AppUiState
 import com.example.powermanager.utils.CORE_FREQUENCY_PATH
 import com.example.powermanager.utils.HOME_SCREEN_SAMPLING_RATE_MILLIS
@@ -18,7 +19,7 @@ import com.example.powermanager.utils.UPTIME_COMMAND
 import com.example.powermanager.utils.convertKHzToGHz
 import com.example.powermanager.utils.determineNumberOfCPUCores
 import com.example.powermanager.utils.getGigaBytesFromBytes
-import com.example.powermanager.utils.getLastMinuteLoadFromUptimeCommandOutput
+import com.example.powermanager.utils.getLoadAverageFromUptimeCommandOutput
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -118,7 +119,7 @@ class PowerManagerAppModel(
             val process = Runtime.getRuntime().exec(UPTIME_COMMAND)
             val uptimeOutput = BufferedReader(InputStreamReader(process.inputStream)).readText()
             process.waitFor()
-            val load = getLastMinuteLoadFromUptimeCommandOutput(uptimeOutput)
+            val load = getLoadAverageFromUptimeCommandOutput(uptimeOutput, LoadAverageTypes.LAST_MINUTE)
 
             // emit a single object that contains all the information
             emit(
@@ -207,7 +208,7 @@ class PowerManagerAppModel(
             filterFlowSamples(FlowType.LOAD)
             cpuLoadSamples.add(
                 FlowSample(
-                    value = getLastMinuteLoadFromUptimeCommandOutput(uptimeOutput),
+                    value = getLoadAverageFromUptimeCommandOutput(uptimeOutput, LoadAverageTypes.LAST_MINUTE),
                     timestamp = Calendar.getInstance().timeInMillis
                 )
             )

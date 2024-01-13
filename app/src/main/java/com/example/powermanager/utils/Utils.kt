@@ -1,5 +1,6 @@
 package com.example.powermanager.utils
 
+import com.example.powermanager.preferences.LoadAverageTypes
 import java.io.File
 import java.io.FileFilter
 import java.time.Duration
@@ -41,11 +42,11 @@ fun determineNumberOfCPUCores(): Int {
     }
 }
 
-fun getLastMinuteLoadFromUptimeCommandOutput(commandOutput: String): Float {
+fun getLoadAverageFromUptimeCommandOutput(commandOutput: String, loadAverageType: LoadAverageTypes): Float {
     val allLoads = commandOutput.split(LOAD_AVERAGE_SEMICOLON)[1].trim()
-    val lastMinuteLoad = allLoads.split(",")[0]
+    val load = allLoads.split(",")[loadAverageType.ordinal]
 
-    return lastMinuteLoad.toFloat()
+    return load.toFloat()
 }
 
 fun formatDuration(duration: Duration?) : String {
