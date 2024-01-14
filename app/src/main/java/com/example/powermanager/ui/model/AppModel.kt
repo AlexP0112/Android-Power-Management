@@ -173,7 +173,10 @@ class PowerManagerAppModel(
     }.flowOn(Dispatchers.IO)
         .stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(stopTimeoutMillis = STATISTICS_BACKGROUND_SAMPLING_THRESHOLD_MILLIS),
+        started = SharingStarted.WhileSubscribed(
+            stopTimeoutMillis = STATISTICS_BACKGROUND_SAMPLING_THRESHOLD_MILLIS,
+            replayExpirationMillis = 0L
+        ),
         initialValue = mutableListOf()
     )
 
@@ -202,7 +205,10 @@ class PowerManagerAppModel(
     }.flowOn(Dispatchers.IO)
         .stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(stopTimeoutMillis = STATISTICS_BACKGROUND_SAMPLING_THRESHOLD_MILLIS),
+            started = SharingStarted.WhileSubscribed(
+                stopTimeoutMillis = STATISTICS_BACKGROUND_SAMPLING_THRESHOLD_MILLIS,
+                replayExpirationMillis = 0L
+            ),
         initialValue = mutableListOf()
     )
 
@@ -230,7 +236,10 @@ class PowerManagerAppModel(
     }.flowOn(Dispatchers.IO)
         .stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(stopTimeoutMillis = STATISTICS_BACKGROUND_SAMPLING_THRESHOLD_MILLIS),
+        started = SharingStarted.WhileSubscribed(
+            stopTimeoutMillis = STATISTICS_BACKGROUND_SAMPLING_THRESHOLD_MILLIS,
+            replayExpirationMillis = 0L
+        ),
         initialValue = mutableListOf()
     )
 
