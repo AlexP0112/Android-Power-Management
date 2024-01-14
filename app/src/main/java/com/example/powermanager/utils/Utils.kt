@@ -60,7 +60,7 @@ fun determineSystemUptimeTimestamp() : Long {
         if (part.contains(DAYS))
             systemUptimeMillis += part.split(SPACE)[0].trim().toLong() * MILLIS_IN_A_DAY
         if (part.contains(SEMICOLON))
-            systemUptimeMillis += part.split(SEMICOLON)[0].trim().toLong() * MINUTES_IN_AN_HOUR +
+            systemUptimeMillis += part.split(SEMICOLON)[0].trim().toLong() * MILLIS_IN_AN_HOUR +
                     part.split(SEMICOLON)[1].trim().toLong() * MILLIS_IN_A_MINUTE
     }
 
