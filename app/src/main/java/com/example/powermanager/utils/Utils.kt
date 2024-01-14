@@ -75,7 +75,7 @@ fun getLoadAverageFromUptimeCommandOutput(commandOutput: String, loadAverageType
 }
 
 fun formatDuration(duration: Duration?) : String {
-    if (duration == null)
+    if (duration == null || duration.seconds <= 0L)
         return NO_VALUE_STRING
 
     var result = ""
@@ -89,5 +89,5 @@ fun formatDuration(duration: Duration?) : String {
     if (duration.toMinutes() % MINUTES_IN_AN_HOUR != 0L)
         result += "${duration.toMinutes() % MINUTES_IN_AN_HOUR}min"
 
-    return if (result != "") result else "0 min"
+    return result
 }
