@@ -57,6 +57,11 @@ data class HomeScreenInfo(
     val systemUptimeString : String = NO_VALUE_STRING
 )
 
+data class FlowSample(
+    val value : Float = 0f,
+    val timestamp : Long = 0L
+)
+
 class PowerManagerAppModel(
     application: Application
 ) : AndroidViewModel(application) {
@@ -72,9 +77,9 @@ class PowerManagerAppModel(
     private val powerManager: PowerManager
     private val batteryManager: BatteryManager
 
-    private var memoryUsageSamples: MutableList<Float> = mutableListOf()
-    private var cpuFrequencySamples: MutableList<Float> = mutableListOf()
-    private var cpuLoadSamples: MutableList<Float> = mutableListOf()
+    private var memoryUsageSamples: MutableList<FlowSample> = mutableListOf()
+    private var cpuFrequencySamples: MutableList<FlowSample> = mutableListOf()
+    private var cpuLoadSamples: MutableList<FlowSample> = mutableListOf()
 
     init {
         activityManager = application.applicationContext.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
@@ -152,21 +157,28 @@ class PowerManagerAppModel(
             val usedMemory = info.totalMem - info.availMem
 
             filterFlowSamples(FlowType.MEMORY)
-            memoryUsageSamples.add(getGigaBytesFromBytes(usedMemory))
+            memoryUsageSamples.add(
+                FlowSample(
+                    value = getGigaBytesFromBytes(usedMemory),
+                    timestamp = Calendar.getInstance().timeInMillis
+                )
+            )
 
-            emit(memoryUsageSamples.toMutableList())
+            emit(memoryUsageSamples.map {
+                it.value
+            }.toMutableList())
 
             delay(STATISTICS_SCREEN_SAMPLING_RATE_MILLIS)
         }
     }.flowOn(Dispatchers.IO)
         .stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(
-            stopTimeoutMillis = STATISTICS_BACKGROUND_SAMPLING_THRESHOLD_MILLIS,
-            replayExpirationMillis = 0L
-        ),
-        initialValue = mutableListOf()
-    )
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(
+                stopTimeoutMillis = STATISTICS_BACKGROUND_SAMPLING_THRESHOLD_MILLIS,
+                replayExpirationMillis = 0L
+            ),
+            initialValue = mutableListOf()
+        )
 
     // cpu frequency sampling
     val cpuFrequencyFlow = flow {
@@ -177,21 +189,28 @@ class PowerManagerAppModel(
             val frequencyKHz = File(path).readText().trim().toInt()
 
             filterFlowSamples(FlowType.FREQUENCY)
-            cpuFrequencySamples.add(convertKHzToGHz(frequencyKHz))
+            cpuFrequencySamples.add(
+                FlowSample(
+                    value = convertKHzToGHz(frequencyKHz),
+                    timestamp = Calendar.getInstance().timeInMillis
+                )
+            )
 
-            emit(cpuFrequencySamples.toMutableList())
+            emit(cpuFrequencySamples.map {
+                it.value
+            }.toMutableList())
 
             delay(STATISTICS_SCREEN_SAMPLING_RATE_MILLIS)
         }
     }.flowOn(Dispatchers.IO)
         .stateIn(
-        scope = viewModelScope,
+            scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(
                 stopTimeoutMillis = STATISTICS_BACKGROUND_SAMPLING_THRESHOLD_MILLIS,
                 replayExpirationMillis = 0L
             ),
-        initialValue = mutableListOf()
-    )
+            initialValue = mutableListOf()
+        )
 
     // cpu load sampling
     val cpuLoadFlow = flow {
@@ -201,21 +220,28 @@ class PowerManagerAppModel(
             process.waitFor()
 
             filterFlowSamples(FlowType.LOAD)
-            cpuLoadSamples.add(getLoadAverageFromUptimeCommandOutput(uptimeOutput, LoadAverageTypes.LAST_MINUTE))
+            cpuLoadSamples.add(
+                FlowSample(
+                    value = getLoadAverageFromUptimeCommandOutput(uptimeOutput, LoadAverageTypes.LAST_MINUTE),
+                    timestamp = Calendar.getInstance().timeInMillis
+                )
+            )
 
-            emit(cpuLoadSamples.toMutableList())
+            emit(cpuLoadSamples.map {
+                it.value
+            }.toMutableList())
 
             delay(STATISTICS_SCREEN_SAMPLING_RATE_MILLIS)
         }
     }.flowOn(Dispatchers.IO)
         .stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(
-            stopTimeoutMillis = STATISTICS_BACKGROUND_SAMPLING_THRESHOLD_MILLIS,
-            replayExpirationMillis = 0L
-        ),
-        initialValue = mutableListOf()
-    )
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(
+                stopTimeoutMillis = STATISTICS_BACKGROUND_SAMPLING_THRESHOLD_MILLIS,
+                replayExpirationMillis = 0L
+            ),
+            initialValue = mutableListOf()
+        )
 
     fun changeTrackedCore(coreNumber: Int) {
         _uiState.update { currentState ->
@@ -230,16 +256,28 @@ class PowerManagerAppModel(
     private fun filterFlowSamples(flowType: FlowType) {
         when (flowType) {
             FlowType.MEMORY -> {
+                if (memoryUsageSamples.isNotEmpty() &&
+                    Calendar.getInstance().timeInMillis - memoryUsageSamples[memoryUsageSamples.size - 1].timestamp > 5L * STATISTICS_SCREEN_SAMPLING_RATE_MILLIS)
+                    memoryUsageSamples.clear()
+
                 if (memoryUsageSamples.size >= NUMBER_OF_VALUES_TRACKED)
                     memoryUsageSamples.removeAt(0)
             }
 
             FlowType.FREQUENCY -> {
+                if (cpuFrequencySamples.isNotEmpty() &&
+                    Calendar.getInstance().timeInMillis - cpuFrequencySamples[cpuFrequencySamples.size - 1].timestamp > 5L * STATISTICS_SCREEN_SAMPLING_RATE_MILLIS)
+                    cpuFrequencySamples.clear()
+
                 if (cpuFrequencySamples.size >= NUMBER_OF_VALUES_TRACKED)
                     cpuFrequencySamples.removeAt(0)
             }
 
             FlowType.LOAD -> {
+                if (cpuLoadSamples.isNotEmpty() &&
+                    Calendar.getInstance().timeInMillis - cpuLoadSamples[cpuLoadSamples.size - 1].timestamp > 5L * STATISTICS_SCREEN_SAMPLING_RATE_MILLIS)
+                    cpuLoadSamples.clear()
+
                 if (cpuLoadSamples.size >= NUMBER_OF_VALUES_TRACKED)
                     cpuLoadSamples.removeAt(0)
             }
