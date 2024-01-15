@@ -11,6 +11,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.powermanager.preferences.LoadAverageTypes
 import com.example.powermanager.ui.state.AppUiState
 import com.example.powermanager.utils.CORE_FREQUENCY_PATH
+import com.example.powermanager.utils.FAILED_TO_DETERMINE
 import com.example.powermanager.utils.HOME_SCREEN_SAMPLING_RATE_MILLIS
 import com.example.powermanager.utils.NO_VALUE_STRING
 import com.example.powermanager.utils.NUMBER_OF_VALUES_TRACKED
@@ -93,7 +94,14 @@ class PowerManagerAppModel(
 
         // determine the number of processors on the device and the timestamp of the system boot
         numberOfCores = determineNumberOfCPUCores()
-        systemBootTimestamp = determineSystemUptimeTimestamp()
+
+        // determine the timestamp of the last system boot
+        systemBootTimestamp =
+            try {
+                determineSystemUptimeTimestamp()
+            } catch (e: Exception) {
+                0L
+            }
     }
 
     // sampling for home screen information
@@ -108,7 +116,9 @@ class PowerManagerAppModel(
                 val chargeTimeRemainingMillis = batteryManager.computeChargeTimeRemaining()
                 if (chargeTimeRemainingMillis == -1L) null else Duration.ofMillis(chargeTimeRemainingMillis)
             }
-            val uptimeString = formatDuration(Duration.ofMillis(Calendar.getInstance().timeInMillis - systemBootTimestamp))
+            val uptimeString = if (systemBootTimestamp != 0L)
+                            formatDuration(Duration.ofMillis(Calendar.getInstance().timeInMillis - systemBootTimestamp))
+                            else FAILED_TO_DETERMINE
 
             // memory usage info
             val info = ActivityManager.MemoryInfo()

@@ -26,6 +26,7 @@ const val SPACE = " "
 const val SEMICOLON = ":"
 
 const val NO_VALUE_STRING = "-"
+const val FAILED_TO_DETERMINE = "Failed to determine"
 
 // sampling
 const val STATISTICS_BACKGROUND_SAMPLING_THRESHOLD_MILLIS = 60L * 1000L // 1 min

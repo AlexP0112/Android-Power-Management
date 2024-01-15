@@ -46,20 +46,28 @@ fun determineNumberOfCPUCores(): Int {
 }
 
 fun determineSystemUptimeTimestamp() : Long {
+    // execute the uptime command
     val process = Runtime.getRuntime().exec(UPTIME_COMMAND)
     val uptimeOutput = BufferedReader(InputStreamReader(process.inputStream)).readText()
     process.waitFor()
 
     var systemUptimeMillis = 0L
 
-    val uptimeParts = uptimeOutput.split(UP)[1].split(USERS)[0].split(COMMA).dropLast(1)
+    // get the section of the output that represents the actual uptime
+    val uptimeParts = uptimeOutput.split(UP)[1] // output after "up"
+                        .split(USERS)[0] // output before "users"
+                        .split(COMMA).dropLast(1) // exclude the number of users
+                        .map { it.trim() } // eliminate the white spaces in the parts
 
+    // parse this section
     for (part in uptimeParts) {
-        if (part.contains(MIN))
+        if (part.contains(MIN)) // X min
             systemUptimeMillis += part.split(SPACE)[0].trim().toLong() * MILLIS_IN_A_MINUTE
-        if (part.contains(DAYS))
+
+        if (part.contains(DAYS)) // X days
             systemUptimeMillis += part.split(SPACE)[0].trim().toLong() * MILLIS_IN_A_DAY
-        if (part.contains(SEMICOLON))
+
+        if (part.contains(SEMICOLON)) // X:Y, where X = hours, Y = minutes
             systemUptimeMillis += part.split(SEMICOLON)[0].trim().toLong() * MILLIS_IN_AN_HOUR +
                     part.split(SEMICOLON)[1].trim().toLong() * MILLIS_IN_A_MINUTE
     }
