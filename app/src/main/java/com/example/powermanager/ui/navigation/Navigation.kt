@@ -3,6 +3,7 @@ package com.example.powermanager.ui.navigation
 import com.example.powermanager.R
 import com.example.powermanager.utils.CONTROL_SCREEN_NAME
 import com.example.powermanager.utils.HOME_SCREEN_NAME
+import com.example.powermanager.utils.SETTINGS_SCREEN_NAME
 import com.example.powermanager.utils.STATISTICS_SCREEN_NAME
 
 data class NavigationItem(
@@ -25,4 +26,9 @@ val navigationItems = listOf(
         title = CONTROL_SCREEN_NAME,
         iconId = R.drawable.controls_svgrepo_com,
     ),
+
+    NavigationItem(
+        title = SETTINGS_SCREEN_NAME,
+        iconId = R.drawable.settings_svgrepo_com
+    )
 )

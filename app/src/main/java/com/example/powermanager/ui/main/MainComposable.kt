@@ -44,9 +44,11 @@ import com.example.powermanager.ui.model.PowerManagerAppModel
 import com.example.powermanager.ui.navigation.navigationItems
 import com.example.powermanager.ui.screens.ControlScreen
 import com.example.powermanager.ui.screens.HomeScreen
+import com.example.powermanager.ui.screens.SettingsScreen
 import com.example.powermanager.ui.screens.StatisticsScreen
 import com.example.powermanager.utils.CONTROL_SCREEN_NAME
 import com.example.powermanager.utils.HOME_SCREEN_NAME
+import com.example.powermanager.utils.SETTINGS_SCREEN_NAME
 import com.example.powermanager.utils.STATISTICS_SCREEN_NAME
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -92,7 +94,7 @@ fun PowerManagerApp(
 }
 
 /*
- * Navigation host that manages navigation between app screens (Home, Statistics, Control)
+ * Navigation host that manages navigation between app screens (Home, Statistics, Control, Settings)
  */
 @Composable
 fun ScreensNavHost(
@@ -104,6 +106,7 @@ fun ScreensNavHost(
         navController = navController,
         startDestination = HOME_SCREEN_NAME
     ) {
+        // home screen
         composable(
             route = HOME_SCREEN_NAME,
             enterTransition = {
@@ -126,6 +129,7 @@ fun ScreensNavHost(
             )
         }
 
+        // statistics screen
         composable(
             route = STATISTICS_SCREEN_NAME,
             enterTransition = {
@@ -147,6 +151,7 @@ fun ScreensNavHost(
             )
         }
 
+        // control screen
         composable(
             route = CONTROL_SCREEN_NAME,
             enterTransition = {
@@ -163,6 +168,27 @@ fun ScreensNavHost(
             },
         ) {
             ControlScreen(
+                topPadding = topPadding,
+            )
+        }
+
+        // settings screen
+        composable(
+            route = SETTINGS_SCREEN_NAME,
+            enterTransition = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                    animationSpec = tween(300)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                    animationSpec = tween(300)
+                )
+            },
+        ) {
+            SettingsScreen(
                 topPadding = topPadding,
             )
         }
