@@ -15,7 +15,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.powermanager.R
-import com.example.powermanager.preferences.allPreferences
 
 @Composable
 fun SettingsScreen(
@@ -37,10 +36,6 @@ fun SettingsScreen(
             fontSize = 20.sp
         )
         
-        // the actual preferences
-        allPreferences.map { preference ->
-            Text(text = stringResource(id = preference.nameStringId))
-            Text(text = stringResource(id = preference.descriptionStringId))
-        }
+        // the actual preferences -> TODO
     }
 }
