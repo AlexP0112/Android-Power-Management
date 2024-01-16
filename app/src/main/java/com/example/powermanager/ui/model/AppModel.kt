@@ -9,6 +9,7 @@ import android.os.PowerManager
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.powermanager.preferences.LoadAverageTypes
+import com.example.powermanager.preferences.PreferencesManager
 import com.example.powermanager.ui.state.AppUiState
 import com.example.powermanager.utils.CORE_FREQUENCY_PATH
 import com.example.powermanager.utils.FAILED_TO_DETERMINE
@@ -35,6 +36,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
@@ -305,6 +307,12 @@ class PowerManagerAppModel(
 
     fun getNumCores(): Int {
         return numberOfCores
+    }
+
+    fun onPreferenceValueChanged(preferenceKey : String, newValue : String) {
+        viewModelScope.launch {
+            PreferencesManager.updatePreferenceValue(preferenceKey, newValue)
+        }
     }
 
 }
