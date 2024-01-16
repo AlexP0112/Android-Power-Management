@@ -8,6 +8,7 @@ const val SETTINGS_SCREEN_NAME      = "Settings"
 
 const val NUMBER_OF_BYTES_IN_A_GIGABYTE : Long = 1024 * 1024 * 1024
 const val NUMBER_OF_KILOHERTZ_IN_A_GIGAHERTZ : Int = 1000 * 1000
+const val NUMBER_OF_MICROS_IN_A_MILLI : Int = 1000
 const val HOURS_IN_A_DAY = 24L
 const val MINUTES_IN_AN_HOUR = 60L
 const val MILLIS_IN_A_MINUTE = 1000L * 60L

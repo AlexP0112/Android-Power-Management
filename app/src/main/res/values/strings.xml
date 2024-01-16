@@ -31,4 +31,5 @@
     <string name="system_uptime">System uptime</string>
     <string name="cpu_load_explanation">This metric shows the demand for the system\'s CPU and represents the average number of processes that are:\n\u2022 Currently using the CPU\n\u2022 Waiting to use the CPU\n\u2022 Waiting for IO or disk access</string>
     <string name="application_settings">Application settings</string>
+    <string name="current_battery_charge">Current battery charge</string>
 </resources>

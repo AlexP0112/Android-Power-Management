@@ -18,11 +18,12 @@ import com.example.powermanager.utils.NUMBER_OF_VALUES_TRACKED
 import com.example.powermanager.utils.STATISTICS_BACKGROUND_SAMPLING_THRESHOLD_MILLIS
 import com.example.powermanager.utils.STATISTICS_SCREEN_SAMPLING_RATE_MILLIS
 import com.example.powermanager.utils.UPTIME_COMMAND
+import com.example.powermanager.utils.convertBytesToGigaBytes
 import com.example.powermanager.utils.convertKHzToGHz
+import com.example.powermanager.utils.convertMicroAmpsToMilliAmps
 import com.example.powermanager.utils.determineNumberOfCPUCores
 import com.example.powermanager.utils.determineSystemUptimeTimestamp
 import com.example.powermanager.utils.formatDuration
-import com.example.powermanager.utils.getGigaBytesFromBytes
 import com.example.powermanager.utils.getLoadAverageFromUptimeCommandOutput
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -49,6 +50,7 @@ enum class FlowType {
 data class HomeScreenInfo(
     val isBatteryCharging : Boolean = false,
     val currentBatteryLevel : Int = 0,
+    val batteryChargeCount : Int = 0,
     val chargeOrDischargePrediction : Duration? = null,
     val powerSaveState : Boolean = false,
     val lowPowerStandbyEnabled : Boolean = false,
@@ -90,7 +92,7 @@ class PowerManagerAppModel(
         // determine the total amount of memory that the device has
         val info = ActivityManager.MemoryInfo()
         activityManager.getMemoryInfo(info)
-        totalMemory = getGigaBytesFromBytes(info.totalMem)
+        totalMemory = convertBytesToGigaBytes(info.totalMem)
 
         // determine the number of processors on the device and the timestamp of the system boot
         numberOfCores = determineNumberOfCPUCores()
@@ -110,6 +112,8 @@ class PowerManagerAppModel(
         while (true) {
             // battery and uptime
             val currentBatteryLevel = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
+            val batteryChargeCountMilliAmps = convertMicroAmpsToMilliAmps(batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CHARGE_COUNTER))
+
             val chargeOrDischargePrediction: Duration? = if (!batteryManager.isCharging) {
                 powerManager.batteryDischargePrediction
             } else {
@@ -124,7 +128,7 @@ class PowerManagerAppModel(
             val info = ActivityManager.MemoryInfo()
             activityManager.getMemoryInfo(info)
             val usedMemory = info.totalMem - info.availMem
-            val usedMemoryGB = getGigaBytesFromBytes(usedMemory)
+            val usedMemoryGB = convertBytesToGigaBytes(usedMemory)
 
             // cpu info
             val cpuFrequenciesGHz : List<Float> = (0 until numberOfCores).map { core ->
@@ -143,6 +147,7 @@ class PowerManagerAppModel(
                 HomeScreenInfo(
                     isBatteryCharging = batteryManager.isCharging,
                     currentBatteryLevel = currentBatteryLevel,
+                    batteryChargeCount = batteryChargeCountMilliAmps,
                     chargeOrDischargePrediction = chargeOrDischargePrediction,
                     powerSaveState = powerManager.isPowerSaveMode,
                     usedMemoryGB = usedMemoryGB,
@@ -169,7 +174,7 @@ class PowerManagerAppModel(
             filterFlowSamples(FlowType.MEMORY)
             memoryUsageSamples.add(
                 FlowSample(
-                    value = getGigaBytesFromBytes(usedMemory),
+                    value = convertBytesToGigaBytes(usedMemory),
                     timestamp = Calendar.getInstance().timeInMillis
                 )
             )

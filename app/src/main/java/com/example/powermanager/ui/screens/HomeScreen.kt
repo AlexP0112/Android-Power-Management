@@ -86,6 +86,12 @@ fun HomeScreen(
             rightText = "${homeScreenInfo.value.currentBatteryLevel}%"
         )
 
+        // battery charge counter
+        SectionMember(
+            leftText = stringResource(R.string.current_battery_charge),
+            rightText = "${homeScreenInfo.value.batteryChargeCount} mAh"
+        )
+
         // battery charge/discharge prediction
         SectionMember(
             leftText = if (homeScreenInfo.value.isBatteryCharging)
