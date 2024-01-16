@@ -133,9 +133,9 @@ class PowerManagerAppModel(
                 convertKHzToGHz(frequencyKHz)
             }
 
-            val process = Runtime.getRuntime().exec(UPTIME_COMMAND)
-            val uptimeOutput = BufferedReader(InputStreamReader(process.inputStream)).readText()
-            process.waitFor()
+            val uptimeProcess = Runtime.getRuntime().exec(UPTIME_COMMAND)
+            val uptimeOutput = BufferedReader(InputStreamReader(uptimeProcess.inputStream)).readText()
+            uptimeProcess.waitFor()
             val load = getLoadAverageFromUptimeCommandOutput(uptimeOutput, LoadAverageTypes.LAST_MINUTE)
 
             // emit a single object that contains all the information
