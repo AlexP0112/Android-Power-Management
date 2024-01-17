@@ -125,7 +125,9 @@ fun ScreensNavHost(
             HomeScreen(
                 topPadding = topPadding,
                 model = model,
-                navController = navController
+                onGoToChartsButtonClicked = {
+                    navController.navigate(STATISTICS_SCREEN_NAME)
+                }
             )
         }
 
@@ -190,6 +192,7 @@ fun ScreensNavHost(
         ) {
             SettingsScreen(
                 topPadding = topPadding,
+                model = model
             )
         }
     }
@@ -251,7 +254,8 @@ fun DrawerContent(
                         drawerState.close()
                     }
 
-                    navController.navigate(item.title)
+                    if (currentScreen != item.title)
+                        navController.navigate(item.title)
                 },
                 icon = {
                     Icon(

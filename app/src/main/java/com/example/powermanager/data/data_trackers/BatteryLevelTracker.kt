@@ -33,6 +33,9 @@ object BatteryLevelTracker {
         val currentTimeLong = Calendar.getInstance().time.time
         val finalRecords = records.toMutableList()
 
+        if (finalRecords.isEmpty())
+            return mutableListOf()
+
         // we need to have at least 2 records
         if (finalRecords.size == 1)
             finalRecords.add(BatteryLevelInfo(level = records[0].level, timestamp = currentTimeLong))

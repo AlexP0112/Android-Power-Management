@@ -36,11 +36,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
 import com.example.powermanager.R
 import com.example.powermanager.ui.model.HomeScreenInfo
 import com.example.powermanager.ui.model.PowerManagerAppModel
-import com.example.powermanager.utils.STATISTICS_SCREEN_NAME
 import com.example.powermanager.utils.formatDuration
 import kotlin.math.roundToInt
 
@@ -48,7 +46,7 @@ import kotlin.math.roundToInt
 fun HomeScreen(
     topPadding: Dp,
     model: PowerManagerAppModel,
-    navController: NavController
+    onGoToChartsButtonClicked : () -> Unit
 ) {
     val homeScreenInfo = model.homeScreenInfoFlow.collectAsStateWithLifecycle(initialValue = HomeScreenInfo())
     val usedMemoryPercentage = ((homeScreenInfo.value.usedMemoryGB / model.getTotalMemory()) * 100f).roundToInt()
@@ -196,9 +194,7 @@ fun HomeScreen(
 
         // button that takes you to statistics screen
         GoToChartButton(
-            onClick = {
-                navController.navigate(STATISTICS_SCREEN_NAME)
-            }
+            onClick = onGoToChartsButtonClicked
         )
 
         if (isCPULoadInfoDialogOpen.value) {

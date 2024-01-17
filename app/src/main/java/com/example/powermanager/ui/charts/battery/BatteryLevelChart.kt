@@ -66,38 +66,40 @@ fun BatteryLevelChart(
     }
     modelProducer.setEntries(listOf(dataPoints))
 
-    Card (
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(15.dp)
-    ) {
-        ProvideChartStyle (
-            chartStyle = m3ChartStyle()
-        ){
-            val marker = rememberMarker()
-            Chart(
-                chart = lineChart(
-                    lines = datasetLineSpec,
-                    axisValuesOverrider = remember { CustomAxisValuesOverrider(0f, 100f) }
-                ),
-                startAxis = rememberStartAxis(
-                    title = "Battery Percentage",
-                    tickLength = 0.dp,
-                    itemPlacer = AxisItemPlacer.Vertical.default(
-                        maxItemCount = 10
+    if (dataPoints.isNotEmpty()) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(15.dp)
+        ) {
+            ProvideChartStyle(
+                chartStyle = m3ChartStyle()
+            ) {
+                val marker = rememberMarker()
+                Chart(
+                    chart = lineChart(
+                        lines = datasetLineSpec,
+                        axisValuesOverrider = remember { CustomAxisValuesOverrider(0f, 100f) }
                     ),
-                ),
-                bottomAxis = rememberBottomAxis(
-                    title = "Time",
-                    valueFormatter = {value, _ ->
-                        getHourAndMinuteFromLongTimestamp(timestamp = records[value.roundToInt()].timestamp)
-                    }
-                ),
-                marker = marker,
-                chartModelProducer = modelProducer,
-                chartScrollState = scrollState,
-                isZoomEnabled = true,
-            )
+                    startAxis = rememberStartAxis(
+                        title = "Battery Percentage",
+                        tickLength = 0.dp,
+                        itemPlacer = AxisItemPlacer.Vertical.default(
+                            maxItemCount = 10
+                        ),
+                    ),
+                    bottomAxis = rememberBottomAxis(
+                        title = "Time",
+                        valueFormatter = { value, _ ->
+                            getHourAndMinuteFromLongTimestamp(timestamp = records[value.roundToInt()].timestamp)
+                        }
+                    ),
+                    marker = marker,
+                    chartModelProducer = modelProducer,
+                    chartScrollState = scrollState,
+                    isZoomEnabled = true,
+                )
+            }
         }
     }
 }
