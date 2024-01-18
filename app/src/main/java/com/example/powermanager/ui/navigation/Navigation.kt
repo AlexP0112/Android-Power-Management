@@ -4,7 +4,7 @@ import com.example.powermanager.R
 import com.example.powermanager.utils.CONTROL_SCREEN_NAME
 import com.example.powermanager.utils.HOME_SCREEN_NAME
 import com.example.powermanager.utils.SETTINGS_SCREEN_NAME
-import com.example.powermanager.utils.STATISTICS_SCREEN_NAME
+import com.example.powermanager.utils.LIVE_CHARTS_SCREEN_NAME
 
 data class NavigationItem(
     val title: String,
@@ -18,7 +18,7 @@ val navigationItems = listOf(
     ),
 
     NavigationItem(
-        title = STATISTICS_SCREEN_NAME,
+        title = LIVE_CHARTS_SCREEN_NAME,
         iconId = R.drawable.chart_line_up_svgrepo_com,
     ),
 

@@ -46,7 +46,7 @@ import kotlin.math.roundToInt
 fun HomeScreen(
     topPadding: Dp,
     model: PowerManagerAppModel,
-    onGoToChartsButtonClicked : () -> Unit
+    onGoToLiveChartsButtonClicked : () -> Unit
 ) {
     val homeScreenInfo = model.homeScreenInfoFlow.collectAsStateWithLifecycle(initialValue = HomeScreenInfo())
     val usedMemoryPercentage = ((homeScreenInfo.value.usedMemoryGB / model.getTotalMemory()) * 100f).roundToInt()
@@ -193,8 +193,8 @@ fun HomeScreen(
         }
 
         // button that takes you to statistics screen
-        GoToChartButton(
-            onClick = onGoToChartsButtonClicked
+        GoToLiveChartsButton(
+            onClick = onGoToLiveChartsButtonClicked
         )
 
         if (isCPULoadInfoDialogOpen.value) {
@@ -262,14 +262,14 @@ fun SectionMember(
 }
 
 @Composable
-fun GoToChartButton(
+fun GoToLiveChartsButton(
     onClick: () -> Unit
 ) {
     OutlinedButton(
         onClick = onClick,
     ) {
         Text(
-            text = stringResource(R.string.go_to_charts),
+            text = stringResource(R.string.go_to_live_charts),
             textAlign = TextAlign.Center
         )
     }

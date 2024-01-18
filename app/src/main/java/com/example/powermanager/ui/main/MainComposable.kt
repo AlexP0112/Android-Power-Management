@@ -44,12 +44,12 @@ import com.example.powermanager.ui.model.PowerManagerAppModel
 import com.example.powermanager.ui.navigation.navigationItems
 import com.example.powermanager.ui.screens.ControlScreen
 import com.example.powermanager.ui.screens.HomeScreen
+import com.example.powermanager.ui.screens.LiveChartsScreen
 import com.example.powermanager.ui.screens.SettingsScreen
-import com.example.powermanager.ui.screens.StatisticsScreen
 import com.example.powermanager.utils.CONTROL_SCREEN_NAME
 import com.example.powermanager.utils.HOME_SCREEN_NAME
+import com.example.powermanager.utils.LIVE_CHARTS_SCREEN_NAME
 import com.example.powermanager.utils.SETTINGS_SCREEN_NAME
-import com.example.powermanager.utils.STATISTICS_SCREEN_NAME
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -125,15 +125,15 @@ fun ScreensNavHost(
             HomeScreen(
                 topPadding = topPadding,
                 model = model,
-                onGoToChartsButtonClicked = {
-                    navController.navigate(STATISTICS_SCREEN_NAME)
+                onGoToLiveChartsButtonClicked = {
+                    navController.navigate(LIVE_CHARTS_SCREEN_NAME)
                 }
             )
         }
 
         // statistics screen
         composable(
-            route = STATISTICS_SCREEN_NAME,
+            route = LIVE_CHARTS_SCREEN_NAME,
             enterTransition = {
                 slideIntoContainer(
                     towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
@@ -147,7 +147,7 @@ fun ScreensNavHost(
                 )
             },
         ) {
-            StatisticsScreen(
+            LiveChartsScreen(
                 topPadding = topPadding,
                 model = model,
             )

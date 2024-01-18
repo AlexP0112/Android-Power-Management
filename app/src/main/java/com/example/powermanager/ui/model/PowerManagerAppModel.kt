@@ -83,7 +83,8 @@ class PowerManagerAppModel(
             }
     }
 
-    // sampling for home screen information
+    // sampling for home screen
+
     @SuppressLint("NewApi")
     val homeScreenInfoFlow = flow {
         while (true) {
@@ -138,7 +139,7 @@ class PowerManagerAppModel(
         }
     }.flowOn(Dispatchers.IO)
 
-    // sampling for statistics screen charts
+    // sampling for live charts screen
 
     // memory info sampling
     val memoryUsageFlow = flow {

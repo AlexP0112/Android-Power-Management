@@ -2,7 +2,7 @@ package com.example.powermanager.utils
 
 // screen names
 const val HOME_SCREEN_NAME          = "Home"
-const val STATISTICS_SCREEN_NAME    = "Statistics"
+const val LIVE_CHARTS_SCREEN_NAME   = "Live charts"
 const val CONTROL_SCREEN_NAME       = "Control"
 const val SETTINGS_SCREEN_NAME      = "Settings"
 
