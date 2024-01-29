@@ -90,6 +90,16 @@ class PowerManagerAppModel(
         }
     }
 
+    // constants determined at startup
+
+    fun getTotalMemory(): Float {
+        return totalMemory
+    }
+
+    fun getNumCores(): Int {
+        return numberOfCores
+    }
+
     // sampling for home screen
 
     @SuppressLint("NewApi")
@@ -284,18 +294,16 @@ class PowerManagerAppModel(
         }
     }
 
-    fun getTotalMemory(): Float {
-        return totalMemory
-    }
-
-    fun getNumCores(): Int {
-        return numberOfCores
-    }
+    // preferences
 
     fun onPreferenceValueChanged(preferenceKey : String, newValue : String) {
         viewModelScope.launch {
             preferencesManager.updatePreferenceValue(preferenceKey, newValue)
         }
+    }
+
+    fun getPreferenceValue(preferenceKey: String) : String {
+        return preferencesManager.getCurrentValueForPreference(preferenceKey)
     }
 
 }

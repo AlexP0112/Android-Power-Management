@@ -3,7 +3,6 @@ package com.example.powermanager.preferences
 import android.content.Context
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.example.powermanager.R
 import kotlinx.coroutines.flow.first
@@ -13,12 +12,6 @@ data class PreferenceProperties(
     val descriptionStringId : Int,
     val possibleValues : List<String>,
     val defaultValue : String
-)
-
-// IDs that are used as keys in the Preferences Datastore
-val allPreferencesIDs = listOf(
-    HOME_SCREEN_SAMPLING_PERIOD_ID,
-    LOAD_AVERAGE_TYPE_ID
 )
 
 class PreferencesManager (
@@ -46,21 +39,22 @@ class PreferencesManager (
             HOME_SCREEN_SAMPLING_PERIOD_ID to PreferenceProperties(
                 nameStringId = R.string.home_screen_sampling_period_name,
                 descriptionStringId = R.string.home_screen_sampling_period_description,
-                possibleValues = HOME_SCREEN_SAMPLING_PERIOD_ALLOWED_VALUES.map { it.toString() },
+                possibleValues = HOME_SCREEN_SAMPLING_PERIOD_POSSIBLE_VALUES,
                 defaultValue = HOME_SCREEN_SAMPLING_PERIOD_DEFAULT_VALUE
             ),
 
             LOAD_AVERAGE_TYPE_ID to PreferenceProperties(
                 nameStringId = R.string.load_average_type_name,
                 descriptionStringId = R.string.load_average_type_description,
-                possibleValues = LoadAverageTypes.values().map { it.toString() },
-                defaultValue = LoadAverageTypes.LAST_MINUTE.toString()
+                possibleValues = LOAD_AVERAGE_TYPE_POSSIBLE_VALUES,
+                defaultValue = LOAD_AVERAGE_TYPE_DEFAULT_VALUE
             )
         )
     }
 
     suspend fun initializePreferences() {
         for (preferenceID in allPreferencesIDs) {
+            // first assign the default value
             var preferenceValue: String = preferenceKeyToProperties[preferenceID]!!.defaultValue
 
             // read from the disk and check if any value was saved there,
@@ -84,11 +78,7 @@ class PreferencesManager (
     }
 
     fun getCurrentValueForPreference(key: String) : String {
+        // return from memory, because it is consistent with the disk
         return preferenceKeyToCurrentValue[key]!!
     }
-}
-
-object PreferencesKeys {
-    val homeScreenSamplingRate = stringPreferencesKey(HOME_SCREEN_SAMPLING_PERIOD_ID)
-    val loadAverageType = stringPreferencesKey(LOAD_AVERAGE_TYPE_ID)
 }
