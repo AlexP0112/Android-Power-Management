@@ -49,7 +49,7 @@ fun determineNumberOfCPUCores(): Int {
     }
 }
 
-fun determineSystemUptimeTimestamp() : Long {
+fun determineSystemBootTimestamp() : Long {
     // execute the uptime command
     val process = Runtime.getRuntime().exec(UPTIME_COMMAND)
     val uptimeOutput = BufferedReader(InputStreamReader(process.inputStream)).readText()

@@ -22,7 +22,7 @@ import com.example.powermanager.utils.convertBytesToGigaBytes
 import com.example.powermanager.utils.convertKHzToGHz
 import com.example.powermanager.utils.convertMicroAmpsToMilliAmps
 import com.example.powermanager.utils.determineNumberOfCPUCores
-import com.example.powermanager.utils.determineSystemUptimeTimestamp
+import com.example.powermanager.utils.determineSystemBootTimestamp
 import com.example.powermanager.utils.formatDuration
 import com.example.powermanager.utils.getLoadAverageFromUptimeCommandOutput
 import kotlinx.coroutines.Dispatchers
@@ -56,6 +56,7 @@ class PowerManagerAppModel(
     private val activityManager : ActivityManager
     private val powerManager: PowerManager
     private val batteryManager: BatteryManager
+    private val preferencesManager: PreferencesManager
 
     private var memoryUsageSamples: MutableList<FlowSample> = mutableListOf()
     private var cpuFrequencySamples: MutableList<FlowSample> = mutableListOf()
@@ -65,6 +66,7 @@ class PowerManagerAppModel(
         activityManager = application.applicationContext.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
         powerManager = application.applicationContext.getSystemService(Context.POWER_SERVICE) as PowerManager
         batteryManager = application.applicationContext.getSystemService(Context.BATTERY_SERVICE) as BatteryManager
+        preferencesManager = PreferencesManager(application.applicationContext)
 
         // determine the total amount of memory that the device has
         val info = ActivityManager.MemoryInfo()
@@ -77,10 +79,15 @@ class PowerManagerAppModel(
         // determine the timestamp of the last system boot
         systemBootTimestamp =
             try {
-                determineSystemUptimeTimestamp()
+                determineSystemBootTimestamp()
             } catch (e: Exception) {
                 0L
             }
+
+        // initialize the user preferences
+        viewModelScope.launch {
+            preferencesManager.initializePreferences()
+        }
     }
 
     // sampling for home screen
@@ -287,7 +294,7 @@ class PowerManagerAppModel(
 
     fun onPreferenceValueChanged(preferenceKey : String, newValue : String) {
         viewModelScope.launch {
-            PreferencesManager.updatePreferenceValue(preferenceKey, newValue)
+            preferencesManager.updatePreferenceValue(preferenceKey, newValue)
         }
     }
 
