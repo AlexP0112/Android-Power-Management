@@ -67,6 +67,10 @@ class PreferencesManager (
         }
     }
 
+    fun getPreferenceProperties(preferenceKey: String) : PreferenceProperties {
+        return preferenceKeyToProperties[preferenceKey]!!
+    }
+
     suspend fun updatePreferenceValue(key : String, newValue : String) {
         // update in memory
         preferenceKeyToCurrentValue[key] = newValue

@@ -16,8 +16,8 @@ val HOME_SCREEN_SAMPLING_PERIOD_POSSIBLE_VALUES = listOf("500", "1000", "2000", 
 const val HOME_SCREEN_SAMPLING_PERIOD_DEFAULT_VALUE = "2000"
 
 const val LOAD_AVERAGE_TYPE_ID = "load_average_type"
-val LOAD_AVERAGE_TYPE_POSSIBLE_VALUES = listOf("1 minute", "5 minutes", "15 minutes")
-const val LOAD_AVERAGE_TYPE_DEFAULT_VALUE = "1 minute"
+val LOAD_AVERAGE_TYPE_POSSIBLE_VALUES = listOf("1 min", "5 min", "15 min")
+const val LOAD_AVERAGE_TYPE_DEFAULT_VALUE = "1 min"
 
 // IDs that are used as keys in the Preferences Datastore
 val allPreferencesIDs = listOf(

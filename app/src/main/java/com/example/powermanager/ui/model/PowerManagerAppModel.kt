@@ -9,6 +9,7 @@ import android.os.PowerManager
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.powermanager.preferences.LoadAverageTypes
+import com.example.powermanager.preferences.PreferenceProperties
 import com.example.powermanager.preferences.PreferencesManager
 import com.example.powermanager.ui.state.AppUiState
 import com.example.powermanager.utils.CORE_FREQUENCY_PATH
@@ -304,6 +305,10 @@ class PowerManagerAppModel(
 
     fun getPreferenceValue(preferenceKey: String) : String {
         return preferencesManager.getCurrentValueForPreference(preferenceKey)
+    }
+
+    fun getPreferenceProperties(preferenceKey: String) : PreferenceProperties {
+        return preferencesManager.getPreferenceProperties(preferenceKey)
     }
 
 }
