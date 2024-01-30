@@ -31,8 +31,12 @@ class PreferencesManager (
         context = appContext
 
         preferenceKeyStringToPrefKey = mapOf(
-            HOME_SCREEN_SAMPLING_PERIOD_ID to PreferencesKeys.homeScreenSamplingRate,
-            LOAD_AVERAGE_TYPE_ID to PreferencesKeys.loadAverageType
+            HOME_SCREEN_SAMPLING_PERIOD_ID to PreferencesKeys.homeScreenSamplingPeriod,
+            LIVE_CHARTS_SAMPLING_PERIOD_ID to PreferencesKeys.liveChartsSamplingPeriod,
+            LIVE_CHARTS_TRACKED_PERIOD_ID to PreferencesKeys.liveChartsTrackedPeriod,
+            BATTERY_CHART_TRACKED_PERIOD_ID to PreferencesKeys.batteryChartTrackedPeriod,
+            LOAD_AVERAGE_TYPE_ID to PreferencesKeys.loadAverageType,
+            RECORDING_FINISHED_NOTIFICATION_ENABLED_ID to PreferencesKeys.recordingFinishedNotificationEnabled
         )
 
         preferenceKeyToProperties = mapOf(
@@ -43,11 +47,39 @@ class PreferencesManager (
                 defaultValue = HOME_SCREEN_SAMPLING_PERIOD_DEFAULT_VALUE
             ),
 
+            LIVE_CHARTS_SAMPLING_PERIOD_ID to PreferenceProperties(
+                nameStringId = R.string.live_charts_sampling_period_name,
+                descriptionStringId = R.string.live_charts_sampling_period_description,
+                possibleValues = LIVE_CHARTS_SAMPLING_PERIOD_POSSIBLE_VALUES,
+                defaultValue = LIVE_CHARTS_SAMPLING_PERIOD_DEFAULT_VALUE
+            ),
+
+            LIVE_CHARTS_TRACKED_PERIOD_ID to PreferenceProperties(
+                nameStringId = R.string.live_charts_tracked_period_name,
+                descriptionStringId = R.string.live_charts_tracked_period_description,
+                possibleValues = LIVE_CHARTS_TRACKED_PERIOD_POSSIBLE_VALUES,
+                defaultValue = LIVE_CHARTS_TRACKED_PERIOD_DEFAULT_VALUE
+            ),
+
+            BATTERY_CHART_TRACKED_PERIOD_ID to PreferenceProperties(
+                nameStringId = R.string.battery_chart_tracked_period_name,
+                descriptionStringId = R.string.battery_chart_tracked_period_description,
+                possibleValues = BATTERY_CHART_TRACKED_PERIOD_POSSIBLE_VALUES,
+                defaultValue = BATTER_CHART_TRACKED_PERIOD_DEFAULT_VALUE
+            ),
+
             LOAD_AVERAGE_TYPE_ID to PreferenceProperties(
                 nameStringId = R.string.load_average_type_name,
                 descriptionStringId = R.string.load_average_type_description,
                 possibleValues = LOAD_AVERAGE_TYPE_POSSIBLE_VALUES,
                 defaultValue = LOAD_AVERAGE_TYPE_DEFAULT_VALUE
+            ),
+
+            RECORDING_FINISHED_NOTIFICATION_ENABLED_ID to PreferenceProperties(
+                nameStringId = R.string.recording_finished_notification_enabled_name,
+                descriptionStringId = R.string.recording_finished_notification_enabled_description,
+                possibleValues = RECORDING_FINISHED_NOTIFICATION_ENABLED_POSSIBLE_VALUES,
+                defaultValue = RECORDING_FINISHED_NOTIFICATION_ENABLED_DEFAULT_VALUE
             )
         )
     }

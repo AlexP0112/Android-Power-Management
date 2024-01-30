@@ -34,6 +34,14 @@
     <string name="current_battery_charge">Current battery charge</string>
     <string name="home_screen_sampling_period_name">Home screen: sampling period</string>
     <string name="home_screen_sampling_period_description">Time interval (in milliseconds) between two consecutive samples for home screen</string>
-    <string name="load_average_type_name">CPU load average: tracked interval</string>
-    <string name="load_average_type_description">Period of time that is accounted for when calculating the CPU load</string>
+    <string name="load_average_type_name">Sampling: CPU load average period</string>
+    <string name="load_average_type_description">Period of time that is accounted for when calculating the CPU load. This applies to both home screen and live chart</string>
+    <string name="live_charts_sampling_period_name">Live charts: sampling period</string>
+    <string name="live_charts_sampling_period_description">Time interval (in milliseconds) between two consecutive samples for memory and CPU live charts</string>
+    <string name="live_charts_tracked_period_name">Live charts: tracked period</string>
+    <string name="live_charts_tracked_period_description">Period of time (in seconds) that is tracked by memory and CPU live charts</string>
+    <string name="battery_chart_tracked_period_name">Battery chart: tracked period</string>
+    <string name="battery_chart_tracked_period_description">Period of time (in hours) that is tracked by the battery level live chart</string>
+    <string name="recording_finished_notification_enabled_name">Recording: enable notification</string>
+    <string name="recording_finished_notification_enabled_description">Controls whether a notification is sent when a recording session ends</string>
 </resources>
