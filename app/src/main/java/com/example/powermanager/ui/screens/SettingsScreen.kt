@@ -158,5 +158,16 @@ fun SettingsScreen(
                 }
             }
         }
+
+        // for styling purposes
+        Divider(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(start = 100.dp, end = 100.dp),
+            thickness = 1.dp,
+            color = MaterialTheme.colorScheme.onPrimaryContainer
+        )
+        
+        Spacer(modifier = Modifier.height(15.dp))
     }
 }

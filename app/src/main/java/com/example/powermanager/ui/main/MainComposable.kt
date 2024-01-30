@@ -219,6 +219,7 @@ fun TopAppBar(
             }) {
                 Icon(
                     imageVector = Icons.Default.Menu,
+                    tint = MaterialTheme.colorScheme.onSecondaryContainer,
                     contentDescription = null
                 )
             }
@@ -226,6 +227,7 @@ fun TopAppBar(
         actions = {
             Icon( // top right corner, use the icon of the app
                 painter = painterResource(id = R.mipmap.ic_launcher_foreground),
+                tint = MaterialTheme.colorScheme.onPrimaryContainer,
                 contentDescription = null
             )
         }

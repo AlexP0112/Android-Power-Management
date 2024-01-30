@@ -305,7 +305,7 @@ class PowerManagerAppModel(
                     memoryUsageSamples.clear()
 
                 if (memoryUsageSamples.size >= numberOfValuesTracked)
-                    memoryUsageSamples.removeAt(0)
+                    memoryUsageSamples = memoryUsageSamples.drop((memoryUsageSamples.size - numberOfValuesTracked + 1).toInt()).toMutableList()
             }
 
             FlowType.FREQUENCY -> {
@@ -314,7 +314,7 @@ class PowerManagerAppModel(
                     cpuFrequencySamples.clear()
 
                 if (cpuFrequencySamples.size >= numberOfValuesTracked)
-                    cpuFrequencySamples.removeAt(0)
+                    cpuFrequencySamples = cpuFrequencySamples.drop((cpuFrequencySamples.size - numberOfValuesTracked + 1).toInt()).toMutableList()
             }
 
             FlowType.LOAD -> {
@@ -323,7 +323,7 @@ class PowerManagerAppModel(
                     cpuLoadSamples.clear()
 
                 if (cpuLoadSamples.size >= numberOfValuesTracked)
-                    cpuLoadSamples.removeAt(0)
+                    cpuLoadSamples = cpuLoadSamples.drop((cpuLoadSamples.size - numberOfValuesTracked + 1).toInt()).toMutableList()
             }
         }
     }
