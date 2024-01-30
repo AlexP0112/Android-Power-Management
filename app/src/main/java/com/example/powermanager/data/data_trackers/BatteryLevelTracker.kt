@@ -1,7 +1,7 @@
 package com.example.powermanager.data.data_trackers
 
 import com.example.powermanager.utils.BATTERY_LEVEL_NUMBER_OF_SAMPLES
-import com.example.powermanager.utils.NUMBER_OF_MILLIS_IN_A_DAY
+import com.example.powermanager.utils.MILLIS_IN_AN_HOUR
 import java.util.Calendar
 
 data class BatteryLevelInfo(
@@ -24,12 +24,16 @@ object BatteryLevelTracker {
             return
 
         records.add(info)
-
-        // only keep records from the last 24h
-        records = records.dropWhile { record -> info.timestamp - record.timestamp > NUMBER_OF_MILLIS_IN_A_DAY }.toMutableList()
     }
 
-    fun getRecordsAtFixedTimeInterval(): MutableList<BatteryLevelInfo> {
+    fun getRecordsAtFixedTimeInterval(
+        numberOfHoursTracked : Long
+    ): MutableList<BatteryLevelInfo> {
+        // filter the records according to the battery_chart_tracked_period preference
+        records = records.dropWhile {
+            record -> Calendar.getInstance().timeInMillis - record.timestamp > numberOfHoursTracked * MILLIS_IN_AN_HOUR
+        }.toMutableList()
+
         val currentTimeLong = Calendar.getInstance().time.time
         val finalRecords = records.toMutableList()
 

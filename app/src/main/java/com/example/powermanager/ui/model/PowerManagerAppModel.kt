@@ -8,16 +8,19 @@ import android.os.BatteryManager
 import android.os.PowerManager
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.powermanager.preferences.HOME_SCREEN_SAMPLING_PERIOD_ID
+import com.example.powermanager.preferences.LIVE_CHARTS_SAMPLING_PERIOD_ID
+import com.example.powermanager.preferences.LIVE_CHARTS_TRACKED_PERIOD_ID
+import com.example.powermanager.preferences.LOAD_AVERAGE_TYPE_ID
 import com.example.powermanager.preferences.LoadAverageTypes
 import com.example.powermanager.preferences.PreferenceProperties
+import com.example.powermanager.preferences.PreferenceValueAdaptor
 import com.example.powermanager.preferences.PreferencesManager
 import com.example.powermanager.ui.state.AppUiState
 import com.example.powermanager.utils.CORE_FREQUENCY_PATH
 import com.example.powermanager.utils.FAILED_TO_DETERMINE
-import com.example.powermanager.utils.HOME_SCREEN_SAMPLING_RATE_MILLIS
-import com.example.powermanager.utils.NUMBER_OF_VALUES_TRACKED
+import com.example.powermanager.utils.MILLIS_IN_A_SECOND
 import com.example.powermanager.utils.STATISTICS_BACKGROUND_SAMPLING_THRESHOLD_MILLIS
-import com.example.powermanager.utils.STATISTICS_SCREEN_SAMPLING_RATE_MILLIS
 import com.example.powermanager.utils.UPTIME_COMMAND
 import com.example.powermanager.utils.convertBytesToGigaBytes
 import com.example.powermanager.utils.convertKHzToGHz
@@ -106,6 +109,10 @@ class PowerManagerAppModel(
     @SuppressLint("NewApi")
     val homeScreenInfoFlow = flow {
         while (true) {
+            val loadAverageType = PreferenceValueAdaptor.preferenceStringValueToActualValue(
+                preferenceID = LOAD_AVERAGE_TYPE_ID,
+                preferenceValueAsString = getPreferenceValue(LOAD_AVERAGE_TYPE_ID)) as LoadAverageTypes
+
             // battery and uptime
             val currentBatteryLevel = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
             val batteryChargeCountMilliAmps = convertMicroAmpsToMilliAmps(batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CHARGE_COUNTER))
@@ -136,7 +143,7 @@ class PowerManagerAppModel(
             val uptimeProcess = Runtime.getRuntime().exec(UPTIME_COMMAND)
             val uptimeOutput = BufferedReader(InputStreamReader(uptimeProcess.inputStream)).readText()
             uptimeProcess.waitFor()
-            val load = getLoadAverageFromUptimeCommandOutput(uptimeOutput, LoadAverageTypes.LAST_MINUTE)
+            val load = getLoadAverageFromUptimeCommandOutput(uptimeOutput, loadAverageType)
 
             // emit a single object that contains all the information
             emit(
@@ -153,7 +160,10 @@ class PowerManagerAppModel(
                 )
             )
 
-            delay(HOME_SCREEN_SAMPLING_RATE_MILLIS)
+            delay(PreferenceValueAdaptor.preferenceStringValueToActualValue(
+                preferenceID = HOME_SCREEN_SAMPLING_PERIOD_ID,
+                preferenceValueAsString = getPreferenceValue(HOME_SCREEN_SAMPLING_PERIOD_ID)) as Long
+            )
         }
     }.flowOn(Dispatchers.IO)
 
@@ -179,7 +189,10 @@ class PowerManagerAppModel(
                 it.value
             }.toMutableList())
 
-            delay(STATISTICS_SCREEN_SAMPLING_RATE_MILLIS)
+            delay(PreferenceValueAdaptor.preferenceStringValueToActualValue(
+                preferenceID = LIVE_CHARTS_SAMPLING_PERIOD_ID,
+                preferenceValueAsString = getPreferenceValue(LIVE_CHARTS_SAMPLING_PERIOD_ID)) as Long
+            )
         }
     }.flowOn(Dispatchers.IO)
         .stateIn(
@@ -211,7 +224,10 @@ class PowerManagerAppModel(
                 it.value
             }.toMutableList())
 
-            delay(STATISTICS_SCREEN_SAMPLING_RATE_MILLIS)
+            delay(PreferenceValueAdaptor.preferenceStringValueToActualValue(
+                preferenceID = LIVE_CHARTS_SAMPLING_PERIOD_ID,
+                preferenceValueAsString = getPreferenceValue(LIVE_CHARTS_SAMPLING_PERIOD_ID)) as Long
+            )
         }
     }.flowOn(Dispatchers.IO)
         .stateIn(
@@ -226,6 +242,10 @@ class PowerManagerAppModel(
     // cpu load sampling
     val cpuLoadFlow = flow {
         while (true) {
+            val loadAverageType = PreferenceValueAdaptor.preferenceStringValueToActualValue(
+                preferenceID = LOAD_AVERAGE_TYPE_ID,
+                preferenceValueAsString = getPreferenceValue(LOAD_AVERAGE_TYPE_ID)) as LoadAverageTypes
+
             val process = Runtime.getRuntime().exec(UPTIME_COMMAND)
             val uptimeOutput = BufferedReader(InputStreamReader(process.inputStream)).readText()
             process.waitFor()
@@ -233,7 +253,7 @@ class PowerManagerAppModel(
             filterFlowSamples(FlowType.LOAD)
             cpuLoadSamples.add(
                 FlowSample(
-                    value = getLoadAverageFromUptimeCommandOutput(uptimeOutput, LoadAverageTypes.LAST_MINUTE),
+                    value = getLoadAverageFromUptimeCommandOutput(uptimeOutput, loadAverageType),
                     timestamp = Calendar.getInstance().timeInMillis
                 )
             )
@@ -242,7 +262,10 @@ class PowerManagerAppModel(
                 it.value
             }.toMutableList())
 
-            delay(STATISTICS_SCREEN_SAMPLING_RATE_MILLIS)
+            delay(PreferenceValueAdaptor.preferenceStringValueToActualValue(
+                preferenceID = LIVE_CHARTS_SAMPLING_PERIOD_ID,
+                preferenceValueAsString = getPreferenceValue(LIVE_CHARTS_SAMPLING_PERIOD_ID)) as Long
+            )
         }
     }.flowOn(Dispatchers.IO)
         .stateIn(
@@ -265,31 +288,41 @@ class PowerManagerAppModel(
     }
 
     private fun filterFlowSamples(flowType: FlowType) {
+        val samplingPeriod = PreferenceValueAdaptor.preferenceStringValueToActualValue(
+            preferenceID = LIVE_CHARTS_SAMPLING_PERIOD_ID,
+            preferenceValueAsString = getPreferenceValue(LIVE_CHARTS_SAMPLING_PERIOD_ID)) as Long
+
+        val trackedPeriodSeconds = PreferenceValueAdaptor.preferenceStringValueToActualValue(
+            preferenceID = LIVE_CHARTS_TRACKED_PERIOD_ID,
+            preferenceValueAsString = getPreferenceValue(LIVE_CHARTS_TRACKED_PERIOD_ID)) as Long
+
+        val numberOfValuesTracked = trackedPeriodSeconds * MILLIS_IN_A_SECOND / samplingPeriod
+
         when (flowType) {
             FlowType.MEMORY -> {
                 if (memoryUsageSamples.isNotEmpty() &&
-                    Calendar.getInstance().timeInMillis - memoryUsageSamples[memoryUsageSamples.size - 1].timestamp > 5L * STATISTICS_SCREEN_SAMPLING_RATE_MILLIS)
+                    Calendar.getInstance().timeInMillis - memoryUsageSamples[memoryUsageSamples.size - 1].timestamp > 4L * samplingPeriod)
                     memoryUsageSamples.clear()
 
-                if (memoryUsageSamples.size >= NUMBER_OF_VALUES_TRACKED)
+                if (memoryUsageSamples.size >= numberOfValuesTracked)
                     memoryUsageSamples.removeAt(0)
             }
 
             FlowType.FREQUENCY -> {
                 if (cpuFrequencySamples.isNotEmpty() &&
-                    Calendar.getInstance().timeInMillis - cpuFrequencySamples[cpuFrequencySamples.size - 1].timestamp > 5L * STATISTICS_SCREEN_SAMPLING_RATE_MILLIS)
+                    Calendar.getInstance().timeInMillis - cpuFrequencySamples[cpuFrequencySamples.size - 1].timestamp > 4L * samplingPeriod)
                     cpuFrequencySamples.clear()
 
-                if (cpuFrequencySamples.size >= NUMBER_OF_VALUES_TRACKED)
+                if (cpuFrequencySamples.size >= numberOfValuesTracked)
                     cpuFrequencySamples.removeAt(0)
             }
 
             FlowType.LOAD -> {
                 if (cpuLoadSamples.isNotEmpty() &&
-                    Calendar.getInstance().timeInMillis - cpuLoadSamples[cpuLoadSamples.size - 1].timestamp > 5L * STATISTICS_SCREEN_SAMPLING_RATE_MILLIS)
+                    Calendar.getInstance().timeInMillis - cpuLoadSamples[cpuLoadSamples.size - 1].timestamp > 4L * samplingPeriod)
                     cpuLoadSamples.clear()
 
-                if (cpuLoadSamples.size >= NUMBER_OF_VALUES_TRACKED)
+                if (cpuLoadSamples.size >= numberOfValuesTracked)
                     cpuLoadSamples.removeAt(0)
             }
         }

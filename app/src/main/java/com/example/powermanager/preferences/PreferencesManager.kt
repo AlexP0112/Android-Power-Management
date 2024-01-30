@@ -115,6 +115,6 @@ class PreferencesManager (
 
     fun getCurrentValueForPreference(key: String) : String {
         // return from memory, because it is consistent with the disk
-        return preferenceKeyToCurrentValue[key]!!
+        return preferenceKeyToCurrentValue[key] ?: preferenceKeyToProperties[key]!!.defaultValue
     }
 }

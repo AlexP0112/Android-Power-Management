@@ -20,18 +20,23 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.example.powermanager.R
+import com.example.powermanager.preferences.BATTERY_CHART_TRACKED_PERIOD_ID
+import com.example.powermanager.preferences.LIVE_CHARTS_TRACKED_PERIOD_ID
+import com.example.powermanager.preferences.PreferenceValueAdaptor
 import com.example.powermanager.ui.charts.battery.BatteryLevelChart
 import com.example.powermanager.ui.charts.frequency.CPUCoresDropdownMenu
 import com.example.powermanager.ui.charts.frequency.CPUFrequencyChart
 import com.example.powermanager.ui.charts.load.CPULoadChart
 import com.example.powermanager.ui.charts.memory.MemoryChart
 import com.example.powermanager.ui.model.PowerManagerAppModel
+import com.example.powermanager.utils.BATTERY_CHART_NAME
+import com.example.powermanager.utils.CPU_FREQUENCY_CHART_NAME
+import com.example.powermanager.utils.CPU_LOAD_CHART_NAME
+import com.example.powermanager.utils.MEMORY_CHART_NAME
 
 @Composable
 fun LiveChartsScreen(
@@ -39,6 +44,16 @@ fun LiveChartsScreen(
     model: PowerManagerAppModel,
 ) {
     val batteryLevelChartRefresher: MutableState<Boolean> = remember { mutableStateOf(false) }
+
+    val batteryChartTrackedPeriod = PreferenceValueAdaptor.preferenceStringValueToActualValue(
+        preferenceID = BATTERY_CHART_TRACKED_PERIOD_ID,
+        preferenceValueAsString = model.getPreferenceValue(BATTERY_CHART_TRACKED_PERIOD_ID)
+    ) as Long
+
+    val liveChartsTrackedPeriod = PreferenceValueAdaptor.preferenceStringValueToActualValue(
+        preferenceID = LIVE_CHARTS_TRACKED_PERIOD_ID,
+        preferenceValueAsString = model.getPreferenceValue(LIVE_CHARTS_TRACKED_PERIOD_ID)
+    ) as Long
 
     Column(
         modifier = Modifier
@@ -53,7 +68,7 @@ fun LiveChartsScreen(
         ) {
             // battery percentage chart title
             Text(
-                text = stringResource(R.string.battery_level_chart_title),
+                text = String.format(BATTERY_CHART_NAME, batteryChartTrackedPeriod),
                 fontWeight = FontWeight.Bold
             )
             // refresh button for battery percentage screen
@@ -68,7 +83,10 @@ fun LiveChartsScreen(
                 )
             }
         }
-        BatteryLevelChart(refreshChart = batteryLevelChartRefresher)
+        BatteryLevelChart(
+            refreshChart = batteryLevelChartRefresher,
+            numberOfHoursTracked = batteryChartTrackedPeriod
+        )
 
         // memory
         Box(
@@ -76,7 +94,7 @@ fun LiveChartsScreen(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = stringResource(R.string.memory_chart_title),
+                text = String.format(MEMORY_CHART_NAME, liveChartsTrackedPeriod),
                 fontWeight = FontWeight.Bold
             )
         }
@@ -96,7 +114,7 @@ fun LiveChartsScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = stringResource(R.string.cpu_frequency_chart_title),
+                    text = String.format(CPU_FREQUENCY_CHART_NAME, liveChartsTrackedPeriod),
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center
                 )
@@ -118,7 +136,7 @@ fun LiveChartsScreen(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = stringResource(R.string.cpu_load_chart_title),
+                text = String.format(CPU_LOAD_CHART_NAME, liveChartsTrackedPeriod),
                 fontWeight = FontWeight.Bold
             )
         }

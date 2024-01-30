@@ -34,10 +34,11 @@ import kotlin.math.roundToInt
 
 @Composable
 fun BatteryLevelChart(
+    numberOfHoursTracked: Long,
     refreshChart : MutableState<Boolean>
 ) {
     // retrieve the records from the battery tracker
-    val records = BatteryLevelTracker.getRecordsAtFixedTimeInterval()
+    val records = BatteryLevelTracker.getRecordsAtFixedTimeInterval(numberOfHoursTracked)
 
     val modelProducer = remember { ChartEntryModelProducer() }
     val scrollState = rememberChartScrollState()
