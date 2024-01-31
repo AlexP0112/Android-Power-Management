@@ -26,6 +26,7 @@
     <string name="go_to_live_charts">Go to live charts</string>
     <string name="system_uptime">System uptime</string>
     <string name="cpu_load_explanation">This metric shows the demand for the system\'s CPU and represents the average number of processes that are:\n\u2022 Currently using the CPU\n\u2022 Waiting to use the CPU\n\u2022 Waiting for IO or disk access</string>
+    <string name="number_of_samples_value_explanation">Should be a number in the interval 5–100</string>
     <string name="application_settings">Application settings</string>
     <string name="power_and_performance_recording">Power and performance recording</string>
     <string name="current_battery_charge">Current battery charge</string>
@@ -45,4 +46,9 @@
     <string name="recording_finished_notification_enabled_description">Controls whether a notification is sent when a recording session ends</string>
     <string name="new_session">New session</string>
     <string name="recent_results">Recent results</string>
+    <string name="recording">Recording…</string>
+    <string name="start_recording">Start recording</string>
+    <string name="sampling_period_millis">Sampling period (milliseconds)</string>
+    <string name="number_of_samples">Number of samples</string>
+    <string name="session_name_optional">Session name (optional)</string>
 </resources>

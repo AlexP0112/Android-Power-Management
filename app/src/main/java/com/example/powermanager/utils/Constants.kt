@@ -25,6 +25,7 @@ const val MILLIS_IN_A_DAY = HOURS_IN_A_DAY * MINUTES_IN_AN_HOUR * MILLIS_IN_A_MI
 
 // regex
 const val CPU_REGEX = "cpu[0-9]+"
+const val ALPHANUMERIC = "[a-zA-Z0-9_]+"
 const val LOAD_AVERAGE_SEMICOLON = "load average:"
 const val UP = " up "
 const val USERS = "users"
@@ -46,6 +47,8 @@ val RECORDING_SAMPLING_PERIOD_POSSIBLE_VALUES = listOf(500L, 1000L, 2000L, 5000L
 const val DEFAULT_RECORDING_SAMPLING_PERIOD_MILLIS = 1000L
 const val DEFAULT_RECORDING_NUMBER_OF_SAMPLES = 30
 const val DEFAULT_RECORDING_NAME = "default"
+const val MINIMUM_NUMBER_OF_RECORDING_SAMPLES_ALLOWED = 5
+const val MAXIMUM_NUMBER_OF_RECORDING_SAMPLES_ALLOWED = 100
 
 // paths
 const val CORE_FREQUENCY_PATH = "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_cur_freq"

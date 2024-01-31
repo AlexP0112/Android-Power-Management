@@ -1,6 +1,5 @@
 package com.example.powermanager.ui.screens
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,16 +9,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,11 +27,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.powermanager.R
 import com.example.powermanager.ui.model.HomeScreenInfo
 import com.example.powermanager.ui.model.PowerManagerAppModel
+import com.example.powermanager.ui.screens.common.InfoDialog
 import com.example.powermanager.ui.screens.common.SectionHeader
 import com.example.powermanager.utils.formatDuration
 import kotlin.math.roundToInt
@@ -197,7 +192,10 @@ fun HomeScreen(
         )
 
         if (isCPULoadInfoDialogOpen.value) {
-            InfoDialogForCpuLoad {
+            InfoDialog(
+                textId = R.string.cpu_load_explanation,
+                cardHeight = 220.dp
+            ) {
                 isCPULoadInfoDialogOpen.value = false
             }
         }
@@ -237,34 +235,5 @@ fun GoToLiveChartsButton(
             text = stringResource(R.string.go_to_live_charts),
             textAlign = TextAlign.Center
         )
-    }
-}
-
-@Composable
-fun InfoDialogForCpuLoad(
-    onDismissRequest: () -> Unit
-) {
-    Dialog(
-        onDismissRequest = onDismissRequest
-    ) {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(220.dp)
-                .padding(16.dp),
-            shape = RoundedCornerShape(16.dp),
-            border = BorderStroke(
-                width = 2.dp,
-                color = MaterialTheme.colorScheme.onPrimaryContainer
-            )
-        ) {
-            Text(
-                text = stringResource(R.string.cpu_load_explanation),
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(5.dp)
-                    .wrapContentSize(Alignment.Center),
-            )
-        }
     }
 }
