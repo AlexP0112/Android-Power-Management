@@ -35,6 +35,10 @@ const val RECORDING_FINISHED_NOTIFICATION_ENABLED_ID = "recording_finished_notif
 val RECORDING_FINISHED_NOTIFICATION_ENABLED_POSSIBLE_VALUES = listOf("Yes", "No")
 const val RECORDING_FINISHED_NOTIFICATION_ENABLED_DEFAULT_VALUE = "Yes"
 
+const val NUMBER_OF_RECORDINGS_LISTED_ID = "number_of_recordings_listed"
+val NUMBER_OF_RECORDINGS_LISTED_POSSIBLE_VALUES = listOf("5", "10", "15", "25")
+const val NUMBER_OF_RECORDINGS_LISTED_DEFAULT_VALUE = "10"
+
 // IDs that are used as keys in the Preferences Datastore
 val allPreferencesIDs = listOf(
     HOME_SCREEN_SAMPLING_PERIOD_ID,
@@ -42,6 +46,7 @@ val allPreferencesIDs = listOf(
     LIVE_CHARTS_TRACKED_PERIOD_ID,
     BATTERY_CHART_TRACKED_PERIOD_ID,
     LOAD_AVERAGE_TYPE_ID,
+    NUMBER_OF_RECORDINGS_LISTED_ID,
     RECORDING_FINISHED_NOTIFICATION_ENABLED_ID
 )
 
@@ -51,5 +56,6 @@ object PreferencesKeys {
     val liveChartsTrackedPeriod = stringPreferencesKey(LIVE_CHARTS_TRACKED_PERIOD_ID)
     val batteryChartTrackedPeriod = stringPreferencesKey(BATTERY_CHART_TRACKED_PERIOD_ID)
     val loadAverageType = stringPreferencesKey(LOAD_AVERAGE_TYPE_ID)
+    val numberOfRecordingsListed = stringPreferencesKey(NUMBER_OF_RECORDINGS_LISTED_ID)
     val recordingFinishedNotificationEnabled = stringPreferencesKey(RECORDING_FINISHED_NOTIFICATION_ENABLED_ID)
 }

@@ -17,7 +17,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Card
-import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -29,7 +28,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -39,6 +37,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.powermanager.R
 import com.example.powermanager.ui.model.HomeScreenInfo
 import com.example.powermanager.ui.model.PowerManagerAppModel
+import com.example.powermanager.ui.screens.common.SectionHeader
 import com.example.powermanager.utils.formatDuration
 import kotlin.math.roundToInt
 
@@ -202,40 +201,6 @@ fun HomeScreen(
                 isCPULoadInfoDialogOpen.value = false
             }
         }
-    }
-}
-
-@Composable
-fun SectionHeader(
-    sectionName: String
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Divider(
-            modifier = Modifier
-                .align(Alignment.CenterVertically)
-                .weight(1f),
-            thickness = 2.dp,
-            color = MaterialTheme.colorScheme.onPrimaryContainer
-        )
-
-        Text(
-            modifier = Modifier
-                .weight(3f),
-            text = sectionName,
-            fontWeight = FontWeight.Bold,
-            fontSize = 20.sp,
-            textAlign = TextAlign.Center
-        )
-
-        Divider(
-            modifier = Modifier
-                .align(Alignment.CenterVertically)
-                .weight(1f),
-            thickness = 2.dp,
-            color = MaterialTheme.colorScheme.onPrimaryContainer
-        )
     }
 }
 

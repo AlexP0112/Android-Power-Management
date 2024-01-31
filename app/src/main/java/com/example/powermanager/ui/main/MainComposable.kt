@@ -45,10 +45,12 @@ import com.example.powermanager.ui.navigation.navigationItems
 import com.example.powermanager.ui.screens.ControlScreen
 import com.example.powermanager.ui.screens.HomeScreen
 import com.example.powermanager.ui.screens.LiveChartsScreen
+import com.example.powermanager.ui.screens.RecordingScreen
 import com.example.powermanager.ui.screens.SettingsScreen
 import com.example.powermanager.utils.CONTROL_SCREEN_NAME
 import com.example.powermanager.utils.HOME_SCREEN_NAME
 import com.example.powermanager.utils.LIVE_CHARTS_SCREEN_NAME
+import com.example.powermanager.utils.RECORDING_SCREEN_NAME
 import com.example.powermanager.utils.SETTINGS_SCREEN_NAME
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -171,6 +173,28 @@ fun ScreensNavHost(
         ) {
             ControlScreen(
                 topPadding = topPadding,
+            )
+        }
+
+        // recording screen
+        composable(
+            route = RECORDING_SCREEN_NAME,
+            enterTransition = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                    animationSpec = tween(300)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                    animationSpec = tween(300)
+                )
+            },
+        ) {
+            RecordingScreen(
+                topPadding = topPadding,
+                model = model
             )
         }
 

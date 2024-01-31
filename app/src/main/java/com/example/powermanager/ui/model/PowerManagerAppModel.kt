@@ -280,7 +280,8 @@ class PowerManagerAppModel(
     fun changeTrackedCore(coreNumber: Int) {
         _uiState.update { currentState ->
             currentState.copy(
-                coreTracked = coreNumber
+                coreTracked = coreNumber,
+                isRecording = uiState.value.isRecording
             )
         }
 
@@ -325,6 +326,26 @@ class PowerManagerAppModel(
                 if (cpuLoadSamples.size >= numberOfValuesTracked)
                     cpuLoadSamples = cpuLoadSamples.drop((cpuLoadSamples.size - numberOfValuesTracked + 1).toInt()).toMutableList()
             }
+        }
+    }
+
+    // recording
+
+    fun onStartRecording(recordingName: String?, samplingPeriodMillis: Long, numberOfSamples: Int) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                coreTracked = uiState.value.coreTracked,
+                isRecording = true
+            )
+        }
+    }
+
+    fun onStopRecording() {
+        _uiState.update { currentState ->
+            currentState.copy(
+                coreTracked = uiState.value.coreTracked,
+                isRecording = false
+            )
         }
     }
 

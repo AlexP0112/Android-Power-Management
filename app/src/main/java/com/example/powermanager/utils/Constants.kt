@@ -3,6 +3,7 @@ package com.example.powermanager.utils
 // screen names
 const val HOME_SCREEN_NAME          = "Home"
 const val LIVE_CHARTS_SCREEN_NAME   = "Live charts"
+const val RECORDING_SCREEN_NAME     = "Recording"
 const val CONTROL_SCREEN_NAME       = "Control"
 const val SETTINGS_SCREEN_NAME      = "Settings"
 
@@ -36,9 +37,15 @@ const val SEMICOLON = ":"
 const val NO_VALUE_STRING = "-"
 const val FAILED_TO_DETERMINE = "Failed to determine"
 
-// sampling
+// charts sampling
 const val STATISTICS_BACKGROUND_SAMPLING_THRESHOLD_MILLIS = 60L * 1000L // 1 min
 const val BATTERY_LEVEL_NUMBER_OF_SAMPLES = 50
+
+// power and performance recording
+val RECORDING_SAMPLING_PERIOD_POSSIBLE_VALUES = listOf(500L, 1000L, 2000L, 5000L)
+const val DEFAULT_RECORDING_SAMPLING_PERIOD_MILLIS = 1000L
+const val DEFAULT_RECORDING_NUMBER_OF_SAMPLES = 30
+const val DEFAULT_RECORDING_NAME = "default"
 
 // paths
 const val CORE_FREQUENCY_PATH = "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_cur_freq"

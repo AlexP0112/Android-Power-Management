@@ -27,6 +27,7 @@
     <string name="system_uptime">System uptime</string>
     <string name="cpu_load_explanation">This metric shows the demand for the system\'s CPU and represents the average number of processes that are:\n\u2022 Currently using the CPU\n\u2022 Waiting to use the CPU\n\u2022 Waiting for IO or disk access</string>
     <string name="application_settings">Application settings</string>
+    <string name="power_and_performance_recording">Power and performance recording</string>
     <string name="current_battery_charge">Current battery charge</string>
     <string name="home_screen_sampling_period_name">Home screen: sampling period</string>
     <string name="home_screen_sampling_period_description">Time interval (in milliseconds) between two consecutive samples for home screen</string>
@@ -38,6 +39,10 @@
     <string name="live_charts_tracked_period_description">Period of time (in seconds) that is tracked by memory and CPU live charts</string>
     <string name="battery_chart_tracked_period_name">Battery chart: tracked period</string>
     <string name="battery_chart_tracked_period_description">Period of time (in hours) that is tracked by the battery level live chart</string>
+    <string name="number_of_recordings_listed_name">Recording: number of results displayed</string>
+    <string name="number_of_recordings_listed_description">Maximum number of power and performance recording results displayed in the list</string>
     <string name="recording_finished_notification_enabled_name">Recording: enable notifications</string>
     <string name="recording_finished_notification_enabled_description">Controls whether a notification is sent when a recording session ends</string>
+    <string name="new_session">New session</string>
+    <string name="recent_results">Recent results</string>
 </resources>

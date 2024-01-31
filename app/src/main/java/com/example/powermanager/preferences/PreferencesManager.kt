@@ -36,6 +36,7 @@ class PreferencesManager (
             LIVE_CHARTS_TRACKED_PERIOD_ID to PreferencesKeys.liveChartsTrackedPeriod,
             BATTERY_CHART_TRACKED_PERIOD_ID to PreferencesKeys.batteryChartTrackedPeriod,
             LOAD_AVERAGE_TYPE_ID to PreferencesKeys.loadAverageType,
+            NUMBER_OF_RECORDINGS_LISTED_ID to PreferencesKeys.numberOfRecordingsListed,
             RECORDING_FINISHED_NOTIFICATION_ENABLED_ID to PreferencesKeys.recordingFinishedNotificationEnabled
         )
 
@@ -73,6 +74,13 @@ class PreferencesManager (
                 descriptionStringId = R.string.load_average_type_description,
                 possibleValues = LOAD_AVERAGE_TYPE_POSSIBLE_VALUES,
                 defaultValue = LOAD_AVERAGE_TYPE_DEFAULT_VALUE
+            ),
+
+            NUMBER_OF_RECORDINGS_LISTED_ID to PreferenceProperties(
+                nameStringId = R.string.number_of_recordings_listed_name,
+                descriptionStringId = R.string.number_of_recordings_listed_description,
+                possibleValues = NUMBER_OF_RECORDINGS_LISTED_POSSIBLE_VALUES,
+                defaultValue = NUMBER_OF_RECORDINGS_LISTED_DEFAULT_VALUE
             ),
 
             RECORDING_FINISHED_NOTIFICATION_ENABLED_ID to PreferenceProperties(
