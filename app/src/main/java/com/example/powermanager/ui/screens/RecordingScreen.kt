@@ -17,12 +17,14 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -72,14 +74,17 @@ fun RecordingScreen(
         modifier = Modifier
             .padding(
                 top = topPadding + 5.dp,
+                start = 8.dp,
+                end = 8.dp
             )
             .fillMaxSize()
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        val state: State<AppUiState> = model.uiState.collectAsState()
         val keyboardController = LocalSoftwareKeyboardController.current
 
+        // screen state variables
+        val state: State<AppUiState> = model.uiState.collectAsState()
         var isSamplingPeriodDropdownExpanded by remember {
             mutableStateOf(false)
         }
@@ -100,6 +105,11 @@ fun RecordingScreen(
             mutableStateOf(false)
         }
 
+        var sessionResults by remember {
+            // TODO change this
+            mutableStateOf(listOf("result111", "result222", "result333", "result444", "result555"))
+        }
+
         // title of the screen
         Text(
             text = stringResource(R.string.power_and_performance_recording),
@@ -117,7 +127,7 @@ fun RecordingScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(8.dp),
+                .padding(top = 8.dp, end = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ){
             Text(
@@ -176,7 +186,7 @@ fun RecordingScreen(
         Row (
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(8.dp),
+                .padding(top = 8.dp, end = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Row (
@@ -222,7 +232,7 @@ fun RecordingScreen(
         Row (
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(8.dp),
+                .padding(top = 8.dp, end = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
@@ -245,6 +255,8 @@ fun RecordingScreen(
                 singleLine = true
             )
         }
+
+        Spacer(modifier = Modifier.height(10.dp))
 
         // "Start recording" button, along with indicator
 
@@ -288,6 +300,65 @@ fun RecordingScreen(
         // results section
 
         SectionHeader(sectionName = stringResource(R.string.recent_results))
+
+        Spacer (modifier = Modifier.height(10.dp))
+
+        Divider(
+            modifier = Modifier
+                .fillMaxSize(),
+            thickness = 0.75.dp,
+            color = MaterialTheme.colorScheme.secondary
+        )
+
+        sessionResults.forEach { resultName ->
+            Row(
+                modifier = Modifier
+                    .fillMaxSize(),
+                verticalAlignment = Alignment.CenterVertically
+            ){
+                Text(
+                    modifier = Modifier.weight(3f),
+                    text = resultName
+                )
+
+                // icons for delete and view results
+                Row(
+                    modifier = Modifier.weight(1f),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    // delete button
+                    IconButton(
+                        onClick = { /*TODO*/ }
+                    ) {
+                       Icon(
+                           painter = painterResource(id = R.drawable.garbage_trash),
+                           tint = Color.Red,
+                           contentDescription = null
+                       )
+                    }
+
+                    Spacer(modifier = Modifier.width(10.dp))
+
+                    // view results button
+                    IconButton(
+                        onClick = { /*TODO*/ }
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.eye_icon),
+                            tint = MaterialTheme.colorScheme.tertiary,
+                            contentDescription = null
+                        )
+                    }
+                }
+            }
+
+            Divider(
+                modifier = Modifier
+                    .fillMaxSize(),
+                thickness = 0.75.dp,
+                color = MaterialTheme.colorScheme.secondary
+            )
+        }
 
         if (isNumberOfSamplesInfoDialogOpen) {
             InfoDialog(
