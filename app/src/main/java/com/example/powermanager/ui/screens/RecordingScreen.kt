@@ -302,14 +302,20 @@ fun RecordingScreen(
 
         SectionHeader(sectionName = stringResource(R.string.recent_results))
 
-        if (sessionResults.isNotEmpty()) {
-            Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 
+        if (sessionResults.isNotEmpty()) {
             Divider(
                 modifier = Modifier
                     .fillMaxSize(),
                 thickness = 0.75.dp,
                 color = MaterialTheme.colorScheme.secondary
+            )
+        } else {
+            Text(
+                text = stringResource(R.string.no_results_found),
+                textAlign = TextAlign.Center,
+                fontSize = 18.sp
             )
         }
 
