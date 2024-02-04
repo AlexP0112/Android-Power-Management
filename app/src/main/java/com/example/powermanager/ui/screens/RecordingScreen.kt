@@ -35,6 +35,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -105,9 +106,9 @@ fun RecordingScreen(
             mutableStateOf(false)
         }
 
-        var sessionResults by remember {
+        val sessionResults = remember {
             // TODO change this
-            mutableStateOf(listOf("result111", "result222", "result333", "result444", "result555"))
+            mutableStateListOf("result111", "result222", "result333", "result444", "result555")
         }
 
         // title of the screen
@@ -301,14 +302,16 @@ fun RecordingScreen(
 
         SectionHeader(sectionName = stringResource(R.string.recent_results))
 
-        Spacer (modifier = Modifier.height(10.dp))
+        if (sessionResults.isNotEmpty()) {
+            Spacer(modifier = Modifier.height(10.dp))
 
-        Divider(
-            modifier = Modifier
-                .fillMaxSize(),
-            thickness = 0.75.dp,
-            color = MaterialTheme.colorScheme.secondary
-        )
+            Divider(
+                modifier = Modifier
+                    .fillMaxSize(),
+                thickness = 0.75.dp,
+                color = MaterialTheme.colorScheme.secondary
+            )
+        }
 
         sessionResults.forEach { resultName ->
             Row(
@@ -328,7 +331,10 @@ fun RecordingScreen(
                 ) {
                     // delete button
                     IconButton(
-                        onClick = { /*TODO*/ }
+                        onClick = {
+                            sessionResults -= resultName
+                        /*TODO*/
+                        }
                     ) {
                        Icon(
                            painter = painterResource(id = R.drawable.garbage_trash),

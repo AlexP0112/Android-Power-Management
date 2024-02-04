@@ -114,13 +114,13 @@ fun ScreensNavHost(
             enterTransition = {
                 slideIntoContainer(
                     towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
-                    animationSpec = tween(300)
+                    animationSpec = tween(250)
                 )
             },
             exitTransition = {
                 slideOutOfContainer(
                     towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
-                    animationSpec = tween(300)
+                    animationSpec = tween(250)
                 )
             },
         ) {
@@ -139,13 +139,13 @@ fun ScreensNavHost(
             enterTransition = {
                 slideIntoContainer(
                     towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
-                    animationSpec = tween(300)
+                    animationSpec = tween(250)
                 )
             },
             exitTransition = {
                 slideOutOfContainer(
                     towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
-                    animationSpec = tween(300)
+                    animationSpec = tween(250)
                 )
             },
         ) {
@@ -161,13 +161,13 @@ fun ScreensNavHost(
             enterTransition = {
                 slideIntoContainer(
                     towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
-                    animationSpec = tween(300)
+                    animationSpec = tween(250)
                 )
             },
             exitTransition = {
                 slideOutOfContainer(
                     towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
-                    animationSpec = tween(300)
+                    animationSpec = tween(250)
                 )
             },
         ) {
@@ -182,13 +182,13 @@ fun ScreensNavHost(
             enterTransition = {
                 slideIntoContainer(
                     towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
-                    animationSpec = tween(300)
+                    animationSpec = tween(250)
                 )
             },
             exitTransition = {
                 slideOutOfContainer(
                     towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
-                    animationSpec = tween(300)
+                    animationSpec = tween(250)
                 )
             },
         ) {
@@ -204,13 +204,13 @@ fun ScreensNavHost(
             enterTransition = {
                 slideIntoContainer(
                     towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
-                    animationSpec = tween(300)
+                    animationSpec = tween(250)
                 )
             },
             exitTransition = {
                 slideOutOfContainer(
                     towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
-                    animationSpec = tween(300)
+                    animationSpec = tween(250)
                 )
             },
         ) {
