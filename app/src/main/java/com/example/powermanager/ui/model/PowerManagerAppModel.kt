@@ -281,7 +281,10 @@ class PowerManagerAppModel(
         _uiState.update { currentState ->
             currentState.copy(
                 coreTracked = coreNumber,
-                isRecording = uiState.value.isRecording
+                isRecording = uiState.value.isRecording,
+                recordingSamplingPeriod = uiState.value.recordingSamplingPeriod,
+                recordingNumberOfSamplesString = uiState.value.recordingNumberOfSamplesString,
+                recordingSessionName = uiState.value.recordingSessionName
             )
         }
 
@@ -331,11 +334,14 @@ class PowerManagerAppModel(
 
     // recording
 
-    fun onStartRecording(recordingName: String?, samplingPeriodMillis: Long, numberOfSamples: Int) {
+    fun onStartRecording() {
         _uiState.update { currentState ->
             currentState.copy(
                 coreTracked = uiState.value.coreTracked,
-                isRecording = true
+                isRecording = true,
+                recordingSamplingPeriod = uiState.value.recordingSamplingPeriod,
+                recordingNumberOfSamplesString = uiState.value.recordingNumberOfSamplesString,
+                recordingSessionName = uiState.value.recordingSessionName
             )
         }
     }
@@ -344,7 +350,46 @@ class PowerManagerAppModel(
         _uiState.update { currentState ->
             currentState.copy(
                 coreTracked = uiState.value.coreTracked,
-                isRecording = false
+                isRecording = false,
+                recordingSamplingPeriod = uiState.value.recordingSamplingPeriod,
+                recordingNumberOfSamplesString = uiState.value.recordingNumberOfSamplesString,
+                recordingSessionName = uiState.value.recordingSessionName
+            )
+        }
+    }
+
+    fun changeRecordingSamplingPeriod(newValue: Long) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                coreTracked = uiState.value.coreTracked,
+                isRecording = uiState.value.isRecording,
+                recordingSamplingPeriod = newValue,
+                recordingNumberOfSamplesString = uiState.value.recordingNumberOfSamplesString,
+                recordingSessionName = uiState.value.recordingSessionName
+            )
+        }
+    }
+
+    fun changeRecordingNumberOfSamplesString(newValue: String) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                coreTracked = uiState.value.coreTracked,
+                isRecording = uiState.value.isRecording,
+                recordingSamplingPeriod = uiState.value.recordingSamplingPeriod,
+                recordingNumberOfSamplesString = newValue,
+                recordingSessionName = uiState.value.recordingSessionName
+            )
+        }
+    }
+
+    fun changeRecordingSessionName(newValue: String) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                coreTracked = uiState.value.coreTracked,
+                isRecording = uiState.value.isRecording,
+                recordingSamplingPeriod = uiState.value.recordingSamplingPeriod,
+                recordingNumberOfSamplesString = uiState.value.recordingNumberOfSamplesString,
+                recordingSessionName = newValue
             )
         }
     }

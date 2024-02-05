@@ -34,7 +34,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,6 +43,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -58,14 +58,11 @@ import com.example.powermanager.ui.model.PowerManagerAppModel
 import com.example.powermanager.ui.screens.common.InfoDialog
 import com.example.powermanager.ui.screens.common.SectionHeader
 import com.example.powermanager.ui.state.AppUiState
-import com.example.powermanager.utils.DEFAULT_RECORDING_NAME
-import com.example.powermanager.utils.DEFAULT_RECORDING_NUMBER_OF_SAMPLES
-import com.example.powermanager.utils.DEFAULT_RECORDING_SAMPLING_PERIOD_MILLIS
 import com.example.powermanager.utils.RECORDING_SAMPLING_PERIOD_POSSIBLE_VALUES
 import com.example.powermanager.utils.isRecordingNumberOfSamplesStringValid
 import com.example.powermanager.utils.isRecordingSessionNameValid
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun RecordingScreen(
     topPadding: Dp,
@@ -84,22 +81,12 @@ fun RecordingScreen(
     ) {
         val keyboardController = LocalSoftwareKeyboardController.current
 
-        // screen state variables
-        val state: State<AppUiState> = model.uiState.collectAsState()
+        // ================= screen state variables =================== //
+
+        val uiState: State<AppUiState> = model.uiState.collectAsState()
+
         var isSamplingPeriodDropdownExpanded by remember {
             mutableStateOf(false)
-        }
-
-        var samplingPeriod by remember {
-            mutableLongStateOf(DEFAULT_RECORDING_SAMPLING_PERIOD_MILLIS)
-        }
-
-        var numberOfSamplesString by remember {
-            mutableStateOf(DEFAULT_RECORDING_NUMBER_OF_SAMPLES.toString())
-        }
-
-        var sessionName by remember {
-            mutableStateOf(DEFAULT_RECORDING_NAME)
         }
 
         var isNumberOfSamplesInfoDialogOpen by remember {
@@ -111,194 +98,64 @@ fun RecordingScreen(
             mutableStateListOf("result111", "result222", "result333", "result444", "result555")
         }
 
-        // title of the screen
-        Text(
-            text = stringResource(R.string.power_and_performance_recording),
-            fontWeight = FontWeight.Bold,
-            fontSize = 20.sp
+        // ================= screen title variables =================== //
+
+        RecordingScreenTitle()
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        // ================= New session section =================== //
+
+        SectionHeader(sectionName = stringResource(R.string.new_session))
+
+        SamplingPeriodRow(
+            onDismissDropdownMenu = {
+                isSamplingPeriodDropdownExpanded = false
+            },
+            onSelectedNewValue = { newValue ->
+                model.changeRecordingSamplingPeriod(newValue)
+                isSamplingPeriodDropdownExpanded = false
+            },
+            isSamplingPeriodDropdownExpanded = isSamplingPeriodDropdownExpanded,
+            currentValue = uiState.value.recordingSamplingPeriod,
+            onChangedExpandedValue = { newValue ->
+                isSamplingPeriodDropdownExpanded = newValue
+            }
+        )
+
+        NumberOfSamplesRow(
+            onIconButtonPressed = {
+                isNumberOfSamplesInfoDialogOpen = true
+            },
+            keyboardController = keyboardController,
+            currentNumberOfSamplesString = uiState.value.recordingNumberOfSamplesString,
+            onValueChanged = { newValue ->
+                model.changeRecordingNumberOfSamplesString(newValue)
+            }
+        )
+
+        RecordingSessionNameRow(
+            keyboardController = keyboardController,
+            currentSessionName = uiState.value.recordingSessionName,
+            onValueChanged = { input ->
+                model.changeRecordingSessionName(input)
+            }
         )
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        // New session section
-
-        SectionHeader(sectionName = stringResource(R.string.new_session))
-
-        // dropdown to select the sampling period, similar to preferences screen
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp, end = 8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ){
-            Text(
-                modifier = Modifier.weight(2.5f),
-                text = stringResource(R.string.sampling_period_millis)
-            )
-
-            Spacer(modifier = Modifier.width(10.dp))
-
-            // the dropdown with the possible values
-            Box(
-                modifier = Modifier.weight(1f)
-            ) {
-                ExposedDropdownMenuBox(
-                    expanded = isSamplingPeriodDropdownExpanded,
-                    onExpandedChange = { newValue ->
-                        isSamplingPeriodDropdownExpanded = newValue
-                    }
-                ) {
-                    TextField(
-                        value = samplingPeriod.toString(),
-                        onValueChange = {},
-                        readOnly = true,
-                        trailingIcon = {
-                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = isSamplingPeriodDropdownExpanded)
-                        },
-                        colors = TextFieldDefaults.colors(),
-                        modifier = Modifier.menuAnchor()
-                    )
-
-                    ExposedDropdownMenu(
-                        expanded = isSamplingPeriodDropdownExpanded,
-                        onDismissRequest = {
-                            isSamplingPeriodDropdownExpanded = false
-                        }
-                    ) {
-                        RECORDING_SAMPLING_PERIOD_POSSIBLE_VALUES.map { value ->
-                            DropdownMenuItem(
-                                text = {
-                                    Text(text = value.toString())
-                                },
-                                colors = MenuDefaults.itemColors(),
-                                onClick = {
-                                    samplingPeriod = value
-                                    isSamplingPeriodDropdownExpanded = false
-                                }
-                            )
-                        }
-                    }
-                }
-            }
-        }
-
-        // text field for number of samples
-
-        Row (
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp, end = 8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Row (
-                modifier = Modifier.weight(4.5f),
-                verticalAlignment = Alignment.CenterVertically
-            ){
-                Text(
-                    text = stringResource(R.string.number_of_samples)
-                )
-
-                IconButton(onClick = {
-                    isNumberOfSamplesInfoDialogOpen = true
-                }) {
-                    Icon(
-                        imageVector = Icons.Default.Info,
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(18.dp)
-                            .align(Alignment.CenterVertically)
-                    )
-                }
-            }
-
-            TextField(
-                modifier = Modifier.weight(1f),
-                value = numberOfSamplesString,
-                isError = !isRecordingNumberOfSamplesStringValid(numberOfSamplesString),
-                onValueChange = { input ->
-                    numberOfSamplesString = input
-                },
-                colors = TextFieldDefaults.colors(),
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    keyboardType = KeyboardType.Decimal,
-                    imeAction = ImeAction.Done
-                ),
-                keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
-                singleLine = true
-            )
-        }
-
-        // session name
-
-        Row (
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp, end = 8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                modifier = Modifier.weight(1.5f),
-                text = stringResource(R.string.session_name_optional)
-            )
-
-            TextField(
-                modifier = Modifier.weight(1f),
-                value = sessionName,
-                isError = !isRecordingSessionNameValid(sessionName),
-                onValueChange = { input ->
-                    sessionName = input
-                },
-                colors = TextFieldDefaults.colors(),
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    imeAction = ImeAction.Done
-                ),
-                keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
-                singleLine = true
-            )
-        }
-
-        Spacer(modifier = Modifier.height(10.dp))
-
-        // "Start recording" button, along with indicator
-
-        Row (
-            modifier = Modifier.fillMaxSize(),
-            horizontalArrangement = Arrangement.Center
-        ) {
-            OutlinedButton(
-                onClick = {
-                    model.onStartRecording(
-                        recordingName = sessionName,
-                        samplingPeriodMillis = samplingPeriod,
-                        numberOfSamples = numberOfSamplesString.toInt()
-                    )
-                },
-                enabled = !state.value.isRecording &&
-                        isRecordingNumberOfSamplesStringValid(numberOfSamplesString) &&
-                        isRecordingSessionNameValid(sessionName)
-            ) {
-                Text(
-                    text = if (state.value.isRecording) stringResource(R.string.recording)
-                    else stringResource(R.string.start_recording),
-                    textAlign = TextAlign.Center
-                )
-            }
-
-            if (state.value.isRecording) {
-                Spacer(modifier = Modifier.width(15.dp))
-
-                Icon(
-                    modifier = Modifier.align(Alignment.CenterVertically),
-                    painter = painterResource(id = R.drawable.recording_filled_svgrepo_com),
-                    contentDescription = null,
-                    tint = Color.Red
-                )
-            }
-        }
+        StartRecordingButtonAndIndicatorRow(
+            onButtonPressed = {
+                model.onStartRecording()
+            },
+            isRecordingInProgress = uiState.value.isRecording,
+            recordingNumberOfSamplesString = uiState.value.recordingNumberOfSamplesString,
+            recordingSessionName = uiState.value.recordingSessionName
+        )
 
         Spacer (modifier = Modifier.height(10.dp))
 
-        // results section
+        // ================= Recent results section =================== //
 
         SectionHeader(sectionName = stringResource(R.string.recent_results))
 
@@ -372,12 +229,218 @@ fun RecordingScreen(
             )
         }
 
+        // ================= Info dialog =================== //
+
         if (isNumberOfSamplesInfoDialogOpen) {
             InfoDialog(
                 textId = R.string.number_of_samples_value_explanation,
                 cardHeight = 100.dp
             ) {
                 isNumberOfSamplesInfoDialogOpen = false
+            }
+        }
+    }
+}
+
+@Composable
+fun RecordingScreenTitle() {
+    Text(
+        text = stringResource(R.string.power_and_performance_recording),
+        fontWeight = FontWeight.Bold,
+        fontSize = 20.sp
+    )
+}
+
+/*
+ * A Row composable that contains a text ("Number of samples"), a button that opens an info
+ * dialog and a text field where the number of samples is set by the user
+ */
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+fun NumberOfSamplesRow(
+    onIconButtonPressed: () -> Unit,
+    keyboardController : SoftwareKeyboardController?,
+    currentNumberOfSamplesString: String,
+    onValueChanged : (String) -> Unit
+) {
+    Row (
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 8.dp, end = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Row (
+            modifier = Modifier.weight(4.5f),
+            verticalAlignment = Alignment.CenterVertically
+        ){
+            Text(
+                text = stringResource(R.string.number_of_samples)
+            )
+
+            IconButton(onClick = onIconButtonPressed) {
+                Icon(
+                    imageVector = Icons.Default.Info,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(18.dp)
+                        .align(Alignment.CenterVertically)
+                )
+            }
+        }
+
+        TextField(
+            modifier = Modifier.weight(1f),
+            value = currentNumberOfSamplesString,
+            isError = !isRecordingNumberOfSamplesStringValid(currentNumberOfSamplesString),
+            onValueChange = onValueChanged,
+            colors = TextFieldDefaults.colors(),
+            keyboardOptions = KeyboardOptions.Default.copy(
+                keyboardType = KeyboardType.Decimal,
+                imeAction = ImeAction.Done
+            ),
+            keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
+            singleLine = true
+        )
+    }
+}
+
+/*
+ * A Row composable that contains a text ("Session name (optional)") and a text field where the
+ * name of the new recording session is set by the user
+ */
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+fun RecordingSessionNameRow(
+    keyboardController : SoftwareKeyboardController?,
+    currentSessionName: String,
+    onValueChanged : (String) -> Unit
+) {
+    Row (
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 8.dp, end = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            modifier = Modifier.weight(1.5f),
+            text = stringResource(R.string.session_name_optional)
+        )
+
+        TextField(
+            modifier = Modifier.weight(1f),
+            value = currentSessionName,
+            isError = !isRecordingSessionNameValid(currentSessionName),
+            onValueChange = onValueChanged,
+            colors = TextFieldDefaults.colors(),
+            keyboardOptions = KeyboardOptions.Default.copy(
+                imeAction = ImeAction.Done
+            ),
+            keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
+            singleLine = true
+        )
+    }
+}
+
+/*
+ * A Row composable that contains a button for starting the recording session and, only if a
+ * session is in progress, a red circle as an indicator
+ */
+@Composable
+fun StartRecordingButtonAndIndicatorRow(
+    onButtonPressed: () -> Unit,
+    isRecordingInProgress: Boolean,
+    recordingNumberOfSamplesString: String,
+    recordingSessionName: String
+) {
+    Row (
+        modifier = Modifier.fillMaxSize(),
+        horizontalArrangement = Arrangement.Center
+    ) {
+        OutlinedButton(
+            onClick = onButtonPressed,
+            enabled = !isRecordingInProgress &&
+                    isRecordingNumberOfSamplesStringValid(recordingNumberOfSamplesString) &&
+                    isRecordingSessionNameValid(recordingSessionName)
+        ) {
+            Text(
+                text = if (isRecordingInProgress) stringResource(R.string.recording)
+                else stringResource(R.string.start_recording),
+                textAlign = TextAlign.Center
+            )
+        }
+
+        if (isRecordingInProgress) {
+            Spacer(modifier = Modifier.width(15.dp))
+
+            Icon(
+                modifier = Modifier.align(Alignment.CenterVertically),
+                painter = painterResource(id = R.drawable.recording_filled_svgrepo_com),
+                contentDescription = null,
+                tint = Color.Red
+            )
+        }
+    }
+}
+
+/*
+ * A Row composable that contains a text ("Sampling period (milliseconds)") and a dropdown menu from
+ * where the recording sampling period is set by the user
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SamplingPeriodRow(
+    onDismissDropdownMenu: () -> Unit,
+    onSelectedNewValue: (Long) -> Unit,
+    isSamplingPeriodDropdownExpanded : Boolean,
+    currentValue : Long,
+    onChangedExpandedValue: (Boolean) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 8.dp, end = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ){
+        Text(
+            modifier = Modifier.weight(2.5f),
+            text = stringResource(R.string.sampling_period_millis)
+        )
+
+        Spacer(modifier = Modifier.width(10.dp))
+
+        // the dropdown with the possible values
+        Box(
+            modifier = Modifier.weight(1f)
+        ) {
+            ExposedDropdownMenuBox(
+                expanded = isSamplingPeriodDropdownExpanded,
+                onExpandedChange = onChangedExpandedValue
+            ) {
+                TextField(
+                    value = currentValue.toString(),
+                    onValueChange = {},
+                    readOnly = true,
+                    trailingIcon = {
+                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = isSamplingPeriodDropdownExpanded)
+                    },
+                    colors = TextFieldDefaults.colors(),
+                    modifier = Modifier.menuAnchor()
+                )
+
+                ExposedDropdownMenu(
+                    expanded = isSamplingPeriodDropdownExpanded,
+                    onDismissRequest = onDismissDropdownMenu
+                ) {
+                    RECORDING_SAMPLING_PERIOD_POSSIBLE_VALUES.map { value ->
+                        DropdownMenuItem(
+                            text = {
+                                Text(text = value.toString())
+                            },
+                            colors = MenuDefaults.itemColors(),
+                            onClick = { onSelectedNewValue(value) }
+                        )
+                    }
+                }
             }
         }
     }
