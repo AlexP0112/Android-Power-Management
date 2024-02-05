@@ -98,7 +98,7 @@ fun RecordingScreen(
             mutableStateListOf("result111", "result222", "result333", "result444", "result555")
         }
 
-        // ================= screen title variables =================== //
+        // ================= screen title =================== //
 
         RecordingScreenTitle()
 
@@ -108,7 +108,7 @@ fun RecordingScreen(
 
         SectionHeader(sectionName = stringResource(R.string.new_session))
 
-        SamplingPeriodRow(
+        RecordingSamplingPeriodRow(
             onDismissDropdownMenu = {
                 isSamplingPeriodDropdownExpanded = false
             },
@@ -177,49 +177,16 @@ fun RecordingScreen(
         }
 
         sessionResults.forEach { resultName ->
-            Row(
-                modifier = Modifier
-                    .fillMaxSize(),
-                verticalAlignment = Alignment.CenterVertically
-            ){
-                Text(
-                    modifier = Modifier.weight(3f),
-                    text = resultName
-                )
-
-                // icons for delete and view results
-                Row(
-                    modifier = Modifier.weight(1f),
-                    horizontalArrangement = Arrangement.End
-                ) {
-                    // delete button
-                    IconButton(
-                        onClick = {
-                            sessionResults -= resultName
-                        /*TODO*/
-                        }
-                    ) {
-                       Icon(
-                           painter = painterResource(id = R.drawable.garbage_trash),
-                           tint = Color.Red,
-                           contentDescription = null
-                       )
-                    }
-
-                    Spacer(modifier = Modifier.width(10.dp))
-
-                    // view results button
-                    IconButton(
-                        onClick = { /*TODO*/ }
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.eye_icon),
-                            tint = MaterialTheme.colorScheme.tertiary,
-                            contentDescription = null
-                        )
-                    }
+            RecordingSessionResultRow(
+                resultName = resultName,
+                onDeleteButtonPressed = {
+                    // TODO: also delete from storage
+                    sessionResults -= resultName
+                },
+                onViewResultsButtonPressed = {
+                    // TODO: open results
                 }
-            }
+            )
 
             Divider(
                 modifier = Modifier
@@ -388,7 +355,7 @@ fun StartRecordingButtonAndIndicatorRow(
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SamplingPeriodRow(
+fun RecordingSamplingPeriodRow(
     onDismissDropdownMenu: () -> Unit,
     onSelectedNewValue: (Long) -> Unit,
     isSamplingPeriodDropdownExpanded : Boolean,
@@ -441,6 +408,58 @@ fun SamplingPeriodRow(
                         )
                     }
                 }
+            }
+        }
+    }
+}
+
+/*
+ * A Row composable corresponding to a "Recent results" entry. It contains a text (the name of the
+ * result), a button for deleting it and a button for viewing the result
+ */
+@Composable
+fun RecordingSessionResultRow(
+    resultName : String,
+    onDeleteButtonPressed : () -> Unit,
+    onViewResultsButtonPressed: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxSize(),
+        verticalAlignment = Alignment.CenterVertically
+    ){
+        Text(
+            modifier = Modifier.weight(3f),
+            text = resultName
+        )
+
+        // buttons for delete and view results
+        Row(
+            modifier = Modifier.weight(1f),
+            horizontalArrangement = Arrangement.End
+        ) {
+            // delete button
+            IconButton(
+                onClick = onDeleteButtonPressed
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.garbage_trash),
+                    tint = Color.Red,
+                    contentDescription = null
+                )
+            }
+
+            Spacer(modifier = Modifier.width(10.dp))
+
+            // view results button
+            IconButton(
+                onClick = onViewResultsButtonPressed
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.eye_icon),
+                    tint = MaterialTheme.colorScheme.tertiary,
+                    contentDescription = null
+                )
             }
         }
     }
