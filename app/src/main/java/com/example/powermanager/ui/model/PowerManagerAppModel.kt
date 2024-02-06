@@ -13,9 +13,12 @@ import com.example.powermanager.preferences.LIVE_CHARTS_SAMPLING_PERIOD_ID
 import com.example.powermanager.preferences.LIVE_CHARTS_TRACKED_PERIOD_ID
 import com.example.powermanager.preferences.LOAD_AVERAGE_TYPE_ID
 import com.example.powermanager.preferences.LoadAverageTypes
+import com.example.powermanager.preferences.NUMBER_OF_RECORDINGS_LISTED_ID
 import com.example.powermanager.preferences.PreferenceProperties
 import com.example.powermanager.preferences.PreferenceValueAdaptor
 import com.example.powermanager.preferences.PreferencesManager
+import com.example.powermanager.recording.model.Recorder
+import com.example.powermanager.recording.storage.RecordingStorageManager
 import com.example.powermanager.ui.state.AppUiState
 import com.example.powermanager.utils.CORE_FREQUENCY_PATH
 import com.example.powermanager.utils.FAILED_TO_DETERMINE
@@ -334,7 +337,7 @@ class PowerManagerAppModel(
 
     // recording
 
-    fun onStartRecording() {
+    fun startRecording() {
         _uiState.update { currentState ->
             currentState.copy(
                 coreTracked = uiState.value.coreTracked,
@@ -344,9 +347,18 @@ class PowerManagerAppModel(
                 recordingSessionName = uiState.value.recordingSessionName
             )
         }
+
+        viewModelScope.launch {
+            Recorder.record(
+                samplingPeriod = uiState.value.recordingSamplingPeriod,
+                numberOfSamples = uiState.value.recordingNumberOfSamplesString.toInt(),
+                sessionName = uiState.value.recordingSessionName,
+                onRecordingCompleted = { onRecordingCompleted() }
+            )
+        }
     }
 
-    fun onStopRecording() {
+    private fun onRecordingCompleted() {
         _uiState.update { currentState ->
             currentState.copy(
                 coreTracked = uiState.value.coreTracked,
@@ -392,6 +404,18 @@ class PowerManagerAppModel(
                 recordingSessionName = newValue
             )
         }
+    }
+
+    fun getMostRecentRecordingResultsNames(): List<String> {
+        val limit = PreferenceValueAdaptor.preferenceStringValueToActualValue(
+            preferenceID = NUMBER_OF_RECORDINGS_LISTED_ID,
+            preferenceValueAsString = getPreferenceValue(NUMBER_OF_RECORDINGS_LISTED_ID)) as Int
+
+        return RecordingStorageManager.getMostRecentRecordingResultsNames(limit)
+    }
+
+    fun deleteRecordingResult(name: String) {
+        RecordingStorageManager.deleteRecordingResult(name)
     }
 
     // preferences

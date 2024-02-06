@@ -36,7 +36,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -88,6 +87,14 @@ fun RecordingScreen(
 
         val uiState: State<AppUiState> = model.uiState.collectAsState()
 
+        val sessionResults = remember {
+            mutableStateOf(model.getMostRecentRecordingResultsNames())
+        }
+
+        var currentlySelectedResult by remember {
+            mutableStateOf("")
+        }
+
         var isSamplingPeriodDropdownExpanded by remember {
             mutableStateOf(false)
         }
@@ -98,15 +105,6 @@ fun RecordingScreen(
 
         var isConfirmResultDeletionDialogOpen by remember {
             mutableStateOf(false)
-        }
-
-        var currentlySelectedResult by remember {
-            mutableStateOf("")
-        }
-
-        val sessionResults = remember {
-            // TODO change this
-            mutableStateListOf("result111", "result222", "result333", "result444", "result555")
         }
 
         // ================= screen title =================== //
@@ -157,7 +155,7 @@ fun RecordingScreen(
 
         StartRecordingButtonAndIndicatorRow(
             onButtonPressed = {
-                model.onStartRecording()
+                model.startRecording()
             },
             isRecordingInProgress = uiState.value.isRecording,
             recordingNumberOfSamplesString = uiState.value.recordingNumberOfSamplesString,
@@ -172,7 +170,7 @@ fun RecordingScreen(
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        if (sessionResults.isNotEmpty()) {
+        if (sessionResults.value.isNotEmpty()) {
             Divider(
                 modifier = Modifier
                     .fillMaxSize(),
@@ -187,7 +185,7 @@ fun RecordingScreen(
             )
         }
 
-        sessionResults.forEach { resultName ->
+        sessionResults.value.forEach { resultName ->
             RecordingSessionResultRow(
                 resultName = resultName,
                 onDeleteButtonPressed = {
@@ -222,8 +220,8 @@ fun RecordingScreen(
             ConfirmResultDeletionAlertDialog(
                 onDismiss = { isConfirmResultDeletionDialogOpen = false },
                 onConfirm = {
-                    // TODO: also delete from storage
-                    sessionResults -= currentlySelectedResult
+                    model.deleteRecordingResult(currentlySelectedResult)
+                    sessionResults.value -= currentlySelectedResult
                     isConfirmResultDeletionDialogOpen = false
                 },
                 resultName = currentlySelectedResult
