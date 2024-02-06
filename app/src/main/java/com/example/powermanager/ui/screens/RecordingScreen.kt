@@ -17,6 +17,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -58,6 +60,7 @@ import com.example.powermanager.ui.model.PowerManagerAppModel
 import com.example.powermanager.ui.screens.common.InfoDialog
 import com.example.powermanager.ui.screens.common.SectionHeader
 import com.example.powermanager.ui.state.AppUiState
+import com.example.powermanager.utils.CONFIRM_DELETION_TEXT
 import com.example.powermanager.utils.RECORDING_SAMPLING_PERIOD_POSSIBLE_VALUES
 import com.example.powermanager.utils.isRecordingNumberOfSamplesStringValid
 import com.example.powermanager.utils.isRecordingSessionNameValid
@@ -91,6 +94,14 @@ fun RecordingScreen(
 
         var isNumberOfSamplesInfoDialogOpen by remember {
             mutableStateOf(false)
+        }
+
+        var isConfirmResultDeletionDialogOpen by remember {
+            mutableStateOf(false)
+        }
+
+        var currentlySelectedResult by remember {
+            mutableStateOf("")
         }
 
         val sessionResults = remember {
@@ -180,8 +191,8 @@ fun RecordingScreen(
             RecordingSessionResultRow(
                 resultName = resultName,
                 onDeleteButtonPressed = {
-                    // TODO: also delete from storage
-                    sessionResults -= resultName
+                    currentlySelectedResult = resultName
+                    isConfirmResultDeletionDialogOpen = true
                 },
                 onViewResultsButtonPressed = {
                     // TODO: open results
@@ -196,7 +207,7 @@ fun RecordingScreen(
             )
         }
 
-        // ================= Info dialog =================== //
+        // ================= Info/alert dialogs =================== //
 
         if (isNumberOfSamplesInfoDialogOpen) {
             InfoDialog(
@@ -205,6 +216,18 @@ fun RecordingScreen(
             ) {
                 isNumberOfSamplesInfoDialogOpen = false
             }
+        }
+
+        if (isConfirmResultDeletionDialogOpen) {
+            ConfirmResultDeletionAlertDialog(
+                onDismiss = { isConfirmResultDeletionDialogOpen = false },
+                onConfirm = {
+                    // TODO: also delete from storage
+                    sessionResults -= currentlySelectedResult
+                    isConfirmResultDeletionDialogOpen = false
+                },
+                resultName = currentlySelectedResult
+            )
         }
     }
 }
@@ -463,4 +486,45 @@ fun RecordingSessionResultRow(
             }
         }
     }
+}
+
+/*
+ * Alert dialog that asks for user confirmation when deleting a recording result
+ */
+@Composable
+fun ConfirmResultDeletionAlertDialog(
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit,
+    resultName: String
+) {
+    AlertDialog(
+        modifier = Modifier,
+        onDismissRequest = onDismiss,
+        text = {
+            Text(
+                text = String.format(CONFIRM_DELETION_TEXT, resultName),
+                fontSize = 17.sp
+            )
+        },
+        confirmButton = {
+            Button(
+                onClick = onConfirm
+            ) {
+                Text(
+                    text = stringResource(R.string.delete),
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        },
+        dismissButton = {
+            Button(
+                onClick = onDismiss
+            ) {
+                Text(
+                    text = stringResource(R.string.cancel),
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
+    )
 }

@@ -49,6 +49,7 @@ const val DEFAULT_RECORDING_NUMBER_OF_SAMPLES = 30
 const val DEFAULT_RECORDING_NAME = "default"
 const val MINIMUM_NUMBER_OF_RECORDING_SAMPLES_ALLOWED = 5
 const val MAXIMUM_NUMBER_OF_RECORDING_SAMPLES_ALLOWED = 200
+const val CONFIRM_DELETION_TEXT = "Are you sure you want to delete recording result %s?"
 
 // paths
 const val CORE_FREQUENCY_PATH = "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_cur_freq"
