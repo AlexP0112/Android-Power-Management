@@ -5,14 +5,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.example.powermanager.R
 import com.example.powermanager.ui.charts.common.CustomAxisValuesOverrider
-import com.example.powermanager.ui.charts.common.FlowBasedChart
+import com.example.powermanager.ui.charts.common.DynamicChart
 import com.example.powermanager.ui.model.PowerManagerAppModel
 
 @Composable
 fun MemoryChart(
     model: PowerManagerAppModel
 ) {
-    FlowBasedChart(
+    DynamicChart(
         inputDataFlow = model.memoryUsageFlow,
         chartLineColor = MaterialTheme.colorScheme.secondary,
         chartYAxisName = stringResource(R.string.memory_gb),
