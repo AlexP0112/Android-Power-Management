@@ -51,6 +51,13 @@ const val MINIMUM_NUMBER_OF_RECORDING_SAMPLES_ALLOWED = 5
 const val MAXIMUM_NUMBER_OF_RECORDING_SAMPLES_ALLOWED = 200
 const val CONFIRM_DELETION_TEXT = "Are you sure you want to delete recording result %s?"
 
+// notifications
+const val NOTIFICATION_CHANNEL_ID = "power_manager"
+const val NOTIFICATION_CHANNEL_NAME = "Power Manager"
+const val NOTIFICATION_ID = 12345
+const val NOTIFICATION_TITLE = "Power and performance recording finished"
+const val NOTIFICATION_TEXT = "Result saved in %s.json"
+
 // paths
 const val CORE_FREQUENCY_PATH = "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_cur_freq"
 const val DEVICES_SYSTEM_CPU_PATH = "/sys/devices/system/cpu/"

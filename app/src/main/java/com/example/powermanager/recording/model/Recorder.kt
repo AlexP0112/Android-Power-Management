@@ -10,7 +10,7 @@ object Recorder {
         samplingPeriod: Long,
         numberOfSamples: Int,
         sessionName: String,
-        onRecordingCompleted: () -> Unit
+        onRecordingFinished: () -> Unit
     ) {
         withContext(Dispatchers.IO) {
             // TODO initial setup
@@ -22,7 +22,7 @@ object Recorder {
             }
 
             // TODO final stuff
-            onRecordingCompleted()
+            onRecordingFinished()
         }
     }
 }

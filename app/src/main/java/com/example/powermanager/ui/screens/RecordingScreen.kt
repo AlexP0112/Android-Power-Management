@@ -126,11 +126,12 @@ fun RecordingScreen(
                 isSamplingPeriodDropdownExpanded = false
             },
             isSamplingPeriodDropdownExpanded = isSamplingPeriodDropdownExpanded,
-            currentValue = uiState.value.recordingSamplingPeriod,
-            onChangedExpandedValue = { newValue ->
-                isSamplingPeriodDropdownExpanded = newValue
-            }
-        )
+            currentValue = uiState.value.recordingSamplingPeriod
+        ) { newValue ->
+            if (!isSamplingPeriodDropdownExpanded && uiState.value.isRecording)
+                return@RecordingSamplingPeriodRow
+            isSamplingPeriodDropdownExpanded = newValue
+        }
 
         NumberOfSamplesRow(
             onIconButtonPressed = {
@@ -140,7 +141,8 @@ fun RecordingScreen(
             currentNumberOfSamplesString = uiState.value.recordingNumberOfSamplesString,
             onValueChanged = { newValue ->
                 model.changeRecordingNumberOfSamplesString(newValue)
-            }
+            },
+            textFieldEnabled = !uiState.value.isRecording
         )
 
         RecordingSessionNameRow(
@@ -148,7 +150,8 @@ fun RecordingScreen(
             currentSessionName = uiState.value.recordingSessionName,
             onValueChanged = { input ->
                 model.changeRecordingSessionName(input)
-            }
+            },
+            textFieldEnabled = !uiState.value.isRecording
         )
 
         Spacer(modifier = Modifier.height(10.dp))
@@ -249,7 +252,8 @@ fun NumberOfSamplesRow(
     onIconButtonPressed: () -> Unit,
     keyboardController : SoftwareKeyboardController?,
     currentNumberOfSamplesString: String,
-    onValueChanged : (String) -> Unit
+    onValueChanged : (String) -> Unit,
+    textFieldEnabled: Boolean
 ) {
     Row (
         modifier = Modifier
@@ -287,7 +291,8 @@ fun NumberOfSamplesRow(
                 imeAction = ImeAction.Done
             ),
             keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
-            singleLine = true
+            singleLine = true,
+            enabled = textFieldEnabled
         )
     }
 }
@@ -301,7 +306,8 @@ fun NumberOfSamplesRow(
 fun RecordingSessionNameRow(
     keyboardController : SoftwareKeyboardController?,
     currentSessionName: String,
-    onValueChanged : (String) -> Unit
+    onValueChanged : (String) -> Unit,
+    textFieldEnabled: Boolean
 ) {
     Row (
         modifier = Modifier
@@ -324,7 +330,8 @@ fun RecordingSessionNameRow(
                 imeAction = ImeAction.Done
             ),
             keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
-            singleLine = true
+            singleLine = true,
+            enabled = textFieldEnabled
         )
     }
 }

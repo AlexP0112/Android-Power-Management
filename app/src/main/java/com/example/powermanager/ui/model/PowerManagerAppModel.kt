@@ -3,11 +3,14 @@ package com.example.powermanager.ui.model
 import android.annotation.SuppressLint
 import android.app.ActivityManager
 import android.app.Application
+import android.app.NotificationManager
 import android.content.Context
 import android.os.BatteryManager
 import android.os.PowerManager
+import androidx.core.app.NotificationCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.powermanager.R
 import com.example.powermanager.preferences.HOME_SCREEN_SAMPLING_PERIOD_ID
 import com.example.powermanager.preferences.LIVE_CHARTS_SAMPLING_PERIOD_ID
 import com.example.powermanager.preferences.LIVE_CHARTS_TRACKED_PERIOD_ID
@@ -17,12 +20,17 @@ import com.example.powermanager.preferences.NUMBER_OF_RECORDINGS_LISTED_ID
 import com.example.powermanager.preferences.PreferenceProperties
 import com.example.powermanager.preferences.PreferenceValueAdaptor
 import com.example.powermanager.preferences.PreferencesManager
+import com.example.powermanager.preferences.RECORDING_FINISHED_NOTIFICATION_ENABLED_ID
 import com.example.powermanager.recording.model.Recorder
 import com.example.powermanager.recording.storage.RecordingStorageManager
 import com.example.powermanager.ui.state.AppUiState
 import com.example.powermanager.utils.CORE_FREQUENCY_PATH
 import com.example.powermanager.utils.FAILED_TO_DETERMINE
 import com.example.powermanager.utils.MILLIS_IN_A_SECOND
+import com.example.powermanager.utils.NOTIFICATION_CHANNEL_ID
+import com.example.powermanager.utils.NOTIFICATION_ID
+import com.example.powermanager.utils.NOTIFICATION_TEXT
+import com.example.powermanager.utils.NOTIFICATION_TITLE
 import com.example.powermanager.utils.STATISTICS_BACKGROUND_SAMPLING_THRESHOLD_MILLIS
 import com.example.powermanager.utils.UPTIME_COMMAND
 import com.example.powermanager.utils.convertBytesToGigaBytes
@@ -63,6 +71,8 @@ class PowerManagerAppModel(
     private val activityManager : ActivityManager
     private val powerManager: PowerManager
     private val batteryManager: BatteryManager
+    private val notificationManager: NotificationManager
+
     private val preferencesManager: PreferencesManager
 
     private var memoryUsageSamples: MutableList<FlowSample> = mutableListOf()
@@ -73,6 +83,7 @@ class PowerManagerAppModel(
         activityManager = application.applicationContext.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
         powerManager = application.applicationContext.getSystemService(Context.POWER_SERVICE) as PowerManager
         batteryManager = application.applicationContext.getSystemService(Context.BATTERY_SERVICE) as BatteryManager
+        notificationManager = application.applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         preferencesManager = PreferencesManager(application.applicationContext)
 
         // determine the total amount of memory that the device has
@@ -353,12 +364,12 @@ class PowerManagerAppModel(
                 samplingPeriod = uiState.value.recordingSamplingPeriod,
                 numberOfSamples = uiState.value.recordingNumberOfSamplesString.toInt(),
                 sessionName = uiState.value.recordingSessionName,
-                onRecordingCompleted = { onRecordingCompleted() }
+                onRecordingFinished = { onRecordingFinished() }
             )
         }
     }
 
-    private fun onRecordingCompleted() {
+    private fun onRecordingFinished() {
         _uiState.update { currentState ->
             currentState.copy(
                 coreTracked = uiState.value.coreTracked,
@@ -368,6 +379,29 @@ class PowerManagerAppModel(
                 recordingSessionName = uiState.value.recordingSessionName
             )
         }
+
+        val notificationEnabled = PreferenceValueAdaptor.preferenceStringValueToActualValue(
+            preferenceID = RECORDING_FINISHED_NOTIFICATION_ENABLED_ID,
+            preferenceValueAsString = getPreferenceValue(RECORDING_FINISHED_NOTIFICATION_ENABLED_ID)) as Boolean
+
+        if (notificationEnabled)
+            sendRecordingFinishedNotification()
+    }
+
+    private fun sendRecordingFinishedNotification() {
+        val context = getApplication<Application>().applicationContext
+
+        val notification = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
+            .setContentTitle(NOTIFICATION_TITLE)
+            .setContentText(String.format(NOTIFICATION_TEXT, uiState.value.recordingSessionName))
+            .setSmallIcon(R.drawable.app_icon)
+            .setAutoCancel(true)
+            .build()
+
+        notificationManager.notify(
+            NOTIFICATION_ID,
+            notification
+        )
     }
 
     fun changeRecordingSamplingPeriod(newValue: Long) {
