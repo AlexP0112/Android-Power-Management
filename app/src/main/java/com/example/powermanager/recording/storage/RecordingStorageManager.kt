@@ -3,6 +3,7 @@ package com.example.powermanager.recording.storage
 import com.example.powermanager.recording.model.RecordingResult
 import com.example.powermanager.utils.DOT_JSON
 import com.example.powermanager.utils.NO_VALUE_STRING
+import com.example.powermanager.utils.getPrettyStringFromFileSize
 import com.google.gson.GsonBuilder
 import java.io.File
 import java.nio.file.Files
@@ -75,6 +76,9 @@ object RecordingStorageManager {
         if (!file.exists())
             return NO_VALUE_STRING
 
-        return file.readText()
+        val attributes: BasicFileAttributes = Files.readAttributes(file.toPath(), BasicFileAttributes::class.java)
+        val fileSizeInBytes = attributes.size()
+
+        return "File ${file.name} (${getPrettyStringFromFileSize(fileSizeInBytes)})\n\n${file.readText()}"
     }
 }

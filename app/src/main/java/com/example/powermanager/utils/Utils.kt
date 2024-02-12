@@ -145,3 +145,11 @@ fun getDateTimeNiceString(): String {
     val date = Date()
     return dateFormat.format(date)
 }
+
+fun getPrettyStringFromFileSize(size: Long) : String {
+    if (size < NUMBER_OF_BYTES_IN_A_KILOBYTE)
+        return "${size}B"
+
+    val sizeKilo = size.toFloat() / NUMBER_OF_BYTES_IN_A_KILOBYTE.toFloat()
+    return String.format("%.1fKB", sizeKilo)
+}

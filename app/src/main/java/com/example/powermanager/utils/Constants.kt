@@ -13,7 +13,8 @@ const val MEMORY_CHART_NAME         = "Memory usage (GB) in the last %d seconds"
 const val CPU_FREQUENCY_CHART_NAME  = "CPU frequency (GHz) in the last %d seconds"
 const val CPU_LOAD_CHART_NAME       = "CPU load in the last %d seconds"
 
-const val NUMBER_OF_BYTES_IN_A_GIGABYTE : Long = 1024 * 1024 * 1024
+const val NUMBER_OF_BYTES_IN_A_KILOBYTE : Long = 1024L
+const val NUMBER_OF_BYTES_IN_A_GIGABYTE : Long = 1024L * 1024 * 1024
 const val NUMBER_OF_KILOHERTZ_IN_A_GIGAHERTZ : Int = 1000 * 1000
 const val NUMBER_OF_MICROS_IN_A_MILLI : Int = 1000
 const val HOURS_IN_A_DAY = 24L
