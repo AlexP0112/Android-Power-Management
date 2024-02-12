@@ -62,12 +62,14 @@ class PowerManagerAppModel(
     application: Application
 ) : AndroidViewModel(application) {
 
-    private val _uiState = MutableStateFlow(AppUiState())
-    val uiState: StateFlow<AppUiState> = _uiState.asStateFlow()
+    private val _uiState : MutableStateFlow<AppUiState>
+    val uiState: StateFlow<AppUiState>
 
     private val totalMemory: Float
     private val numberOfCores : Int
     private val systemBootTimestamp : Long
+
+    private val recordingResultsDirectory : File
 
     private val activityManager : ActivityManager
     private val powerManager: PowerManager
@@ -81,11 +83,13 @@ class PowerManagerAppModel(
     private var cpuLoadSamples: MutableList<FlowSample> = mutableListOf()
 
     init {
+        // initialize managers
         activityManager = application.applicationContext.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
         powerManager = application.applicationContext.getSystemService(Context.POWER_SERVICE) as PowerManager
         batteryManager = application.applicationContext.getSystemService(Context.BATTERY_SERVICE) as BatteryManager
         notificationManager = application.applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         preferencesManager = PreferencesManager(application.applicationContext)
+        recordingResultsDirectory = File(application.applicationContext.filesDir, STORAGE_DIRECTORY_NAME)
 
         // determine the total amount of memory that the device has
         val info = ActivityManager.MemoryInfo()
@@ -107,6 +111,16 @@ class PowerManagerAppModel(
         viewModelScope.launch {
             preferencesManager.initializePreferences()
         }
+
+        // initialize state
+        val numberOfRecordingsListedLimit = PreferenceValueAdaptor.preferenceStringValueToActualValue(
+            preferenceID = NUMBER_OF_RECORDINGS_LISTED_ID,
+            preferenceValueAsString = getPreferenceValue(NUMBER_OF_RECORDINGS_LISTED_ID)) as Int
+
+        _uiState = MutableStateFlow(AppUiState(
+            recordingResults = RecordingStorageManager.getMostRecentRecordingResultsNames(numberOfRecordingsListedLimit ,recordingResultsDirectory)
+        ))
+        uiState = _uiState.asStateFlow()
     }
 
     // constants determined at startup
@@ -299,7 +313,8 @@ class PowerManagerAppModel(
                 isRecording = uiState.value.isRecording,
                 recordingSamplingPeriod = uiState.value.recordingSamplingPeriod,
                 recordingNumberOfSamplesString = uiState.value.recordingNumberOfSamplesString,
-                recordingSessionName = uiState.value.recordingSessionName
+                recordingSessionName = uiState.value.recordingSessionName,
+                recordingResults = uiState.value.recordingResults
             )
         }
 
@@ -350,19 +365,16 @@ class PowerManagerAppModel(
     // recording
 
     fun startRecording() {
-        val context = getApplication<Application>().applicationContext
-
         _uiState.update { currentState ->
             currentState.copy(
                 coreTracked = uiState.value.coreTracked,
                 isRecording = true,
                 recordingSamplingPeriod = uiState.value.recordingSamplingPeriod,
                 recordingNumberOfSamplesString = uiState.value.recordingNumberOfSamplesString,
-                recordingSessionName = uiState.value.recordingSessionName
+                recordingSessionName = uiState.value.recordingSessionName,
+                recordingResults = uiState.value.recordingResults
             )
         }
-
-        val outputDirectory = File(context.filesDir, STORAGE_DIRECTORY_NAME)
 
         viewModelScope.launch {
             Recorder.record(
@@ -371,37 +383,40 @@ class PowerManagerAppModel(
                 sessionName = uiState.value.recordingSessionName,
                 batteryManager = batteryManager,
                 activityManager = activityManager,
-                outputDirectory = outputDirectory,
-                onRecordingFinished = { onRecordingFinished() }
+                outputDirectory = recordingResultsDirectory,
+                onRecordingFinished = { onRecordingFinished(it) }
             )
         }
     }
 
-    private fun onRecordingFinished() {
+    private fun onRecordingFinished(savedFileName : String) {
+        // send the notification, if it is enabled
+        val notificationEnabled = PreferenceValueAdaptor.preferenceStringValueToActualValue(
+            preferenceID = RECORDING_FINISHED_NOTIFICATION_ENABLED_ID,
+            preferenceValueAsString = getPreferenceValue(RECORDING_FINISHED_NOTIFICATION_ENABLED_ID)) as Boolean
+
+        if (notificationEnabled)
+            sendRecordingFinishedNotification(savedFileName)
+
+        // update state
         _uiState.update { currentState ->
             currentState.copy(
                 coreTracked = uiState.value.coreTracked,
                 isRecording = false,
                 recordingSamplingPeriod = uiState.value.recordingSamplingPeriod,
                 recordingNumberOfSamplesString = uiState.value.recordingNumberOfSamplesString,
-                recordingSessionName = uiState.value.recordingSessionName
+                recordingSessionName = uiState.value.recordingSessionName,
+                recordingResults = getMostRecentRecordingResultsNames()
             )
         }
-
-        val notificationEnabled = PreferenceValueAdaptor.preferenceStringValueToActualValue(
-            preferenceID = RECORDING_FINISHED_NOTIFICATION_ENABLED_ID,
-            preferenceValueAsString = getPreferenceValue(RECORDING_FINISHED_NOTIFICATION_ENABLED_ID)) as Boolean
-
-        if (notificationEnabled)
-            sendRecordingFinishedNotification()
     }
 
-    private fun sendRecordingFinishedNotification() {
+    private fun sendRecordingFinishedNotification(savedFileName: String) {
         val context = getApplication<Application>().applicationContext
 
         val notification = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
             .setContentTitle(NOTIFICATION_TITLE)
-            .setContentText(String.format(NOTIFICATION_TEXT, uiState.value.recordingSessionName))
+            .setContentText(String.format(NOTIFICATION_TEXT, savedFileName))
             .setSmallIcon(R.drawable.app_icon)
             .setAutoCancel(true)
             .build()
@@ -419,7 +434,8 @@ class PowerManagerAppModel(
                 isRecording = uiState.value.isRecording,
                 recordingSamplingPeriod = newValue,
                 recordingNumberOfSamplesString = uiState.value.recordingNumberOfSamplesString,
-                recordingSessionName = uiState.value.recordingSessionName
+                recordingSessionName = uiState.value.recordingSessionName,
+                recordingResults = uiState.value.recordingResults
             )
         }
     }
@@ -431,7 +447,8 @@ class PowerManagerAppModel(
                 isRecording = uiState.value.isRecording,
                 recordingSamplingPeriod = uiState.value.recordingSamplingPeriod,
                 recordingNumberOfSamplesString = newValue,
-                recordingSessionName = uiState.value.recordingSessionName
+                recordingSessionName = uiState.value.recordingSessionName,
+                recordingResults = uiState.value.recordingResults
             )
         }
     }
@@ -443,26 +460,41 @@ class PowerManagerAppModel(
                 isRecording = uiState.value.isRecording,
                 recordingSamplingPeriod = uiState.value.recordingSamplingPeriod,
                 recordingNumberOfSamplesString = uiState.value.recordingNumberOfSamplesString,
-                recordingSessionName = newValue
+                recordingSessionName = newValue,
+                recordingResults = uiState.value.recordingResults
             )
         }
     }
 
-    fun getMostRecentRecordingResultsNames(): List<String> {
+    fun deleteRecordingResult(name: String) {
+        val deleted = RecordingStorageManager.deleteRecordingResult(
+            name = name,
+            directory = recordingResultsDirectory
+        )
+
+        // update state, if the file was successfully deleted
+        if (deleted) {
+            _uiState.update { currentState ->
+                currentState.copy(
+                    coreTracked = uiState.value.coreTracked,
+                    isRecording = uiState.value.isRecording,
+                    recordingSamplingPeriod = uiState.value.recordingSamplingPeriod,
+                    recordingNumberOfSamplesString = uiState.value.recordingNumberOfSamplesString,
+                    recordingSessionName = uiState.value.recordingSessionName,
+                    recordingResults = getMostRecentRecordingResultsNames()
+                )
+            }
+        }
+    }
+
+    private fun getMostRecentRecordingResultsNames(): List<String> {
         val limit = PreferenceValueAdaptor.preferenceStringValueToActualValue(
             preferenceID = NUMBER_OF_RECORDINGS_LISTED_ID,
             preferenceValueAsString = getPreferenceValue(NUMBER_OF_RECORDINGS_LISTED_ID)) as Int
 
         return RecordingStorageManager.getMostRecentRecordingResultsNames(
             limit = limit,
-            directory = File(getApplication<Application>().applicationContext.filesDir, STORAGE_DIRECTORY_NAME)
-        )
-    }
-
-    fun deleteRecordingResult(name: String) {
-        RecordingStorageManager.deleteRecordingResult(
-            name = name,
-            directory = File(getApplication<Application>().applicationContext.filesDir, STORAGE_DIRECTORY_NAME)
+            directory = recordingResultsDirectory
         )
     }
 

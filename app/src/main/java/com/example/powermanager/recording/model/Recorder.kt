@@ -29,7 +29,7 @@ object Recorder {
         batteryManager: BatteryManager,
         activityManager: ActivityManager,
         outputDirectory : File,
-        onRecordingFinished: () -> Unit
+        onRecordingFinished: (String) -> Unit
     ) {
         withContext(Dispatchers.IO) {
             val batteryChargeValues : MutableList<Int> = mutableListOf()
@@ -83,13 +83,12 @@ object Recorder {
             )
 
             // save the result in a JSON file
-            RecordingStorageManager.saveRecordingResult(
+            val savedFileName = RecordingStorageManager.saveRecordingResult(
                 result = result,
                 directory = outputDirectory
             )
 
-            // send the notification that sampling ended
-            onRecordingFinished()
+            onRecordingFinished(savedFileName)
         }
     }
 

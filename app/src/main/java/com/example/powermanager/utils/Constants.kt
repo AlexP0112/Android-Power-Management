@@ -57,7 +57,7 @@ const val DOT_JSON = ".json"
 const val NOTIFICATION_CHANNEL_ID = "power_manager"
 const val NOTIFICATION_CHANNEL_NAME = "Power Manager"
 const val NOTIFICATION_ID = 12345
-const val NOTIFICATION_TITLE = "Power and performance recording finished"
+const val NOTIFICATION_TITLE = "Power and performance recording ended"
 const val NOTIFICATION_TEXT = "Result saved in %s.json"
 
 // paths

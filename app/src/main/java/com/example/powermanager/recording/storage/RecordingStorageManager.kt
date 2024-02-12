@@ -34,15 +34,16 @@ object RecordingStorageManager {
         }
     }
 
-    fun deleteRecordingResult(name: String, directory: File) {
-        try {
+    fun deleteRecordingResult(name: String, directory: File) : Boolean {
+        return try {
             File(directory, "$name$DOT_JSON").delete()
+            true
         } catch (_ : Exception) {
-
+            false
         }
     }
 
-    fun saveRecordingResult(result : RecordingResult, directory: File) {
+    fun saveRecordingResult(result : RecordingResult, directory: File) : String {
         // first convert the result to JSON format
         val gson = GsonBuilder().setPrettyPrinting().create()
         val fileContent = gson.toJson(result)
@@ -64,5 +65,7 @@ object RecordingStorageManager {
         }
 
         File(directory, "$fileName$DOT_JSON").writeText(fileContent)
+
+        return fileName
     }
 }

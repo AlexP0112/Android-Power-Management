@@ -17,7 +17,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
@@ -87,10 +86,6 @@ fun RecordingScreen(
         // ================= screen state variables =================== //
 
         val uiState: State<AppUiState> = model.uiState.collectAsState()
-
-        val sessionResults = remember {
-            mutableStateOf(model.getMostRecentRecordingResultsNames())
-        }
 
         var currentlySelectedResult by remember {
             mutableStateOf("")
@@ -174,7 +169,7 @@ fun RecordingScreen(
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        if (sessionResults.value.isNotEmpty()) {
+        if (uiState.value.recordingResults.isNotEmpty()) {
             Divider(
                 modifier = Modifier
                     .fillMaxSize(),
@@ -189,7 +184,7 @@ fun RecordingScreen(
             )
         }
 
-        sessionResults.value.forEach { resultName ->
+        uiState.value.recordingResults.forEach { resultName ->
             RecordingSessionResultRow(
                 resultName = resultName,
                 onDeleteButtonPressed = {
@@ -209,11 +204,6 @@ fun RecordingScreen(
             )
         }
 
-        // refresh button for recent results
-        RefreshRecentResultsButton {
-            sessionResults.value = model.getMostRecentRecordingResultsNames()
-        }
-
         // ================= Info/alert dialogs =================== //
 
         if (isNumberOfSamplesInfoDialogOpen) {
@@ -230,7 +220,6 @@ fun RecordingScreen(
                 onDismiss = { isConfirmResultDeletionDialogOpen = false },
                 onConfirm = {
                     model.deleteRecordingResult(currentlySelectedResult)
-                    sessionResults.value = model.getMostRecentRecordingResultsNames()
                     isConfirmResultDeletionDialogOpen = false
                 },
                 resultName = currentlySelectedResult
@@ -322,8 +311,8 @@ fun RecordingSessionNameRow(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            modifier = Modifier.weight(1.5f),
-            text = stringResource(R.string.session_name_optional)
+            modifier = Modifier.weight(1.8f),
+            text = stringResource(R.string.session_name)
         )
 
         TextField(
@@ -538,19 +527,4 @@ fun ConfirmResultDeletionAlertDialog(
             }
         }
     )
-}
-
-@Composable
-fun RefreshRecentResultsButton(
-    onClick: () -> Unit
-) {
-    IconButton(
-        onClick = onClick
-    ) {
-        Icon(
-            imageVector = Icons.Default.Refresh,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.secondary
-        )
-    }
 }
