@@ -5,9 +5,12 @@ import java.io.BufferedReader
 import java.io.File
 import java.io.FileFilter
 import java.io.InputStreamReader
+import java.text.DateFormat
+import java.text.SimpleDateFormat
 import java.time.Duration
 import java.util.Calendar
 import java.util.Date
+import java.util.Locale
 import java.util.regex.Pattern
 
 fun getHourAndMinuteFromLongTimestamp(timestamp: Long): String {
@@ -111,4 +114,34 @@ fun isRecordingNumberOfSamplesStringValid(numberOfSamplesString : String) : Bool
 
 fun isRecordingSessionNameValid(name : String) : Boolean {
     return name.matches(ALPHANUMERIC.toRegex())
+}
+
+fun computeListAverage(list : List<Float>) : Float {
+    var sum = 0f
+
+    list.forEach {
+        sum += it
+    }
+
+    return sum / list.size
+}
+
+fun getListMaximum(list : List<Float>) : Float {
+    if (list.isEmpty())
+        return 0f
+
+    var max = list[0]
+
+    list.forEach {
+        if (it > max)
+            max = it
+    }
+
+    return max
+}
+
+fun getDateTimeNiceString(): String {
+    val dateFormat: DateFormat = SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.getDefault())
+    val date = Date()
+    return dateFormat.format(date)
 }

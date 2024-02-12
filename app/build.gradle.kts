@@ -56,6 +56,9 @@ dependencies {
     implementation("com.patrykandpatrick.vico:compose-m3:1.13.1")
     implementation("com.patrykandpatrick.vico:core:1.13.1")
 
+    // json files handling
+    implementation("com.google.code.gson:gson:2.10")
+
     implementation("androidx.navigation:navigation-compose:2.7.5")
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")

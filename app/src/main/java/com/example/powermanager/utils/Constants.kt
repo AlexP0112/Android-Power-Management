@@ -50,6 +50,8 @@ const val DEFAULT_RECORDING_NAME = "default"
 const val MINIMUM_NUMBER_OF_RECORDING_SAMPLES_ALLOWED = 5
 const val MAXIMUM_NUMBER_OF_RECORDING_SAMPLES_ALLOWED = 200
 const val CONFIRM_DELETION_TEXT = "Are you sure you want to delete recording result %s?"
+const val STORAGE_DIRECTORY_NAME = "recording_results"
+const val DOT_JSON = ".json"
 
 // notifications
 const val NOTIFICATION_CHANNEL_ID = "power_manager"

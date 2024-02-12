@@ -32,6 +32,7 @@ import com.example.powermanager.utils.NOTIFICATION_ID
 import com.example.powermanager.utils.NOTIFICATION_TEXT
 import com.example.powermanager.utils.NOTIFICATION_TITLE
 import com.example.powermanager.utils.STATISTICS_BACKGROUND_SAMPLING_THRESHOLD_MILLIS
+import com.example.powermanager.utils.STORAGE_DIRECTORY_NAME
 import com.example.powermanager.utils.UPTIME_COMMAND
 import com.example.powermanager.utils.convertBytesToGigaBytes
 import com.example.powermanager.utils.convertKHzToGHz
@@ -349,6 +350,8 @@ class PowerManagerAppModel(
     // recording
 
     fun startRecording() {
+        val context = getApplication<Application>().applicationContext
+
         _uiState.update { currentState ->
             currentState.copy(
                 coreTracked = uiState.value.coreTracked,
@@ -359,11 +362,16 @@ class PowerManagerAppModel(
             )
         }
 
+        val outputDirectory = File(context.filesDir, STORAGE_DIRECTORY_NAME)
+
         viewModelScope.launch {
             Recorder.record(
                 samplingPeriod = uiState.value.recordingSamplingPeriod,
                 numberOfSamples = uiState.value.recordingNumberOfSamplesString.toInt(),
                 sessionName = uiState.value.recordingSessionName,
+                batteryManager = batteryManager,
+                activityManager = activityManager,
+                outputDirectory = outputDirectory,
                 onRecordingFinished = { onRecordingFinished() }
             )
         }
@@ -445,11 +453,17 @@ class PowerManagerAppModel(
             preferenceID = NUMBER_OF_RECORDINGS_LISTED_ID,
             preferenceValueAsString = getPreferenceValue(NUMBER_OF_RECORDINGS_LISTED_ID)) as Int
 
-        return RecordingStorageManager.getMostRecentRecordingResultsNames(limit)
+        return RecordingStorageManager.getMostRecentRecordingResultsNames(
+            limit = limit,
+            directory = File(getApplication<Application>().applicationContext.filesDir, STORAGE_DIRECTORY_NAME)
+        )
     }
 
     fun deleteRecordingResult(name: String) {
-        RecordingStorageManager.deleteRecordingResult(name)
+        RecordingStorageManager.deleteRecordingResult(
+            name = name,
+            directory = File(getApplication<Application>().applicationContext.filesDir, STORAGE_DIRECTORY_NAME)
+        )
     }
 
     // preferences
