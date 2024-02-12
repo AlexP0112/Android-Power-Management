@@ -110,6 +110,11 @@ class PowerManagerAppModel(
         // initialize the user preferences
         viewModelScope.launch {
             preferencesManager.initializePreferences()
+
+            val numberOfRecordingsListedLimit = PreferenceValueAdaptor.preferenceStringValueToActualValue(
+                preferenceID = NUMBER_OF_RECORDINGS_LISTED_ID,
+                preferenceValueAsString = getPreferenceValue(NUMBER_OF_RECORDINGS_LISTED_ID)) as Int
+            onPreferenceValueChanged(NUMBER_OF_RECORDINGS_LISTED_ID, numberOfRecordingsListedLimit.toString())
         }
 
         // initialize state
@@ -118,7 +123,7 @@ class PowerManagerAppModel(
             preferenceValueAsString = getPreferenceValue(NUMBER_OF_RECORDINGS_LISTED_ID)) as Int
 
         _uiState = MutableStateFlow(AppUiState(
-            recordingResults = RecordingStorageManager.getMostRecentRecordingResultsNames(numberOfRecordingsListedLimit ,recordingResultsDirectory)
+            recordingResults = RecordingStorageManager.getMostRecentRecordingResultsNames(numberOfRecordingsListedLimit, recordingResultsDirectory)
         ))
         uiState = _uiState.asStateFlow()
     }
@@ -503,6 +508,19 @@ class PowerManagerAppModel(
     fun onPreferenceValueChanged(preferenceKey : String, newValue : String) {
         viewModelScope.launch {
             preferencesManager.updatePreferenceValue(preferenceKey, newValue)
+        }
+
+        if (preferenceKey == NUMBER_OF_RECORDINGS_LISTED_ID) {
+            _uiState.update { currentState ->
+                currentState.copy(
+                    coreTracked = uiState.value.coreTracked,
+                    isRecording = uiState.value.isRecording,
+                    recordingSamplingPeriod = uiState.value.recordingSamplingPeriod,
+                    recordingNumberOfSamplesString = uiState.value.recordingNumberOfSamplesString,
+                    recordingSessionName = uiState.value.recordingSessionName,
+                    recordingResults = getMostRecentRecordingResultsNames()
+                )
+            }
         }
     }
 
