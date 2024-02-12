@@ -503,6 +503,13 @@ class PowerManagerAppModel(
         )
     }
 
+    fun getRecordingResultFileContent(fileName: String) : String {
+        return RecordingStorageManager.getFileContent(
+            fileName = fileName,
+            directory = recordingResultsDirectory
+        )
+    }
+
     // preferences
 
     fun onPreferenceValueChanged(preferenceKey : String, newValue : String) {

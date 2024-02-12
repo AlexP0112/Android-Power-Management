@@ -1,5 +1,6 @@
 package com.example.powermanager.ui.screens
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -19,6 +21,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -43,6 +46,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -54,6 +58,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import com.example.powermanager.R
 import com.example.powermanager.ui.model.PowerManagerAppModel
 import com.example.powermanager.ui.screens.common.InfoDialog
@@ -100,6 +105,10 @@ fun RecordingScreen(
         }
 
         var isConfirmResultDeletionDialogOpen by remember {
+            mutableStateOf(false)
+        }
+
+        var isInspectDialogOpen by remember {
             mutableStateOf(false)
         }
 
@@ -191,6 +200,10 @@ fun RecordingScreen(
                     currentlySelectedResult = resultName
                     isConfirmResultDeletionDialogOpen = true
                 },
+                onInspectButtonPressed = {
+                    currentlySelectedResult = resultName
+                    isInspectDialogOpen = true
+                },
                 onViewResultsButtonPressed = {
                     // TODO: open results
                 }
@@ -223,6 +236,13 @@ fun RecordingScreen(
                     isConfirmResultDeletionDialogOpen = false
                 },
                 resultName = currentlySelectedResult
+            )
+        }
+
+        if (isInspectDialogOpen) {
+            InspectResultInfoDialog(
+                content = model.getRecordingResultFileContent(currentlySelectedResult),
+                onDismissRequest = { isInspectDialogOpen = false }
             )
         }
     }
@@ -444,6 +464,7 @@ fun RecordingSamplingPeriodRow(
 fun RecordingSessionResultRow(
     resultName : String,
     onDeleteButtonPressed : () -> Unit,
+    onInspectButtonPressed : () -> Unit,
     onViewResultsButtonPressed: () -> Unit
 ) {
     Row(
@@ -452,11 +473,11 @@ fun RecordingSessionResultRow(
         verticalAlignment = Alignment.CenterVertically
     ){
         Text(
-            modifier = Modifier.weight(3f),
+            modifier = Modifier.weight(1.8f),
             text = resultName
         )
 
-        // buttons for delete and view results
+        // buttons for delete, inspect and view results
         Row(
             modifier = Modifier.weight(1f),
             horizontalArrangement = Arrangement.End
@@ -468,6 +489,17 @@ fun RecordingSessionResultRow(
                 Icon(
                     painter = painterResource(id = R.drawable.garbage_trash),
                     tint = Color.Red,
+                    contentDescription = null
+                )
+            }
+
+            // inspect results button
+            IconButton(
+                onClick = onInspectButtonPressed
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.magnifier_svgrepo_com),
+                    tint = MaterialTheme.colorScheme.primary,
                     contentDescription = null
                 )
             }
@@ -527,4 +559,38 @@ fun ConfirmResultDeletionAlertDialog(
             }
         }
     )
+}
+
+/*
+ * Info Dialog that contains the raw content of a session result
+ */
+@Composable
+fun InspectResultInfoDialog(
+    content: String,
+    onDismissRequest: () -> Unit
+) {
+    val (height, width) = LocalConfiguration.current.run { screenHeightDp.dp to screenWidthDp.dp }
+
+    Dialog(
+        onDismissRequest = onDismissRequest
+    ) {
+        Card(
+            modifier = Modifier
+                .width(width)
+                .height(height / 2)
+                .verticalScroll(rememberScrollState()),
+            shape = RoundedCornerShape(16.dp),
+            border = BorderStroke(
+                width = 2.dp,
+                color = MaterialTheme.colorScheme.onPrimaryContainer
+            )
+        ) {
+            Text(
+                text = content,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(5.dp)
+            )
+        }
+    }
 }

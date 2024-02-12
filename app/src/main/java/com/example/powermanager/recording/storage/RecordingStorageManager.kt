@@ -2,6 +2,7 @@ package com.example.powermanager.recording.storage
 
 import com.example.powermanager.recording.model.RecordingResult
 import com.example.powermanager.utils.DOT_JSON
+import com.example.powermanager.utils.NO_VALUE_STRING
 import com.google.gson.GsonBuilder
 import java.io.File
 import java.nio.file.Files
@@ -67,5 +68,13 @@ object RecordingStorageManager {
         File(directory, "$fileName$DOT_JSON").writeText(fileContent)
 
         return fileName
+    }
+
+    fun getFileContent(fileName: String, directory: File) : String {
+        val file = File(directory, "$fileName$DOT_JSON")
+        if (!file.exists())
+            return NO_VALUE_STRING
+
+        return file.readText()
     }
 }
