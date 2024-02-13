@@ -1,20 +1,28 @@
 package com.example.powermanager.ui.screens
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Divider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.example.powermanager.R
 import com.example.powermanager.recording.model.RecordingResult
+import com.example.powermanager.ui.charts.common.StaticChart
 import com.example.powermanager.ui.model.PowerManagerAppModel
 import com.example.powermanager.ui.state.AppUiState
 
@@ -27,18 +35,113 @@ fun RecordingResultViewScreen(
         modifier = Modifier
             .padding(
                 top = topPadding + 5.dp,
+                start = 6.dp,
+                end = 6.dp
             )
             .fillMaxSize()
-            .verticalScroll(rememberScrollState()),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .verticalScroll(rememberScrollState())
     ) {
         val uiState: State<AppUiState> = model.uiState.collectAsState()
         val result: RecordingResult = model.getCurrentlySelectedRecordingResult()
+        val totalMemoryGB = model.getTotalMemory()
+        val batteryDischarge = result.batteryChargeValues.first() - result.batteryChargeValues.last()
 
         // title of the screen
         Text(
-            text = "Recording session ${uiState.value.currentlySelectedRecordingResult}",
-            fontWeight = FontWeight.Bold
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+            text = "Recording session '${uiState.value.currentlySelectedRecordingResult}'",
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        // general info about the recording session
+        Text(
+            text = "\u25cb Timestamp: ${result.timestamp}"
+        )
+
+        Text(
+            text = "\u25cb Total duration: ${result.duration}"
+        )
+
+        Text(
+            text = "\u25cb Number of samples: ${result.numberOfSamples}"
+        )
+
+        Spacer(modifier = Modifier.height(6.dp))
+
+        Divider(
+            modifier = Modifier
+                .fillMaxSize(),
+            thickness = 0.75.dp,
+            color = MaterialTheme.colorScheme.secondary
+        )
+
+        Spacer(modifier = Modifier.height(6.dp))
+
+        // stats
+        Text(
+            text = if (batteryDischarge >= 0) "\u25cb Total battery discharge: $batteryDischarge mAh" else
+                "\u25cb Total battery charge: ${-batteryDischarge} mAh"
+        )
+
+        Text(
+            text = "\u25cb Average memory usage: ${String.format("%.2f", result.averageMemoryUsed)}/${String.format("%.2f", totalMemoryGB)}GB (${String.format("%.1f", result.averageMemoryUsed * 100f / totalMemoryGB)}%)"
+        )
+
+        Text(
+            text = "\u25cb Peak memory usage: ${String.format("%.2f", result.peakMemoryUsed)}/${String.format("%.2f", totalMemoryGB)}GB (${String.format("%.1f", result.peakMemoryUsed * 100f / totalMemoryGB)}%)"
+        )
+
+        Text(
+            text = "\u25cb Average CPU load: ${String.format("%.1f", result.averageCpuLoad)}"
+        )
+
+        Text(
+            text = "\u25cb Peak CPU load: ${String.format("%.1f", result.peakCpuLoad)}"
+        )
+
+        Spacer(modifier = Modifier.height(6.dp))
+
+        Divider(
+            modifier = Modifier
+                .fillMaxSize(),
+            thickness = 0.75.dp,
+            color = MaterialTheme.colorScheme.secondary
+        )
+
+        Spacer(modifier = Modifier.height(6.dp))
+
+        // charts
+        Text(
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+            text = stringResource(R.string.battery_level_mah)
+        )
+
+        StaticChart(
+            chartLineColor = MaterialTheme.colorScheme.tertiary,
+            inputData = result.batteryChargeValues.map { it.toFloat() }
+        )
+
+        Text(
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+            text = stringResource(R.string.memory_usage_gb)
+        )
+
+        StaticChart(
+            chartLineColor = MaterialTheme.colorScheme.secondary,
+            inputData = result.memoryUsedValues
+        )
+
+        Text(
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+            text = stringResource(R.string.cpu_load)
+        )
+
+        StaticChart(
+            chartLineColor = MaterialTheme.colorScheme.onSecondaryContainer,
+            inputData = result.cpuLoadValues
         )
     }
 }

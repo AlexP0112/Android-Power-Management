@@ -54,4 +54,6 @@
     <string name="no_results_found">No recording results found!</string>
     <string name="delete">Delete</string>
     <string name="cancel">Cancel</string>
+    <string name="battery_level_mah">Battery level (mAh)</string>
+    <string name="memory_usage_gb">Memory usage (GB)</string>
 </resources>
