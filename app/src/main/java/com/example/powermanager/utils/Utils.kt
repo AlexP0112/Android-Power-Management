@@ -140,6 +140,20 @@ fun getListMaximum(list : List<Float>) : Float {
     return max
 }
 
+fun getListMinimum(list : List<Float>) : Float {
+    if (list.isEmpty())
+        return 0f
+
+    var min = list[0]
+
+    list.forEach {
+        if (it < min)
+            min = it
+    }
+
+    return min
+}
+
 fun getDateTimeNiceString(): String {
     val dateFormat: DateFormat = SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.getDefault())
     val date = Date()

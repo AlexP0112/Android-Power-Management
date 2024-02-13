@@ -22,9 +22,12 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.powermanager.R
 import com.example.powermanager.recording.model.RecordingResult
+import com.example.powermanager.ui.charts.common.CustomAxisValuesOverrider
 import com.example.powermanager.ui.charts.common.StaticChart
 import com.example.powermanager.ui.model.PowerManagerAppModel
 import com.example.powermanager.ui.state.AppUiState
+import com.example.powermanager.utils.getListMaximum
+import com.example.powermanager.utils.getListMinimum
 
 @Composable
 fun RecordingResultViewScreen(
@@ -43,7 +46,9 @@ fun RecordingResultViewScreen(
     ) {
         val uiState: State<AppUiState> = model.uiState.collectAsState()
         val result: RecordingResult = model.getCurrentlySelectedRecordingResult()
+
         val totalMemoryGB = model.getTotalMemory()
+        val batteryChargeValuesFloat = result.batteryChargeValues.map { it.toFloat() }
         val batteryDischarge = result.batteryChargeValues.first() - result.batteryChargeValues.last()
 
         // title of the screen
@@ -119,9 +124,14 @@ fun RecordingResultViewScreen(
             text = stringResource(R.string.battery_level_mah)
         )
 
+        // battery level chart
         StaticChart(
             chartLineColor = MaterialTheme.colorScheme.tertiary,
-            inputData = result.batteryChargeValues.map { it.toFloat() }
+            inputData = batteryChargeValuesFloat,
+            customAxisValuesOverrider = CustomAxisValuesOverrider(
+                minYValue = getListMinimum(batteryChargeValuesFloat),
+                maxYValue = getListMaximum(batteryChargeValuesFloat)
+            )
         )
 
         Text(
@@ -129,9 +139,14 @@ fun RecordingResultViewScreen(
             text = stringResource(R.string.memory_usage_gb)
         )
 
+        // memory chart
         StaticChart(
             chartLineColor = MaterialTheme.colorScheme.secondary,
-            inputData = result.memoryUsedValues
+            inputData = result.memoryUsedValues,
+            customAxisValuesOverrider = CustomAxisValuesOverrider(
+                minYValue = getListMinimum(result.memoryUsedValues),
+                maxYValue = result.peakMemoryUsed
+            )
         )
 
         Text(
@@ -139,9 +154,14 @@ fun RecordingResultViewScreen(
             text = stringResource(R.string.cpu_load)
         )
 
+        // CPU load chart
         StaticChart(
             chartLineColor = MaterialTheme.colorScheme.onSecondaryContainer,
-            inputData = result.cpuLoadValues
+            inputData = result.cpuLoadValues,
+            customAxisValuesOverrider = CustomAxisValuesOverrider(
+                minYValue = getListMinimum(result.cpuLoadValues),
+                maxYValue = result.peakCpuLoad
+            )
         )
     }
 }

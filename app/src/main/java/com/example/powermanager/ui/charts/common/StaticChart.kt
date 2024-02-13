@@ -29,7 +29,8 @@ import com.patrykandpatrick.vico.core.entry.FloatEntry
 @Composable
 fun StaticChart(
     chartLineColor: Color,
-    inputData: List<Float>
+    inputData: List<Float>,
+    customAxisValuesOverrider: CustomAxisValuesOverrider
 ) {
     val modelProducer = remember { ChartEntryModelProducer() }
     val scrollState = rememberChartScrollState()
@@ -65,7 +66,10 @@ fun StaticChart(
         ){
             val marker = rememberMarker()
             Chart(
-                chart = lineChart(lines = datasetLineSpec),
+                chart = lineChart(
+                    lines = datasetLineSpec,
+                    axisValuesOverrider = customAxisValuesOverrider
+                ),
                 startAxis = rememberStartAxis(
                     tickLength = 0.dp,
                     itemPlacer = AxisItemPlacer.Vertical.default(
