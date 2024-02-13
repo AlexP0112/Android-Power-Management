@@ -73,7 +73,8 @@ import com.example.powermanager.utils.isRecordingSessionNameValid
 @Composable
 fun RecordingScreen(
     topPadding: Dp,
-    model : PowerManagerAppModel
+    model : PowerManagerAppModel,
+    onViewResultsButtonPressed: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -92,10 +93,6 @@ fun RecordingScreen(
 
         val uiState: State<AppUiState> = model.uiState.collectAsState()
 
-        var currentlySelectedResult by remember {
-            mutableStateOf("")
-        }
-
         var isSamplingPeriodDropdownExpanded by remember {
             mutableStateOf(false)
         }
@@ -108,7 +105,7 @@ fun RecordingScreen(
             mutableStateOf(false)
         }
 
-        var isInspectDialogOpen by remember {
+        var isInspectRawResultDialogOpen by remember {
             mutableStateOf(false)
         }
 
@@ -197,15 +194,16 @@ fun RecordingScreen(
             RecordingSessionResultRow(
                 resultName = resultName,
                 onDeleteButtonPressed = {
-                    currentlySelectedResult = resultName
+                    model.changeSelectedRecordingResult(resultName)
                     isConfirmResultDeletionDialogOpen = true
                 },
                 onInspectButtonPressed = {
-                    currentlySelectedResult = resultName
-                    isInspectDialogOpen = true
+                    model.changeSelectedRecordingResult(resultName)
+                    isInspectRawResultDialogOpen = true
                 },
                 onViewResultsButtonPressed = {
-                    // TODO: open results
+                    model.changeSelectedRecordingResult(resultName)
+                    onViewResultsButtonPressed()
                 }
             )
 
@@ -232,17 +230,17 @@ fun RecordingScreen(
             ConfirmResultDeletionAlertDialog(
                 onDismiss = { isConfirmResultDeletionDialogOpen = false },
                 onConfirm = {
-                    model.deleteRecordingResult(currentlySelectedResult)
+                    model.deleteRecordingResult()
                     isConfirmResultDeletionDialogOpen = false
                 },
-                resultName = currentlySelectedResult
+                resultName = uiState.value.currentlySelectedRecordingResult
             )
         }
 
-        if (isInspectDialogOpen) {
+        if (isInspectRawResultDialogOpen) {
             InspectResultInfoDialog(
-                content = model.getRecordingResultFileContent(currentlySelectedResult),
-                onDismissRequest = { isInspectDialogOpen = false }
+                content = model.getRecordingResultRawFileContent(),
+                onDismissRequest = { isInspectRawResultDialogOpen = false }
             )
         }
     }

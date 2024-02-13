@@ -45,11 +45,13 @@ import com.example.powermanager.ui.navigation.navigationItems
 import com.example.powermanager.ui.screens.ControlScreen
 import com.example.powermanager.ui.screens.HomeScreen
 import com.example.powermanager.ui.screens.LiveChartsScreen
+import com.example.powermanager.ui.screens.RecordingResultViewScreen
 import com.example.powermanager.ui.screens.RecordingScreen
 import com.example.powermanager.ui.screens.SettingsScreen
 import com.example.powermanager.utils.CONTROL_SCREEN_NAME
 import com.example.powermanager.utils.HOME_SCREEN_NAME
 import com.example.powermanager.utils.LIVE_CHARTS_SCREEN_NAME
+import com.example.powermanager.utils.RECORDING_RESULT_SCREEN_NAME
 import com.example.powermanager.utils.RECORDING_SCREEN_NAME
 import com.example.powermanager.utils.SETTINGS_SCREEN_NAME
 import kotlinx.coroutines.CoroutineScope
@@ -193,6 +195,31 @@ fun ScreensNavHost(
             },
         ) {
             RecordingScreen(
+                topPadding = topPadding,
+                model = model,
+                onViewResultsButtonPressed = {
+                    navController.navigate(RECORDING_RESULT_SCREEN_NAME)
+                }
+            )
+        }
+
+        // recording results view screen
+        composable(
+            route = RECORDING_RESULT_SCREEN_NAME,
+            enterTransition = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                    animationSpec = tween(250)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                    animationSpec = tween(250)
+                )
+            },
+        ) {
+            RecordingResultViewScreen(
                 topPadding = topPadding,
                 model = model
             )

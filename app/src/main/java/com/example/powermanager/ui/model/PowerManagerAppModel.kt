@@ -22,6 +22,7 @@ import com.example.powermanager.preferences.PreferenceValueAdaptor
 import com.example.powermanager.preferences.PreferencesManager
 import com.example.powermanager.preferences.RECORDING_FINISHED_NOTIFICATION_ENABLED_ID
 import com.example.powermanager.recording.model.Recorder
+import com.example.powermanager.recording.model.RecordingResult
 import com.example.powermanager.recording.storage.RecordingStorageManager
 import com.example.powermanager.ui.state.AppUiState
 import com.example.powermanager.utils.CORE_FREQUENCY_PATH
@@ -319,7 +320,8 @@ class PowerManagerAppModel(
                 recordingSamplingPeriod = uiState.value.recordingSamplingPeriod,
                 recordingNumberOfSamplesString = uiState.value.recordingNumberOfSamplesString,
                 recordingSessionName = uiState.value.recordingSessionName,
-                recordingResults = uiState.value.recordingResults
+                recordingResults = uiState.value.recordingResults,
+                currentlySelectedRecordingResult = uiState.value.currentlySelectedRecordingResult
             )
         }
 
@@ -377,7 +379,8 @@ class PowerManagerAppModel(
                 recordingSamplingPeriod = uiState.value.recordingSamplingPeriod,
                 recordingNumberOfSamplesString = uiState.value.recordingNumberOfSamplesString,
                 recordingSessionName = uiState.value.recordingSessionName,
-                recordingResults = uiState.value.recordingResults
+                recordingResults = uiState.value.recordingResults,
+                currentlySelectedRecordingResult = uiState.value.currentlySelectedRecordingResult
             )
         }
 
@@ -411,7 +414,8 @@ class PowerManagerAppModel(
                 recordingSamplingPeriod = uiState.value.recordingSamplingPeriod,
                 recordingNumberOfSamplesString = uiState.value.recordingNumberOfSamplesString,
                 recordingSessionName = uiState.value.recordingSessionName,
-                recordingResults = getMostRecentRecordingResultsNames()
+                recordingResults = getMostRecentRecordingResultsNames(),
+                currentlySelectedRecordingResult = uiState.value.currentlySelectedRecordingResult
             )
         }
     }
@@ -440,7 +444,8 @@ class PowerManagerAppModel(
                 recordingSamplingPeriod = newValue,
                 recordingNumberOfSamplesString = uiState.value.recordingNumberOfSamplesString,
                 recordingSessionName = uiState.value.recordingSessionName,
-                recordingResults = uiState.value.recordingResults
+                recordingResults = uiState.value.recordingResults,
+                currentlySelectedRecordingResult = uiState.value.currentlySelectedRecordingResult
             )
         }
     }
@@ -453,7 +458,8 @@ class PowerManagerAppModel(
                 recordingSamplingPeriod = uiState.value.recordingSamplingPeriod,
                 recordingNumberOfSamplesString = newValue,
                 recordingSessionName = uiState.value.recordingSessionName,
-                recordingResults = uiState.value.recordingResults
+                recordingResults = uiState.value.recordingResults,
+                currentlySelectedRecordingResult = uiState.value.currentlySelectedRecordingResult
             )
         }
     }
@@ -466,14 +472,29 @@ class PowerManagerAppModel(
                 recordingSamplingPeriod = uiState.value.recordingSamplingPeriod,
                 recordingNumberOfSamplesString = uiState.value.recordingNumberOfSamplesString,
                 recordingSessionName = newValue,
-                recordingResults = uiState.value.recordingResults
+                recordingResults = uiState.value.recordingResults,
+                currentlySelectedRecordingResult = uiState.value.currentlySelectedRecordingResult
             )
         }
     }
 
-    fun deleteRecordingResult(name: String) {
+    fun changeSelectedRecordingResult(newValue: String) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                coreTracked = uiState.value.coreTracked,
+                isRecording = uiState.value.isRecording,
+                recordingSamplingPeriod = uiState.value.recordingSamplingPeriod,
+                recordingNumberOfSamplesString = uiState.value.recordingNumberOfSamplesString,
+                recordingSessionName = uiState.value.recordingSessionName,
+                recordingResults = uiState.value.recordingResults,
+                currentlySelectedRecordingResult = newValue
+            )
+        }
+    }
+
+    fun deleteRecordingResult() {
         val deleted = RecordingStorageManager.deleteRecordingResult(
-            name = name,
+            name = uiState.value.currentlySelectedRecordingResult,
             directory = recordingResultsDirectory
         )
 
@@ -486,7 +507,8 @@ class PowerManagerAppModel(
                     recordingSamplingPeriod = uiState.value.recordingSamplingPeriod,
                     recordingNumberOfSamplesString = uiState.value.recordingNumberOfSamplesString,
                     recordingSessionName = uiState.value.recordingSessionName,
-                    recordingResults = getMostRecentRecordingResultsNames()
+                    recordingResults = getMostRecentRecordingResultsNames(),
+                    currentlySelectedRecordingResult = uiState.value.currentlySelectedRecordingResult
                 )
             }
         }
@@ -503,11 +525,18 @@ class PowerManagerAppModel(
         )
     }
 
-    fun getRecordingResultFileContent(fileName: String) : String {
+    fun getRecordingResultRawFileContent() : String {
         return RecordingStorageManager.getFileContent(
-            fileName = fileName,
+            fileName = uiState.value.currentlySelectedRecordingResult,
             directory = recordingResultsDirectory
         )
+    }
+
+    fun getCurrentlySelectedRecordingResult() : RecordingResult {
+        return RecordingStorageManager.getRecordingResultForFileName(
+            fileName = uiState.value.currentlySelectedRecordingResult,
+            directory = recordingResultsDirectory
+        )!!
     }
 
     // preferences
@@ -525,7 +554,8 @@ class PowerManagerAppModel(
                     recordingSamplingPeriod = uiState.value.recordingSamplingPeriod,
                     recordingNumberOfSamplesString = uiState.value.recordingNumberOfSamplesString,
                     recordingSessionName = uiState.value.recordingSessionName,
-                    recordingResults = getMostRecentRecordingResultsNames()
+                    recordingResults = getMostRecentRecordingResultsNames(),
+                    currentlySelectedRecordingResult = uiState.value.currentlySelectedRecordingResult
                 )
             }
         }
