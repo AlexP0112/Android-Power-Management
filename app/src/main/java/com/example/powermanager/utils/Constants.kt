@@ -52,8 +52,13 @@ const val DEFAULT_RECORDING_NAME = "default"
 const val MINIMUM_NUMBER_OF_RECORDING_SAMPLES_ALLOWED = 5
 const val MAXIMUM_NUMBER_OF_RECORDING_SAMPLES_ALLOWED = 200
 const val CONFIRM_DELETION_TEXT = "Are you sure you want to delete recording result %s?"
-const val STORAGE_DIRECTORY_NAME = "recording_results"
+const val RECORDING_RESULTS_DIRECTORY_NAME = "recording_results"
 const val DOT_JSON = ".json"
+
+// scripts
+const val SCRIPTS_DIRECTORY_NAME = "scripts"
+const val GET_NUMBER_OF_PROCESSES_SCRIPT_NAME = "get_num_procs.sh"
+const val GET_NUMBER_OF_THREADS_SCRIPT_NAME = "get_num_threads.sh"
 
 // notifications
 const val NOTIFICATION_CHANNEL_ID = "power_manager"
@@ -67,4 +72,5 @@ const val CORE_FREQUENCY_PATH = "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_c
 const val DEVICES_SYSTEM_CPU_PATH = "/sys/devices/system/cpu/"
 
 // linux commands
+const val SH_COMMAND = "sh"
 const val UPTIME_COMMAND = "uptime"

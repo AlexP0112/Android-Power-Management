@@ -19,7 +19,9 @@ data class HomeScreenInfo(
     val usedMemoryGB : Float = 0f,
     val cpuLoad : Float = 0f,
     val cpuFrequenciesGHz : List<Float> = listOf(),
-    val systemUptimeString : String = NO_VALUE_STRING
+    val systemUptimeString : String = NO_VALUE_STRING,
+    val numberOfProcesses : Int = 0,
+    val numberOfThreads : Int = 0
 )
 
 data class FlowSample(

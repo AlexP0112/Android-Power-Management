@@ -186,6 +186,20 @@ fun HomeScreen(
             )
         }
 
+        SectionHeader(sectionName = stringResource(R.string.processes_information))
+
+        SectionMember(
+            leftText = stringResource(R.string.total_number_of_processes),
+            rightText = homeScreenInfo.value.numberOfProcesses.toString()
+        )
+
+        SectionMember(
+            leftText = stringResource(R.string.total_number_of_threads),
+            rightText = homeScreenInfo.value.numberOfThreads.toString()
+        )
+        
+        Spacer(modifier = Modifier.height(10.dp))
+
         // button that takes you to statistics screen
         GoToLiveChartsButton(
             onClick = onGoToLiveChartsButtonClicked
