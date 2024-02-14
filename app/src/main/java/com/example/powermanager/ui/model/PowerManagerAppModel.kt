@@ -27,16 +27,14 @@ import com.example.powermanager.recording.storage.RecordingStorageManager
 import com.example.powermanager.ui.state.AppUiState
 import com.example.powermanager.utils.CORE_FREQUENCY_PATH
 import com.example.powermanager.utils.FAILED_TO_DETERMINE
-import com.example.powermanager.utils.GET_NUMBER_OF_PROCESSES_SCRIPT_NAME
-import com.example.powermanager.utils.GET_NUMBER_OF_THREADS_SCRIPT_NAME
+import com.example.powermanager.utils.GET_NUMBER_OF_PROCESSES_COMMAND
+import com.example.powermanager.utils.GET_NUMBER_OF_THREADS_COMMAND
 import com.example.powermanager.utils.MILLIS_IN_A_SECOND
 import com.example.powermanager.utils.NOTIFICATION_CHANNEL_ID
 import com.example.powermanager.utils.NOTIFICATION_ID
 import com.example.powermanager.utils.NOTIFICATION_TEXT
 import com.example.powermanager.utils.NOTIFICATION_TITLE
 import com.example.powermanager.utils.RECORDING_RESULTS_DIRECTORY_NAME
-import com.example.powermanager.utils.SCRIPTS_DIRECTORY_NAME
-import com.example.powermanager.utils.SH_COMMAND
 import com.example.powermanager.utils.STATISTICS_BACKGROUND_SAMPLING_THRESHOLD_MILLIS
 import com.example.powermanager.utils.UPTIME_COMMAND
 import com.example.powermanager.utils.convertBytesToGigaBytes
@@ -75,8 +73,6 @@ class PowerManagerAppModel(
     private val systemBootTimestamp : Long
 
     private val recordingResultsDirectory : File
-    private val numProcessesScriptFile : File
-    private val numThreadsScriptFile : File
 
     private val activityManager : ActivityManager
     private val powerManager: PowerManager
@@ -96,12 +92,7 @@ class PowerManagerAppModel(
         batteryManager = application.applicationContext.getSystemService(Context.BATTERY_SERVICE) as BatteryManager
         notificationManager = application.applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         preferencesManager = PreferencesManager(application.applicationContext)
-
-        // files and directories
-        val scriptsDirectory = File(application.applicationContext.filesDir, SCRIPTS_DIRECTORY_NAME)
         recordingResultsDirectory = File(application.applicationContext.filesDir, RECORDING_RESULTS_DIRECTORY_NAME)
-        numProcessesScriptFile = File(scriptsDirectory, GET_NUMBER_OF_PROCESSES_SCRIPT_NAME)
-        numThreadsScriptFile = File(scriptsDirectory, GET_NUMBER_OF_THREADS_SCRIPT_NAME)
 
         // determine the total amount of memory that the device has
         val info = ActivityManager.MemoryInfo()
@@ -580,12 +571,12 @@ class PowerManagerAppModel(
         return preferencesManager.getPreferenceProperties(preferenceKey)
     }
 
-    // scripts
+    // Linux commands invocation
 
     private fun getNumberOfProcessesOrThreads(processes: Boolean) : Int {
-        val scriptFile = if (processes) numProcessesScriptFile else numThreadsScriptFile
+        val command = if (processes) GET_NUMBER_OF_PROCESSES_COMMAND else GET_NUMBER_OF_THREADS_COMMAND
 
-        val process = Runtime.getRuntime().exec(arrayOf(SH_COMMAND, scriptFile.absolutePath))
+        val process = Runtime.getRuntime().exec(command)
         val processOutput = BufferedReader(InputStreamReader(process.inputStream)).readText()
         process.waitFor()
 

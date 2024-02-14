@@ -55,11 +55,6 @@ const val CONFIRM_DELETION_TEXT = "Are you sure you want to delete recording res
 const val RECORDING_RESULTS_DIRECTORY_NAME = "recording_results"
 const val DOT_JSON = ".json"
 
-// scripts
-const val SCRIPTS_DIRECTORY_NAME = "scripts"
-const val GET_NUMBER_OF_PROCESSES_SCRIPT_NAME = "get_num_procs.sh"
-const val GET_NUMBER_OF_THREADS_SCRIPT_NAME = "get_num_threads.sh"
-
 // notifications
 const val NOTIFICATION_CHANNEL_ID = "power_manager"
 const val NOTIFICATION_CHANNEL_NAME = "Power Manager"
@@ -72,5 +67,6 @@ const val CORE_FREQUENCY_PATH = "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_c
 const val DEVICES_SYSTEM_CPU_PATH = "/sys/devices/system/cpu/"
 
 // linux commands
-const val SH_COMMAND = "sh"
 const val UPTIME_COMMAND = "uptime"
+const val GET_NUMBER_OF_PROCESSES_COMMAND = "su -c ps -A | wc -l"
+const val GET_NUMBER_OF_THREADS_COMMAND = "su -c ps -AT | wc -l"
