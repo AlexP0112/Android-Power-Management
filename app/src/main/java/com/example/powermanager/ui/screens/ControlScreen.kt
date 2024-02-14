@@ -17,4 +17,3 @@ fun ControlScreen(
             text = "Control screen")
     }
 }
-
