@@ -49,6 +49,7 @@ fun RecordingResultViewScreen(
 
         val totalMemoryGB = model.getTotalMemory()
         val batteryChargeValuesFloat = result.batteryChargeValues.map { it.toFloat() }
+        val numberOfThreadsValuesFloat = result.numberOfThreadsValues.map { it.toFloat() }
         val batteryDischarge = result.batteryChargeValues.first() - result.batteryChargeValues.last()
 
         // title of the screen
@@ -67,11 +68,11 @@ fun RecordingResultViewScreen(
         )
 
         Text(
-            text = "\u25cb Total duration: ${result.duration}"
+            text = "\u25cb Number of samples: ${result.numberOfSamples}"
         )
 
         Text(
-            text = "\u25cb Number of samples: ${result.numberOfSamples}"
+            text = "\u25cb Time interval between samples: ${result.samplingPeriodMillis} ms"
         )
 
         Spacer(modifier = Modifier.height(6.dp))
@@ -100,11 +101,11 @@ fun RecordingResultViewScreen(
         )
 
         Text(
-            text = "\u25cb Average CPU load: ${String.format("%.1f", result.averageCpuLoad)}"
+            text = "\u25cb Average CPU load: ${String.format("%.2f", result.averageCpuLoad)}"
         )
 
         Text(
-            text = "\u25cb Peak CPU load: ${String.format("%.1f", result.peakCpuLoad)}"
+            text = "\u25cb Peak CPU load: ${String.format("%.2f", result.peakCpuLoad)}"
         )
 
         Spacer(modifier = Modifier.height(6.dp))
@@ -129,8 +130,8 @@ fun RecordingResultViewScreen(
             chartLineColor = MaterialTheme.colorScheme.tertiary,
             inputData = batteryChargeValuesFloat,
             customAxisValuesOverrider = CustomAxisValuesOverrider(
-                minYValue = getListMinimum(batteryChargeValuesFloat),
-                maxYValue = getListMaximum(batteryChargeValuesFloat)
+                minYValue = getListMinimum(batteryChargeValuesFloat) - 1f,
+                maxYValue = getListMaximum(batteryChargeValuesFloat) + 1f
             )
         )
 
@@ -144,8 +145,8 @@ fun RecordingResultViewScreen(
             chartLineColor = MaterialTheme.colorScheme.secondary,
             inputData = result.memoryUsedValues,
             customAxisValuesOverrider = CustomAxisValuesOverrider(
-                minYValue = getListMinimum(result.memoryUsedValues),
-                maxYValue = result.peakMemoryUsed
+                minYValue = getListMinimum(result.memoryUsedValues) - 0.01f,
+                maxYValue = result.peakMemoryUsed + 0.01f
             )
         )
 
@@ -159,8 +160,23 @@ fun RecordingResultViewScreen(
             chartLineColor = MaterialTheme.colorScheme.onSecondaryContainer,
             inputData = result.cpuLoadValues,
             customAxisValuesOverrider = CustomAxisValuesOverrider(
-                minYValue = getListMinimum(result.cpuLoadValues),
-                maxYValue = result.peakCpuLoad
+                minYValue = getListMinimum(result.cpuLoadValues) - 0.01f,
+                maxYValue = result.peakCpuLoad + 0.01f
+            )
+        )
+
+        Text(
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+            text = stringResource(R.string.total_number_of_threads)
+        )
+
+        // number of threads chart
+        StaticChart(
+            chartLineColor = MaterialTheme.colorScheme.primary,
+            inputData = numberOfThreadsValuesFloat,
+            customAxisValuesOverrider = CustomAxisValuesOverrider(
+                minYValue = getListMinimum(numberOfThreadsValuesFloat) - 1f,
+                maxYValue = getListMaximum(numberOfThreadsValuesFloat) + 1f
             )
         )
     }

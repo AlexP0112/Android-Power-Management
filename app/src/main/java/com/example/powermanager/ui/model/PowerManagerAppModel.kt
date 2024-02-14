@@ -402,7 +402,8 @@ class PowerManagerAppModel(
                 batteryManager = batteryManager,
                 activityManager = activityManager,
                 outputDirectory = recordingResultsDirectory,
-                onRecordingFinished = { onRecordingFinished(it) }
+                onRecordingFinished = { onRecordingFinished(it) },
+                getNumberOfThreads = { getNumberOfProcessesOrThreads(false) }
             )
         }
     }

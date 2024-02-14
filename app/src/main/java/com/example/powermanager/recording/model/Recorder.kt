@@ -4,7 +4,6 @@ import android.app.ActivityManager
 import android.os.BatteryManager
 import com.example.powermanager.preferences.LoadAverageTypes
 import com.example.powermanager.recording.storage.RecordingStorageManager
-import com.example.powermanager.utils.MILLIS_IN_A_SECOND
 import com.example.powermanager.utils.UPTIME_COMMAND
 import com.example.powermanager.utils.computeListAverage
 import com.example.powermanager.utils.convertBytesToGigaBytes
@@ -18,7 +17,6 @@ import kotlinx.coroutines.withContext
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
-import kotlin.math.roundToInt
 
 object Recorder {
 
@@ -29,12 +27,14 @@ object Recorder {
         batteryManager: BatteryManager,
         activityManager: ActivityManager,
         outputDirectory : File,
-        onRecordingFinished: (String) -> Unit
+        onRecordingFinished: (String) -> Unit,
+        getNumberOfThreads: () -> Int
     ) {
         withContext(Dispatchers.IO) {
             val batteryChargeValues : MutableList<Int> = mutableListOf()
             val memoryUsedValues : MutableList<Float> = mutableListOf()
             val cpuLoadValues : MutableList<Float> = mutableListOf()
+            val numberOfThreadsValues : MutableList<Int> = mutableListOf()
 
             // sampling
             for (i in 0 until numberOfSamples) {
@@ -56,7 +56,12 @@ object Recorder {
                 val load = getLoadAverageFromUptimeCommandOutput(uptimeOutput, LoadAverageTypes.LAST_MINUTE)
                 cpuLoadValues.add(load)
 
-                delay(samplingPeriod)
+                // number of threads sampling
+                val numberOfThreads = getNumberOfThreads()
+                numberOfThreadsValues.add(numberOfThreads)
+
+                if (i != numberOfSamples - 1)
+                    delay(samplingPeriod)
             }
 
             // compute final statistics and aggregate the results
@@ -66,12 +71,10 @@ object Recorder {
             val averageMemoryUsage = computeListAverage(memoryUsedValues)
             val averageCpuLoad = computeListAverage(cpuLoadValues)
 
-            val sessionNumberOfSeconds = (samplingPeriod.toFloat() / MILLIS_IN_A_SECOND.toFloat() * numberOfSamples).roundToInt()
-
             val result = RecordingResult(
                 sessionName = sessionName,
                 timestamp = getDateTimeNiceString(),
-                duration = "$sessionNumberOfSeconds seconds",
+                samplingPeriodMillis = samplingPeriod,
                 numberOfSamples = numberOfSamples,
                 batteryChargeValues = batteryChargeValues,
                 memoryUsedValues = memoryUsedValues,
@@ -79,7 +82,8 @@ object Recorder {
                 peakMemoryUsed = peakMemoryUsage,
                 averageMemoryUsed = averageMemoryUsage,
                 peakCpuLoad = peakCpuLoad,
-                averageCpuLoad = averageCpuLoad
+                averageCpuLoad = averageCpuLoad,
+                numberOfThreadsValues = numberOfThreadsValues
             )
 
             // save the result in a JSON file

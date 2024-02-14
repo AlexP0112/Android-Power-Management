@@ -3,7 +3,7 @@ package com.example.powermanager.recording.model
 data class RecordingResult(
     val sessionName : String,
     val timestamp: String,
-    val duration: String,
+    val samplingPeriodMillis : Long,
     val numberOfSamples: Int,
     val batteryChargeValues : List<Int>,
     val memoryUsedValues : List<Float>,
@@ -11,5 +11,6 @@ data class RecordingResult(
     val peakMemoryUsed : Float,
     val averageMemoryUsed : Float,
     val peakCpuLoad : Float,
-    val averageCpuLoad : Float
+    val averageCpuLoad : Float,
+    val numberOfThreadsValues : List<Int>
 )

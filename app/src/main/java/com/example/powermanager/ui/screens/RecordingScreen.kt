@@ -391,7 +391,7 @@ fun StartRecordingButtonAndIndicatorRow(
 }
 
 /*
- * A Row composable that contains a text ("Sampling period (milliseconds)") and a dropdown menu from
+ * A Row composable that contains a text ("Time between samples (milliseconds)") and a dropdown menu from
  * where the recording sampling period is set by the user
  */
 @OptIn(ExperimentalMaterial3Api::class)

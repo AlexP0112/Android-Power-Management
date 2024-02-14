@@ -48,7 +48,7 @@
     <string name="recent_results">Recent results</string>
     <string name="recording">Recording…</string>
     <string name="start_recording">Start recording</string>
-    <string name="sampling_period_millis">Sampling period (milliseconds)</string>
+    <string name="sampling_period_millis">Time between samples (milliseconds)</string>
     <string name="number_of_samples">Number of samples</string>
     <string name="session_name">Session name</string>
     <string name="no_results_found">No recording results found!</string>
