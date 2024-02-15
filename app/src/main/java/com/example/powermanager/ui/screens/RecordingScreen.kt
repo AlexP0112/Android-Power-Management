@@ -101,6 +101,10 @@ fun RecordingScreen(
             mutableStateOf(false)
         }
 
+        var isSamplingPeriodInfoDialogOpen by remember {
+            mutableStateOf(false)
+        }
+
         var isConfirmResultDeletionDialogOpen by remember {
             mutableStateOf(false)
         }
@@ -126,6 +130,9 @@ fun RecordingScreen(
             onSelectedNewValue = { newValue ->
                 model.changeRecordingSamplingPeriod(newValue)
                 isSamplingPeriodDropdownExpanded = false
+            },
+            onIconButtonPressed = {
+                isSamplingPeriodInfoDialogOpen = true
             },
             isSamplingPeriodDropdownExpanded = isSamplingPeriodDropdownExpanded,
             currentValue = uiState.value.recordingSamplingPeriod
@@ -223,6 +230,15 @@ fun RecordingScreen(
                 cardHeight = 100.dp
             ) {
                 isNumberOfSamplesInfoDialogOpen = false
+            }
+        }
+
+        if (isSamplingPeriodInfoDialogOpen) {
+            InfoDialog(
+                textId = R.string.sampling_period_additional_info,
+                cardHeight = 200.dp
+            ) {
+                isSamplingPeriodInfoDialogOpen = false
             }
         }
 
@@ -391,8 +407,8 @@ fun StartRecordingButtonAndIndicatorRow(
 }
 
 /*
- * A Row composable that contains a text ("Time between samples (milliseconds)") and a dropdown menu from
- * where the recording sampling period is set by the user
+ * A Row composable that contains a text ("Time between samples (milliseconds)"), a button that
+ * opens an info dialog and a dropdown menu where the recording sampling period is set by the user
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -401,6 +417,7 @@ fun RecordingSamplingPeriodRow(
     onSelectedNewValue: (Long) -> Unit,
     isSamplingPeriodDropdownExpanded : Boolean,
     currentValue : Long,
+    onIconButtonPressed : () -> Unit,
     onChangedExpandedValue: (Boolean) -> Unit
 ) {
     Row(
@@ -409,12 +426,27 @@ fun RecordingSamplingPeriodRow(
             .padding(top = 8.dp, end = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ){
-        Text(
-            modifier = Modifier.weight(2.5f),
-            text = stringResource(R.string.sampling_period_millis)
-        )
+        // row with text and button
+        Row (
+            modifier = Modifier.weight(2.6f),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(R.string.sampling_period_millis)
+            )
 
-        Spacer(modifier = Modifier.width(10.dp))
+            IconButton(
+                onClick = onIconButtonPressed
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Info,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(18.dp)
+                        .align(Alignment.CenterVertically)
+                )
+            }
+        }
 
         // the dropdown with the possible values
         Box(
