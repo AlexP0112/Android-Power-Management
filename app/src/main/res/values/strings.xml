@@ -30,6 +30,7 @@
     <string name="sampling_period_additional_info">Time interval between the end of a sample and the beginning of the next one. Keep in mind that generating a sample can also take up to 1 second.</string>
     <string name="application_settings">Application settings</string>
     <string name="power_and_performance_recording">Power and performance recording</string>
+    <string name="power_and_performance_control">Power and performance control</string>
     <string name="current_battery_charge">Current battery charge</string>
     <string name="home_screen_sampling_period_name">Home screen: sampling period</string>
     <string name="home_screen_sampling_period_description">Time interval (in milliseconds) between two consecutive samples for home screen</string>

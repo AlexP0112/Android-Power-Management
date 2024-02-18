@@ -175,6 +175,7 @@ fun ScreensNavHost(
         ) {
             ControlScreen(
                 topPadding = topPadding,
+                model = model
             )
         }
 
