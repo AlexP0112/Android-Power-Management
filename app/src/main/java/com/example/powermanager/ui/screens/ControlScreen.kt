@@ -34,6 +34,7 @@ fun ControlScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         ControlScreenTitle()
+
     }
 }
 

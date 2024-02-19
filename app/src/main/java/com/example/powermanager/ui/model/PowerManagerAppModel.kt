@@ -7,11 +7,11 @@ import android.app.NotificationManager
 import android.content.Context
 import android.os.BatteryManager
 import android.os.PowerManager
-import android.provider.Settings
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.powermanager.R
+import com.example.powermanager.control.wifi.WifiManager
 import com.example.powermanager.preferences.HOME_SCREEN_SAMPLING_PERIOD_ID
 import com.example.powermanager.preferences.LIVE_CHARTS_SAMPLING_PERIOD_ID
 import com.example.powermanager.preferences.LIVE_CHARTS_TRACKED_PERIOD_ID
@@ -597,21 +597,18 @@ class PowerManagerAppModel(
         return getLoadAverageFromUptimeCommandOutput(processOutput, loadAverageType)
     }
 
-    /* level should be a number between 1 and 255 */
-    fun setBrightnessLevel(level : Int) {
-        val context = getApplication<Application>().applicationContext
+    // wifi
 
-        Settings.System.putInt(
-            context.contentResolver,
-            Settings.System.SCREEN_BRIGHTNESS_MODE,
-            Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL
-        )
+    fun turnWifiOff() {
+        viewModelScope.launch {
+            WifiManager.turnWifiOffOrOn(false)
+        }
+    }
 
-        Settings.System.putInt(
-            context.contentResolver,
-            Settings.System.SCREEN_BRIGHTNESS,
-            level
-        )
+    fun turnWifiOn() {
+        viewModelScope.launch {
+            WifiManager.turnWifiOffOrOn(true)
+        }
     }
 
 }

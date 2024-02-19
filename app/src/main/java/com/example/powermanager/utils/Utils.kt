@@ -167,3 +167,11 @@ fun getPrettyStringFromFileSize(size: Long) : String {
     val sizeKilo = size.toFloat() / NUMBER_OF_BYTES_IN_A_KILOBYTE.toFloat()
     return String.format("%.1fKB", sizeKilo)
 }
+
+fun getInterfacesFromIfConfigOutput(output: String) : List<String> {
+    return output.split("\n")
+        .filter { it.trim().isNotEmpty() }
+        .map { line ->
+        line.split(" ", "\t")[0]
+    }
+}
