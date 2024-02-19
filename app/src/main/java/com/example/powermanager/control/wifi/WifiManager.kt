@@ -11,6 +11,8 @@ import java.io.InputStreamReader
 
 object WifiManager {
 
+    // function that disables/enables wifi interfaces (it does not change the actual
+    // system setting for wifi
     suspend fun turnWifiOffOrOn(on : Boolean) {
         withContext(Dispatchers.IO) {
             val command = if (on) ENABLE_INTERFACE_COMMAND else DISABLE_INTERFACE_COMMAND
