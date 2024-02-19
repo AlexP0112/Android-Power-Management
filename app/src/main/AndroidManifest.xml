@@ -3,6 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <uses-permission android:name="android.permission.WRITE_SETTINGS"
+        tools:ignore="ProtectedPermissions" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -17,7 +21,6 @@
             android:name=".MainActivity"
             android:launchMode="singleTask"
             android:exported="true"
-            android:label="@string/app_name"
             android:theme="@style/Theme.PowerManager">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

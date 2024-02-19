@@ -55,4 +55,5 @@ class MainActivity : ComponentActivity() {
         val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.createNotificationChannel(notificationChannel)
     }
+
 }

@@ -7,6 +7,7 @@ import android.app.NotificationManager
 import android.content.Context
 import android.os.BatteryManager
 import android.os.PowerManager
+import android.provider.Settings
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -594,6 +595,23 @@ class PowerManagerAppModel(
         process.waitFor()
 
         return getLoadAverageFromUptimeCommandOutput(processOutput, loadAverageType)
+    }
+
+    /* level should be a number between 1 and 255 */
+    fun setBrightnessLevel(level : Int) {
+        val context = getApplication<Application>().applicationContext
+
+        Settings.System.putInt(
+            context.contentResolver,
+            Settings.System.SCREEN_BRIGHTNESS_MODE,
+            Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL
+        )
+
+        Settings.System.putInt(
+            context.contentResolver,
+            Settings.System.SCREEN_BRIGHTNESS,
+            level
+        )
     }
 
 }
