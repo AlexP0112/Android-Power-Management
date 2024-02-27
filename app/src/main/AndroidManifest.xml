@@ -19,6 +19,14 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.PowerManager"
         tools:targetApi="31">
+
+        <receiver android:name=".control.wifi.DeviceIdleModeChangedBroadcastReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.os.action.DEVICE_IDLE_MODE_CHANGED" />
+            </intent-filter>
+        </receiver>
+
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTask"

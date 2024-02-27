@@ -11,10 +11,10 @@ import java.io.InputStreamReader
 
 object WiFiManager {
 
-    var turnedOff = false
+    var interfacesTurnedOff = false
 
-    // function that disables/enables wifi interfaces (it does not change the actual
-    // system setting for wifi
+    // function that disables/enables WiFi interfaces (it does not change the actual
+    // system setting for WiFi, as third party apps cannot access that setting)
     suspend fun turnWifiOffOrOn(on : Boolean) {
         withContext(Dispatchers.IO) {
             val command = if (on) ENABLE_INTERFACE_COMMAND else DISABLE_INTERFACE_COMMAND
@@ -25,7 +25,7 @@ object WiFiManager {
                 process.waitFor()
             }
 
-            turnedOff = !on
+            interfacesTurnedOff = !on
         }
     }
 

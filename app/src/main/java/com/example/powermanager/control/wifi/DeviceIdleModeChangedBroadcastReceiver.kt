@@ -13,13 +13,16 @@ class DeviceIdleModeChangedBroadcastReceiver : BroadcastReceiver() {
     @OptIn(DelicateCoroutinesApi::class)
     override fun onReceive(context: Context, intent: Intent) {
 
+        if (intent.action == null || !intent.action.equals(PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED))
+            return
+
         val powerManager = context.applicationContext.getSystemService(Context.POWER_SERVICE) as PowerManager
         val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
 
         if (powerManager.isDeviceIdleMode) {
             // device entered idle mode
 
-            if (wifiManager.isWifiEnabled && !WiFiManager.turnedOff) {
+            if (wifiManager.isWifiEnabled && !WiFiManager.interfacesTurnedOff) {
                 GlobalScope.launch {
                     WiFiManager.turnWifiOffOrOn(false)
                 }
@@ -27,7 +30,7 @@ class DeviceIdleModeChangedBroadcastReceiver : BroadcastReceiver() {
         } else {
             // device exited idle mode
 
-            if (WiFiManager.turnedOff) {
+            if (WiFiManager.interfacesTurnedOff) {
                 GlobalScope.launch {
                     WiFiManager.turnWifiOffOrOn(true)
                 }
