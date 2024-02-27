@@ -11,8 +11,8 @@ import androidx.activity.compose.setContent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.powermanager.battery_data.BatteryBroadcastReceiver
 import com.example.powermanager.control.wifi.DeviceIdleModeChangedBroadcastReceiver
+import com.example.powermanager.data.battery.BatteryBroadcastReceiver
 import com.example.powermanager.ui.main.PowerManagerApp
 import com.example.powermanager.ui.model.PowerManagerAppModel
 import com.example.powermanager.ui.theme.PowerManagerTheme

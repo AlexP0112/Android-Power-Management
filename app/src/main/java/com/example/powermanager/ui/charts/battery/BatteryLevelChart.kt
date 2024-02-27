@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
-import com.example.powermanager.battery_data.BatteryLevelTracker
+import com.example.powermanager.data.battery.BatteryLevelTracker
 import com.example.powermanager.ui.charts.common.CustomAxisValuesOverrider
 import com.example.powermanager.ui.charts.common.rememberMarker
 import com.example.powermanager.utils.getHourAndMinuteFromLongTimestamp

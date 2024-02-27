@@ -1,4 +1,4 @@
-package com.example.powermanager.battery_data
+package com.example.powermanager.data.battery
 
 import android.content.BroadcastReceiver
 import android.content.Context

@@ -1,4 +1,4 @@
-package com.example.powermanager.battery_data
+package com.example.powermanager.data.battery
 
 import com.example.powermanager.utils.BATTERY_LEVEL_NUMBER_OF_SAMPLES
 import com.example.powermanager.utils.MILLIS_IN_AN_HOUR
