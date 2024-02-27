@@ -15,9 +15,9 @@ object WiFiManager {
 
     // function that disables/enables WiFi interfaces (it does not change the actual
     // system setting for WiFi, as third party apps cannot access that setting)
-    suspend fun turnWifiOffOrOn(on : Boolean) {
+    suspend fun turnWifiOffOrOn(turnOn : Boolean) {
         withContext(Dispatchers.IO) {
-            val command = if (on) ENABLE_INTERFACE_COMMAND else DISABLE_INTERFACE_COMMAND
+            val command = if (turnOn) ENABLE_INTERFACE_COMMAND else DISABLE_INTERFACE_COMMAND
             val interfaces = getAllWifiInterfacesNames()
 
             interfaces.forEach { interfaceName ->
@@ -25,7 +25,7 @@ object WiFiManager {
                 process.waitFor()
             }
 
-            interfacesTurnedOff = !on
+            interfacesTurnedOff = !turnOn
         }
     }
 
