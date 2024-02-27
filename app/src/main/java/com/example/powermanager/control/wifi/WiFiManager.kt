@@ -9,7 +9,9 @@ import kotlinx.coroutines.withContext
 import java.io.BufferedReader
 import java.io.InputStreamReader
 
-object WifiManager {
+object WiFiManager {
+
+    var turnedOff = false
 
     // function that disables/enables wifi interfaces (it does not change the actual
     // system setting for wifi
@@ -22,6 +24,8 @@ object WifiManager {
                 val process = Runtime.getRuntime().exec(String.format(command, interfaceName))
                 process.waitFor()
             }
+
+            turnedOff = !on
         }
     }
 

@@ -11,7 +11,6 @@ import androidx.core.app.NotificationCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.powermanager.R
-import com.example.powermanager.control.wifi.WifiManager
 import com.example.powermanager.preferences.HOME_SCREEN_SAMPLING_PERIOD_ID
 import com.example.powermanager.preferences.LIVE_CHARTS_SAMPLING_PERIOD_ID
 import com.example.powermanager.preferences.LIVE_CHARTS_TRACKED_PERIOD_ID
@@ -595,20 +594,6 @@ class PowerManagerAppModel(
         process.waitFor()
 
         return getLoadAverageFromUptimeCommandOutput(processOutput, loadAverageType)
-    }
-
-    // wifi
-
-    fun turnWifiOff() {
-        viewModelScope.launch {
-            WifiManager.turnWifiOffOrOn(false)
-        }
-    }
-
-    fun turnWifiOn() {
-        viewModelScope.launch {
-            WifiManager.turnWifiOffOrOn(true)
-        }
     }
 
 }
