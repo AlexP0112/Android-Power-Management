@@ -24,6 +24,7 @@
     <string name="supported">Supported</string>
     <string name="not_supported">Not supported</string>
     <string name="go_to_live_charts">Go to live charts</string>
+    <string name="go_to_control_screen">Go to control screen</string>
     <string name="system_uptime">System uptime</string>
     <string name="cpu_load_explanation">This metric shows the demand for the system\'s CPU and represents the average number of processes that are:\n\u2022 Currently using the CPU\n\u2022 Waiting to use the CPU\n\u2022 Waiting for IO or disk access</string>
     <string name="number_of_samples_value_explanation">Should be a number in the interval 5–200</string>
@@ -61,4 +62,8 @@
     <string name="total_number_of_processes">Total number of processes</string>
     <string name="processes_information">Processes information</string>
     <string name="total_number_of_threads">Total number of threads</string>
+    <string name="wi_fi">Wi-Fi</string>
+    <string name="wifi_text">It is recommended to turn off Wi-Fi during long periods of inactivity (such as during the night). In case you forget to do so, Power Manager will automatically disable Wi-Fi when the device enters Doze mode.</string>
+    <string name="doze_mode_explanation_intro">For more information on Doze mode, click here:</string>
+    <string name="doze_mode_explanation">If a user leaves a device unplugged and stationary for a long period of time, with the screen off, the device enters Doze mode. In Doze mode, the system attempts to conserve battery by restricting apps\' access to network and CPU-intensive services.</string>
 </resources>

@@ -131,6 +131,9 @@ fun ScreensNavHost(
                 model = model,
                 onGoToLiveChartsButtonClicked = {
                     navController.navigate(LIVE_CHARTS_SCREEN_NAME)
+                },
+                onGoToControlScreenButtonClicked = {
+                    navController.navigate(CONTROL_SCREEN_NAME)
                 }
             )
         }

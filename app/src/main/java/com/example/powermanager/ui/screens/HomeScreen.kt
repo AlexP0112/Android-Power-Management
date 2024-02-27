@@ -40,7 +40,8 @@ import kotlin.math.roundToInt
 fun HomeScreen(
     topPadding: Dp,
     model: PowerManagerAppModel,
-    onGoToLiveChartsButtonClicked : () -> Unit
+    onGoToLiveChartsButtonClicked : () -> Unit,
+    onGoToControlScreenButtonClicked : () -> Unit
 ) {
     val homeScreenInfo = model.homeScreenInfoFlow.collectAsStateWithLifecycle(initialValue = HomeScreenInfo())
     val usedMemoryPercentage = ((homeScreenInfo.value.usedMemoryGB / model.getTotalMemory()) * 100f).roundToInt()
@@ -200,10 +201,14 @@ fun HomeScreen(
         
         Spacer(modifier = Modifier.height(10.dp))
 
-        // button that takes you to statistics screen
-        GoToLiveChartsButton(
-            onClick = onGoToLiveChartsButtonClicked
-        )
+        // buttons that take you to live charts screen and control screen
+        Row(
+            modifier = Modifier.fillMaxSize(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            GoToOtherScreenButton(onClick = onGoToLiveChartsButtonClicked, buttonTextStringID = R.string.go_to_live_charts)
+            GoToOtherScreenButton(onClick = onGoToControlScreenButtonClicked, buttonTextStringID = R.string.go_to_control_screen)
+        }
 
         if (isCPULoadInfoDialogOpen.value) {
             InfoDialog(
@@ -239,14 +244,15 @@ fun SectionMember(
 }
 
 @Composable
-fun GoToLiveChartsButton(
-    onClick: () -> Unit
+fun GoToOtherScreenButton(
+    onClick: () -> Unit,
+    buttonTextStringID : Int
 ) {
     OutlinedButton(
         onClick = onClick,
     ) {
         Text(
-            text = stringResource(R.string.go_to_live_charts),
+            text = stringResource(buttonTextStringID),
             textAlign = TextAlign.Center
         )
     }
