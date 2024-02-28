@@ -23,6 +23,7 @@ import java.util.Calendar
 
 object Recorder {
 
+    @Suppress("DEPRECATION")
     suspend fun record(
         samplingPeriod: Long,
         numberOfSamples: Int,
