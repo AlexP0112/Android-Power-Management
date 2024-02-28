@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.ActivityManager
 import android.app.Application
 import android.app.NotificationManager
-import android.app.usage.NetworkStatsManager
 import android.content.Context
 import android.os.BatteryManager
 import android.os.PowerManager
@@ -79,7 +78,6 @@ class PowerManagerAppModel(
     private val powerManager: PowerManager
     private val batteryManager: BatteryManager
     private val notificationManager: NotificationManager
-    private val networkStatsManager: NetworkStatsManager
 
     private val preferencesManager: PreferencesManager
 
@@ -93,8 +91,8 @@ class PowerManagerAppModel(
         powerManager = application.applicationContext.getSystemService(Context.POWER_SERVICE) as PowerManager
         batteryManager = application.applicationContext.getSystemService(Context.BATTERY_SERVICE) as BatteryManager
         notificationManager = application.applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        networkStatsManager = application.applicationContext.getSystemService(Context.NETWORK_STATS_SERVICE) as NetworkStatsManager
         preferencesManager = PreferencesManager(application.applicationContext)
+
         recordingResultsDirectory = File(application.applicationContext.filesDir, RECORDING_RESULTS_DIRECTORY_NAME)
 
         // determine the total amount of memory that the device has
@@ -394,12 +392,10 @@ class PowerManagerAppModel(
                 numberOfSamples = uiState.value.recordingNumberOfSamplesString.toInt(),
                 sessionName = uiState.value.recordingSessionName,
                 batteryManager = batteryManager,
-                networkStatsManager = networkStatsManager,
                 activityManager = activityManager,
                 outputDirectory = recordingResultsDirectory,
-                onRecordingFinished = { onRecordingFinished(it) },
-                getNumberOfThreads = { getNumberOfProcessesOrThreads(false) }
-            )
+                onRecordingFinished = { onRecordingFinished(it) }
+            ) { getNumberOfProcessesOrThreads(false) }
         }
     }
 
