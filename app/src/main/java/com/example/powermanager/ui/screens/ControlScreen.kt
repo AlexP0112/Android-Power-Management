@@ -33,7 +33,7 @@ import com.example.powermanager.ui.screens.common.SectionHeader
 @Composable
 fun ControlScreen(
     topPadding: Dp,
-    onEnableDarkModeButtonPressed: () -> Unit
+    goToDisplaySettings: () -> Unit
 ) {
     Column(
         Modifier
@@ -63,10 +63,11 @@ fun ControlScreen(
         // ================= display section ==================== //
         SectionHeader(sectionName = stringResource(R.string.display))
 
+        ScreenBrightnessText()
         DarkThemeText()
 
-        OutlinedButton(onClick = onEnableDarkModeButtonPressed) {
-            Text(stringResource(R.string.enable_dark_theme))
+        OutlinedButton(onClick = goToDisplaySettings) {
+            Text(stringResource(R.string.go_to_display_settings))
         }
 
         // ================= info dialogs ==================== //
@@ -94,7 +95,15 @@ fun ControlScreenTitle() {
 fun WifiText() {
     Text(
         text = stringResource(R.string.wifi_text),
-        fontSize = 16.sp
+        fontSize = 18.sp
+    )
+}
+
+@Composable
+fun ScreenBrightnessText() {
+    Text(
+        text = stringResource(R.string.screen_brightness_text),
+        fontSize = 18.sp
     )
 }
 
@@ -102,7 +111,7 @@ fun WifiText() {
 fun DarkThemeText() {
     Text(
         text = stringResource(R.string.dark_theme_text),
-        fontSize = 16.sp
+        fontSize = 18.sp
     )
 }
 
