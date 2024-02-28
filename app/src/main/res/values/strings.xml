@@ -68,6 +68,6 @@
     <string name="dark_theme_text">\u2022 Enabling Dark Theme can also extend your battery life, especially on devices with OLED or AMOLED displays.</string>
     <string name="doze_mode_explanation">If a user leaves a device unplugged and stationary for a long period of time, with the screen off, the device enters Doze mode. In Doze mode, the system attempts to conserve battery by restricting apps\' access to network and CPU-intensive services.</string>
     <string name="display">Display</string>
-    <string name="screen_brightness_text">\u2022 The display is one of the most important battery drain sources on mobile devices. Reducing its brightness can have a great impact on battery life.</string>
+    <string name="screen_brightness_text">\u2022 The display is one of the most important battery drain sources on mobile devices. Reducing its brightness can have a great impact on battery life. If you want automatic adjustments of the brightness level based on the environmental lighting, you can enable Adaptive Brightness.</string>
     <string name="go_to_display_settings">Open display settings</string>
 </resources>
