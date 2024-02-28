@@ -62,6 +62,7 @@ fun PowerManagerApp(
     navController: NavHostController = rememberNavController(),
     drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
     model: PowerManagerAppModel,
+    onEnableDarkModeButtonPressed: () -> Unit
 ) {
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -91,6 +92,7 @@ fun PowerManagerApp(
                     navController = navController,
                     topPadding = it.calculateTopPadding(),
                     model = model,
+                    onEnableDarkModeButtonPressed = onEnableDarkModeButtonPressed
                 )
             }
         }
@@ -105,6 +107,7 @@ fun ScreensNavHost(
     navController: NavHostController,
     topPadding: Dp,
     model: PowerManagerAppModel,
+    onEnableDarkModeButtonPressed: () -> Unit
 ) {
     NavHost(
         navController = navController,
@@ -178,7 +181,7 @@ fun ScreensNavHost(
         ) {
             ControlScreen(
                 topPadding = topPadding,
-                model = model
+                onEnableDarkModeButtonPressed = onEnableDarkModeButtonPressed
             )
         }
 

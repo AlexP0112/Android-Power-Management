@@ -14,6 +14,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -26,14 +27,13 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.powermanager.R
-import com.example.powermanager.ui.model.PowerManagerAppModel
 import com.example.powermanager.ui.screens.common.InfoDialog
 import com.example.powermanager.ui.screens.common.SectionHeader
 
 @Composable
 fun ControlScreen(
     topPadding: Dp,
-    model : PowerManagerAppModel
+    onEnableDarkModeButtonPressed: () -> Unit
 ) {
     Column(
         Modifier
@@ -58,6 +58,15 @@ fun ControlScreen(
 
         DozeModeInfoRow {
             isDozeModeInfoDialogOpen.value = true
+        }
+
+        // ================= display section ==================== //
+        SectionHeader(sectionName = stringResource(R.string.display))
+
+        DarkThemeText()
+
+        OutlinedButton(onClick = onEnableDarkModeButtonPressed) {
+            Text(stringResource(R.string.enable_dark_theme))
         }
 
         // ================= info dialogs ==================== //
@@ -85,6 +94,14 @@ fun ControlScreenTitle() {
 fun WifiText() {
     Text(
         text = stringResource(R.string.wifi_text),
+        fontSize = 16.sp
+    )
+}
+
+@Composable
+fun DarkThemeText() {
+    Text(
+        text = stringResource(R.string.dark_theme_text),
         fontSize = 16.sp
     )
 }

@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
 import android.os.PowerManager
+import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.lifecycle.ViewModel
@@ -39,7 +40,9 @@ class MainActivity : ComponentActivity() {
                     }
                 )
 
-                PowerManagerApp(model = viewModel)
+                PowerManagerApp(model = viewModel) {
+                    startActivity(Intent(Settings.ACTION_DISPLAY_SETTINGS))
+                }
             }
         }
     }
