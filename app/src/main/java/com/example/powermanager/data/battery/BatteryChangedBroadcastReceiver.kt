@@ -7,7 +7,7 @@ import android.os.BatteryManager
 import java.util.Calendar
 import kotlin.math.roundToInt
 
-class BatteryBroadcastReceiver : BroadcastReceiver() {
+class BatteryChangedBroadcastReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
         val batteryLevel: Int? = intent?.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
         val batteryScale: Int? = intent?.getIntExtra(BatteryManager.EXTRA_SCALE, -1)

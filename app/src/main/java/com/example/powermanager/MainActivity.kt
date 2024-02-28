@@ -13,7 +13,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.powermanager.control.wifi.DeviceIdleModeChangedBroadcastReceiver
-import com.example.powermanager.data.battery.BatteryBroadcastReceiver
+import com.example.powermanager.data.battery.BatteryChangedBroadcastReceiver
 import com.example.powermanager.ui.main.PowerManagerApp
 import com.example.powermanager.ui.model.PowerManagerAppModel
 import com.example.powermanager.ui.theme.PowerManagerTheme
@@ -61,7 +61,7 @@ class MainActivity : ComponentActivity() {
 
     private fun registerBroadcastReceivers() {
         // register receiver for battery broadcasts
-        applicationContext.registerReceiver(BatteryBroadcastReceiver(), IntentFilter(Intent.ACTION_BATTERY_CHANGED))
+        applicationContext.registerReceiver(BatteryChangedBroadcastReceiver(), IntentFilter(Intent.ACTION_BATTERY_CHANGED))
 
         // register receiver for device idle mode status change
         applicationContext.registerReceiver(DeviceIdleModeChangedBroadcastReceiver(), IntentFilter(PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED))

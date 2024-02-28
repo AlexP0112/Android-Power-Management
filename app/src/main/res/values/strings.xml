@@ -7,7 +7,7 @@
     <string name="not_charging">Not charging</string>
     <string name="current_battery_level">Current battery level</string>
     <string name="time_until_full_charge">Time until full charge</string>
-    <string name="remaining_battery_life">Remaining battery life</string>
+    <string name="maximum_battery_life_left">Maximum battery life left</string>
     <string name="load">Load</string>
     <string name="memory_gb">Memory (GB)</string>
     <string name="frequency_ghz">Frequency (GHz)</string>

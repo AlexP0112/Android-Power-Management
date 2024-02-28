@@ -89,7 +89,7 @@ fun HomeScreen(
         SectionMember(
             leftText = if (homeScreenInfo.value.isBatteryCharging)
                     stringResource(R.string.time_until_full_charge) else
-                    stringResource(R.string.remaining_battery_life),
+                    stringResource(R.string.maximum_battery_life_left),
             rightText = formatDuration(homeScreenInfo.value.chargeOrDischargePrediction)
         )
 
