@@ -28,6 +28,7 @@ import com.example.powermanager.ui.model.PowerManagerAppModel
 import com.example.powermanager.ui.state.AppUiState
 import com.example.powermanager.utils.getListMaximum
 import com.example.powermanager.utils.getListMinimum
+import com.example.powermanager.utils.getPrettyStringFromNumberOfBytes
 
 @Composable
 fun RecordingResultViewScreen(
@@ -86,7 +87,7 @@ fun RecordingResultViewScreen(
 
         Spacer(modifier = Modifier.height(6.dp))
 
-        // stats
+        // cpu, memory and battery stats
         Text(
             text = if (batteryDischarge >= 0) "\u25cb Total battery discharge: $batteryDischarge mAh" else
                 "\u25cb Total battery charge: ${-batteryDischarge} mAh"
@@ -106,6 +107,33 @@ fun RecordingResultViewScreen(
 
         Text(
             text = "\u25cb Peak CPU load: ${String.format("%.2f", result.peakCpuLoad)}"
+        )
+
+        Divider(
+            modifier = Modifier
+                .fillMaxSize(),
+            thickness = 0.75.dp,
+            color = MaterialTheme.colorScheme.secondary
+        )
+
+        Spacer(modifier = Modifier.height(6.dp))
+
+        // network stats
+
+        Text(
+            text = "\u25cb Total number of packets received: ${result.packetsRx}"
+        )
+
+        Text(
+            text = "\u25cb Total number of packets sent: ${result.packetsTx}"
+        )
+
+        Text(
+            text = "\u25cb Total number of bytes received: ${getPrettyStringFromNumberOfBytes(result.bytesRx)}"
+        )
+
+        Text(
+            text = "\u25cb Total number of bytes sent: ${getPrettyStringFromNumberOfBytes(result.bytesTx)}"
         )
 
         Spacer(modifier = Modifier.height(6.dp))

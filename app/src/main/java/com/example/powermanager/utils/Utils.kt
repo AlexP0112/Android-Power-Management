@@ -160,12 +160,21 @@ fun getDateTimeNiceString(): String {
     return dateFormat.format(date)
 }
 
-fun getPrettyStringFromFileSize(size: Long) : String {
-    if (size < NUMBER_OF_BYTES_IN_A_KILOBYTE)
-        return "${size}B"
+fun getPrettyStringFromNumberOfBytes(byteCount: Long) : String {
+    // return as number of bytes
+    if (byteCount < NUMBER_OF_BYTES_IN_A_KILOBYTE)
+        return "${byteCount}B"
 
-    val sizeKilo = size.toFloat() / NUMBER_OF_BYTES_IN_A_KILOBYTE.toFloat()
-    return String.format("%.1fKB", sizeKilo)
+    // return as number of gigabytes
+    if (byteCount > NUMBER_OF_BYTES_IN_A_GIGABYTE)
+        return String.format("%.1fGB", byteCount.toFloat() / NUMBER_OF_BYTES_IN_A_GIGABYTE.toFloat())
+
+    // return as number of megabytes
+    if (byteCount > NUMBER_OF_BYTES_IN_A_MEGABYTE)
+        return String.format("%.1fMB", byteCount.toFloat() / NUMBER_OF_BYTES_IN_A_MEGABYTE.toFloat())
+
+    // return as number of kilobytes
+    return String.format("%.1fKB", byteCount.toFloat() / NUMBER_OF_BYTES_IN_A_KILOBYTE.toFloat())
 }
 
 fun getInterfacesFromIfConfigOutput(output: String) : List<String> {

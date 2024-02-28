@@ -3,7 +3,7 @@ package com.example.powermanager.recording.storage
 import com.example.powermanager.recording.model.RecordingResult
 import com.example.powermanager.utils.DOT_JSON
 import com.example.powermanager.utils.NO_VALUE_STRING
-import com.example.powermanager.utils.getPrettyStringFromFileSize
+import com.example.powermanager.utils.getPrettyStringFromNumberOfBytes
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import java.io.File
@@ -80,7 +80,7 @@ object RecordingStorageManager {
         val attributes: BasicFileAttributes = Files.readAttributes(file.toPath(), BasicFileAttributes::class.java)
         val fileSizeInBytes = attributes.size()
 
-        return "File ${file.name} (${getPrettyStringFromFileSize(fileSizeInBytes)})\n\n${file.readText()}"
+        return "File ${file.name} (${getPrettyStringFromNumberOfBytes(fileSizeInBytes)})\n\n${file.readText()}"
     }
 
     fun getRecordingResultForFileName(fileName: String, directory: File) : RecordingResult? {
