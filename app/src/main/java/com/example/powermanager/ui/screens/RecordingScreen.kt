@@ -22,6 +22,8 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -161,6 +163,14 @@ fun RecordingScreen(
                 model.changeRecordingSessionName(input)
             },
             textFieldEnabled = !uiState.value.isRecording
+        )
+
+        ThreadCountInfoCheckboxRow(
+            currentValue = uiState.value.includeThreadCountInfo,
+            onValueChanged = { checked ->
+                model.changeIncludeThreadCountInfoOption(checked)
+            },
+            checkBoxEnabled = !uiState.value.isRecording
         )
 
         Spacer(modifier = Modifier.height(10.dp))
@@ -361,6 +371,35 @@ fun RecordingSessionNameRow(
             keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
             singleLine = true,
             enabled = textFieldEnabled
+        )
+    }
+}
+
+/*
+ * A Row composable that contains a checkbox that controls whether thread count information
+ * is included in the recording session or not
+ */
+@Composable
+fun ThreadCountInfoCheckboxRow(
+    currentValue: Boolean,
+    onValueChanged : (Boolean) -> Unit,
+    checkBoxEnabled: Boolean
+) {
+    Row (
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 8.dp, end = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Checkbox(
+            checked = currentValue,
+            onCheckedChange = onValueChanged,
+            enabled = checkBoxEnabled,
+            colors = CheckboxDefaults.colors()
+        )
+
+        Text(
+            text = stringResource(R.string.include_thread_count)
         )
     }
 }

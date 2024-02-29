@@ -75,6 +75,10 @@ fun RecordingResultViewScreen(
             text = "\u25cb Time interval between samples: ${result.samplingPeriodMillis} ms"
         )
 
+        Text(
+            text = "\u25cb Thread count information included: ${if (numberOfThreadsValuesFloat.isEmpty()) "no" else "yes"}"
+        )
+
         Spacer(modifier = Modifier.height(6.dp))
 
         Divider(
@@ -87,6 +91,8 @@ fun RecordingResultViewScreen(
         Spacer(modifier = Modifier.height(6.dp))
 
         // cpu, memory and battery stats
+        Text(text = "\u25cb Charging status during session: ${if (batteryDischarge >= 0) "not charging" else "charging"}")
+
         Text(
             text = if (batteryDischarge >= 0) "\u25cb Total battery discharge: $batteryDischarge mAh" else
                 "\u25cb Total battery charge: ${-batteryDischarge} mAh"
@@ -120,12 +126,13 @@ fun RecordingResultViewScreen(
         Spacer(modifier = Modifier.height(6.dp))
 
         // charts
+
+        // battery level chart
         Text(
             modifier = Modifier.align(Alignment.CenterHorizontally),
             text = stringResource(R.string.battery_level_mah)
         )
 
-        // battery level chart
         StaticChart(
             chartLineColor = MaterialTheme.colorScheme.tertiary,
             inputData = batteryChargeValuesFloat,
@@ -135,12 +142,12 @@ fun RecordingResultViewScreen(
             )
         )
 
+        // memory chart
         Text(
             modifier = Modifier.align(Alignment.CenterHorizontally),
             text = stringResource(R.string.memory_usage_gb)
         )
 
-        // memory chart
         StaticChart(
             chartLineColor = MaterialTheme.colorScheme.secondary,
             inputData = result.memoryUsedValues,
@@ -150,12 +157,12 @@ fun RecordingResultViewScreen(
             )
         )
 
+        // CPU load chart
         Text(
             modifier = Modifier.align(Alignment.CenterHorizontally),
             text = stringResource(R.string.cpu_load)
         )
 
-        // CPU load chart
         StaticChart(
             chartLineColor = MaterialTheme.colorScheme.onSecondaryContainer,
             inputData = result.cpuLoadValues,
@@ -165,19 +172,21 @@ fun RecordingResultViewScreen(
             )
         )
 
-        Text(
-            modifier = Modifier.align(Alignment.CenterHorizontally),
-            text = stringResource(R.string.total_number_of_threads)
-        )
-
-        // number of threads chart
-        StaticChart(
-            chartLineColor = MaterialTheme.colorScheme.primary,
-            inputData = numberOfThreadsValuesFloat,
-            customAxisValuesOverrider = CustomAxisValuesOverrider(
-                minYValue = getListMinimum(numberOfThreadsValuesFloat) - 1f,
-                maxYValue = getListMaximum(numberOfThreadsValuesFloat) + 1f
+        // number of threads chart, if the stat was included
+        if (numberOfThreadsValuesFloat.isNotEmpty()) {
+            Text(
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                text = stringResource(R.string.total_number_of_threads)
             )
-        )
+
+            StaticChart(
+                chartLineColor = MaterialTheme.colorScheme.primary,
+                inputData = numberOfThreadsValuesFloat,
+                customAxisValuesOverrider = CustomAxisValuesOverrider(
+                    minYValue = getListMinimum(numberOfThreadsValuesFloat) - 1f,
+                    maxYValue = getListMaximum(numberOfThreadsValuesFloat) + 1f
+                )
+            )
+        }
     }
 }

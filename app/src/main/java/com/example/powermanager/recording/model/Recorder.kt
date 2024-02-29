@@ -27,6 +27,7 @@ object Recorder {
         batteryManager: BatteryManager,
         activityManager: ActivityManager,
         outputDirectory: File,
+        includeThreadCountInfo : Boolean,
         onRecordingFinished: (String) -> Unit,
         getNumberOfThreads: () -> Int
     ) {
@@ -57,8 +58,10 @@ object Recorder {
                 cpuLoadValues.add(load)
 
                 // number of threads sampling
-                val numberOfThreads = getNumberOfThreads()
-                numberOfThreadsValues.add(numberOfThreads)
+                if (includeThreadCountInfo) {
+                    val numberOfThreads = getNumberOfThreads()
+                    numberOfThreadsValues.add(numberOfThreads)
+                }
 
                 if (i != numberOfSamples - 1)
                     delay(samplingPeriod)

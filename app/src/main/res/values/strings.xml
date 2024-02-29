@@ -28,7 +28,7 @@
     <string name="system_uptime">System uptime</string>
     <string name="cpu_load_explanation">This metric shows the demand for the system\'s CPU and represents the average number of processes that are:\n\u2022 Currently using the CPU\n\u2022 Waiting to use the CPU\n\u2022 Waiting for IO or disk access</string>
     <string name="number_of_samples_value_explanation">Should be a number in the interval 5–200</string>
-    <string name="sampling_period_additional_info">Time interval between the end of a sample and the beginning of the next one. Keep in mind that generating a sample can also take up to 1 second.</string>
+    <string name="sampling_period_additional_info">Time interval between the end of a sample and the beginning of the next one. Keep in mind that generating a sample can also take up to 1 second, if thread count information is included.</string>
     <string name="application_settings">Application settings</string>
     <string name="power_and_performance_recording">Power and performance recording</string>
     <string name="power_and_performance_control">Power and performance control</string>
@@ -70,4 +70,5 @@
     <string name="display">Display</string>
     <string name="screen_brightness_text">\u2022 The display is one of the most important battery drain sources on mobile devices. Reducing its brightness can have a great impact on battery life. If you want automatic adjustments of the brightness level based on the environmental lighting, you can enable Adaptive Brightness.</string>
     <string name="go_to_display_settings">Open display settings</string>
+    <string name="include_thread_count">Include thread count statistics (might significantly increase total session duration)</string>
 </resources>

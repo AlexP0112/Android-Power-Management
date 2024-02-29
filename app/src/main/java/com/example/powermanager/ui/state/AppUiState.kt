@@ -15,5 +15,6 @@ data class AppUiState(
     val recordingNumberOfSamplesString : String = DEFAULT_RECORDING_NUMBER_OF_SAMPLES.toString(),
     val recordingSessionName : String = DEFAULT_RECORDING_NAME,
     val recordingResults : List<String>,
-    val currentlySelectedRecordingResult : String = NO_VALUE_STRING
+    val currentlySelectedRecordingResult : String = NO_VALUE_STRING,
+    val includeThreadCountInfo : Boolean = true
 )
