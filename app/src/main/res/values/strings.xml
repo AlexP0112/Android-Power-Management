@@ -69,6 +69,7 @@
     <string name="doze_mode_explanation">If a user leaves a device unplugged and stationary for a long period of time, with the screen off, the device enters Doze mode. In Doze mode, the system attempts to conserve battery by restricting apps\' access to network and CPU-intensive services.</string>
     <string name="display">Display</string>
     <string name="screen_brightness_text">\u2022 The display is one of the most important battery drain sources on mobile devices. Reducing its brightness can have a great impact on battery life. If you want automatic adjustments of the brightness level based on the environmental lighting, you can enable Adaptive Brightness.</string>
+    <string name="screen_timeout_text">\u2022 A Screen Timeout value as small as possible is another way to save battery.</string>
     <string name="go_to_display_settings">Open display settings</string>
     <string name="include_thread_count">Include thread count statistics (might significantly increase total session duration)</string>
 </resources>

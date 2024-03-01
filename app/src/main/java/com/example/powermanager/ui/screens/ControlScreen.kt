@@ -64,6 +64,7 @@ fun ControlScreen(
         SectionHeader(sectionName = stringResource(R.string.display))
 
         ScreenBrightnessText()
+        ScreenTimeoutText()
         DarkThemeText()
 
         OutlinedButton(onClick = goToDisplaySettings) {
@@ -95,6 +96,14 @@ fun ControlScreenTitle() {
 fun WifiText() {
     Text(
         text = stringResource(R.string.wifi_text),
+        fontSize = 18.sp
+    )
+}
+
+@Composable
+fun ScreenTimeoutText() {
+    Text(
+        text = stringResource(R.string.screen_timeout_text),
         fontSize = 18.sp
     )
 }
