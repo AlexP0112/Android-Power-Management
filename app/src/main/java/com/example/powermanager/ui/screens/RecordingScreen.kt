@@ -49,6 +49,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -90,6 +91,7 @@ fun RecordingScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         val keyboardController = LocalSoftwareKeyboardController.current
+        val context = LocalContext.current
 
         // ================= screen state variables =================== //
 
@@ -213,6 +215,10 @@ fun RecordingScreen(
                 onDeleteButtonPressed = {
                     model.changeSelectedRecordingResult(resultName)
                     isConfirmResultDeletionDialogOpen = true
+                },
+                onShareButtonPressed = {
+                    model.changeSelectedRecordingResult(resultName)
+                    model.shareRecordingResult(context)
                 },
                 onInspectButtonPressed = {
                     model.changeSelectedRecordingResult(resultName)
@@ -527,12 +533,14 @@ fun RecordingSamplingPeriodRow(
 
 /*
  * A Row composable corresponding to a "Recent results" entry. It contains a text (the name of the
- * result), a button for deleting it and a button for viewing the result
+ * result), a button for deleting it, a button for sharing it, a button for viewing the raw
+ * file content and a button that takes you to the `_recording_result` screen
  */
 @Composable
 fun RecordingSessionResultRow(
     resultName : String,
     onDeleteButtonPressed : () -> Unit,
+    onShareButtonPressed : () -> Unit,
     onInspectButtonPressed : () -> Unit,
     onViewResultsButtonPressed: () -> Unit
 ) {
@@ -542,7 +550,7 @@ fun RecordingSessionResultRow(
         verticalAlignment = Alignment.CenterVertically
     ){
         Text(
-            modifier = Modifier.weight(1.8f),
+            modifier = Modifier.weight(1.3f),
             text = resultName
         )
 
@@ -562,7 +570,18 @@ fun RecordingSessionResultRow(
                 )
             }
 
-            // inspect results button
+            // share result button
+            IconButton(
+                onClick = onShareButtonPressed
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.share_svgrepo_com),
+                    tint = MaterialTheme.colorScheme.secondary,
+                    contentDescription = null
+                )
+            }
+
+            // view raw file button
             IconButton(
                 onClick = onInspectButtonPressed
             ) {
@@ -573,7 +592,7 @@ fun RecordingSessionResultRow(
                 )
             }
 
-            Spacer(modifier = Modifier.width(10.dp))
+            Spacer(modifier = Modifier.width(8.dp))
 
             // view results button
             IconButton(

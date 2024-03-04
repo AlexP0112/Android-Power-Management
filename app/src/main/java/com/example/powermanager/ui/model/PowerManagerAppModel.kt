@@ -5,9 +5,11 @@ import android.app.ActivityManager
 import android.app.Application
 import android.app.NotificationManager
 import android.content.Context
+import android.content.Intent
 import android.os.BatteryManager
 import android.os.PowerManager
 import androidx.core.app.NotificationCompat
+import androidx.core.content.FileProvider
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.powermanager.R
@@ -26,9 +28,12 @@ import com.example.powermanager.recording.model.RecordingResult
 import com.example.powermanager.recording.storage.RecordingStorageManager
 import com.example.powermanager.ui.state.AppUiState
 import com.example.powermanager.utils.CORE_FREQUENCY_PATH
+import com.example.powermanager.utils.DOT_JSON
+import com.example.powermanager.utils.DOT_PROVIDER
 import com.example.powermanager.utils.FAILED_TO_DETERMINE
 import com.example.powermanager.utils.GET_NUMBER_OF_PROCESSES_COMMAND
 import com.example.powermanager.utils.GET_NUMBER_OF_THREADS_COMMAND
+import com.example.powermanager.utils.JSON_MIME_TYPE
 import com.example.powermanager.utils.MILLIS_IN_A_SECOND
 import com.example.powermanager.utils.NOTIFICATION_CHANNEL_ID
 import com.example.powermanager.utils.NOTIFICATION_ID
@@ -538,6 +543,21 @@ class PowerManagerAppModel(
                 )
             }
         }
+    }
+
+    fun shareRecordingResult(context: Context) {
+        val jsonFile = File(recordingResultsDirectory, "${uiState.value.currentlySelectedRecordingResult}$DOT_JSON")
+        val fileUri = FileProvider.getUriForFile(context, context.packageName + DOT_PROVIDER, jsonFile)
+
+        val shareIntent = Intent(Intent.ACTION_SEND).apply {
+            type = JSON_MIME_TYPE
+            putExtra(Intent.EXTRA_STREAM, fileUri)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+
+        val shareAppChooser = Intent.createChooser(shareIntent, null)
+        context.startActivity(shareAppChooser)
     }
 
     private fun getMostRecentRecordingResultsNames(): List<String> {

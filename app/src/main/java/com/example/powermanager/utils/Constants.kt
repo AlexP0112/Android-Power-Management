@@ -40,6 +40,7 @@ const val SEMICOLON = ":"
 
 const val NO_VALUE_STRING = "-"
 const val FAILED_TO_DETERMINE = "Failed to determine"
+const val JSON_MIME_TYPE = "application/json"
 
 // charts sampling
 const val STATISTICS_BACKGROUND_SAMPLING_THRESHOLD_MILLIS = 60L * 1000L // 1 min
@@ -55,6 +56,7 @@ const val MAXIMUM_NUMBER_OF_RECORDING_SAMPLES_ALLOWED = 200
 const val CONFIRM_DELETION_TEXT = "Are you sure you want to delete recording result %s?"
 const val RECORDING_RESULTS_DIRECTORY_NAME = "recording_results"
 const val DOT_JSON = ".json"
+const val DOT_PROVIDER = ".provider"
 
 // notifications
 const val NOTIFICATION_CHANNEL_ID = "power_manager"
