@@ -12,5 +12,7 @@ data class RecordingResult(
     val averageMemoryUsed : Float,
     val peakCpuLoad : Float,
     val averageCpuLoad : Float,
+    val numberOfBytesReceived : Long,
+    val numberOfBytesSent : Long,
     val numberOfThreadsValues : List<Int>
 )

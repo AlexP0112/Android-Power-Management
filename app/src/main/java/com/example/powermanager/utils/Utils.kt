@@ -184,3 +184,27 @@ fun getInterfacesFromIfConfigOutput(output: String) : List<String> {
         line.split(" ", "\t")[0]
     }
 }
+
+fun getBytesSentAndReceivedByAllInterfacesFromFileContent(fileContent: String) : List<Long> {
+    var totalBytesReceived = 0L
+    var totalBytesSent = 0L
+
+    try {
+        fileContent
+            .split("\n")
+            .drop(2)
+            .map { it.trim() }
+            .filter { interfaceInfo ->
+                interfaceInfo.startsWith(WLAN) || interfaceInfo.startsWith(RMNET)
+            }
+            .forEach { interfaceInfo ->
+                val parts = interfaceInfo.split("\\s+".toRegex())
+                totalBytesReceived += parts[1].toLong()
+                totalBytesSent += parts[9].toLong()
+            }
+    } catch (_ : Exception) {
+
+    }
+
+    return listOf(totalBytesReceived, totalBytesSent)
+}

@@ -59,6 +59,7 @@ const val DOT_JSON = ".json"
 const val DOT_PROVIDER = ".provider"
 const val WAKELOCK_TIMEOUT = 30L * 60 * 1000 // half an hour
 const val WAKELOCK_TAG = "RecordingWakeLockTag"
+const val RECORDING_TAG = "recording"
 
 // notifications
 const val NOTIFICATION_CHANNEL_ID = "power_manager"
@@ -70,6 +71,7 @@ const val NOTIFICATION_TEXT = "Result saved in %s.json"
 // paths
 const val CORE_FREQUENCY_PATH = "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_cur_freq"
 const val DEVICES_SYSTEM_CPU_PATH = "/sys/devices/system/cpu/"
+const val NETWORK_INTERFACES_STATS_PATH = "/proc/net/dev"
 
 // linux commands
 const val UPTIME_COMMAND = "uptime"
@@ -78,3 +80,7 @@ const val GET_NUMBER_OF_THREADS_COMMAND = "su -c ps -AT | wc -l"
 const val GET_ALL_WIFI_INTERFACES_COMMAND = "su -c ifconfig -a | grep wlan"
 const val DISABLE_INTERFACE_COMMAND = "su -c ifconfig %s down"
 const val ENABLE_INTERFACE_COMMAND = "su -c ifconfig %s up"
+const val READ_NETWORK_INTERFACES_STATS_COMMAND = "su -c cat $NETWORK_INTERFACES_STATS_PATH"
+
+const val WLAN = "wlan"
+const val RMNET = "rmnet"

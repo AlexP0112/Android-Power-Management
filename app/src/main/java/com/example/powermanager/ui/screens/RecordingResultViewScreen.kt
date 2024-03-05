@@ -28,6 +28,7 @@ import com.example.powermanager.ui.model.PowerManagerAppModel
 import com.example.powermanager.ui.state.AppUiState
 import com.example.powermanager.utils.getListMaximum
 import com.example.powermanager.utils.getListMinimum
+import com.example.powermanager.utils.getPrettyStringFromNumberOfBytes
 
 @Composable
 fun RecordingResultViewScreen(
@@ -112,6 +113,26 @@ fun RecordingResultViewScreen(
 
         Text(
             text = "\u25cb Peak CPU load: ${String.format("%.2f", result.peakCpuLoad)}"
+        )
+
+        Spacer(modifier = Modifier.height(6.dp))
+
+        Divider(
+            modifier = Modifier
+                .fillMaxSize(),
+            thickness = 0.75.dp,
+            color = MaterialTheme.colorScheme.secondary
+        )
+
+        Spacer(modifier = Modifier.height(6.dp))
+
+        // network stats
+        Text(
+            text = "\u25cb Total internet traffic (download): ${getPrettyStringFromNumberOfBytes(result.numberOfBytesReceived)}"
+        )
+
+        Text(
+            text = "\u25cb Total internet traffic (upload): ${getPrettyStringFromNumberOfBytes(result.numberOfBytesSent)}"
         )
 
         Spacer(modifier = Modifier.height(6.dp))
