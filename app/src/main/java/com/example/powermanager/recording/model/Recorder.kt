@@ -1,10 +1,14 @@
 package com.example.powermanager.recording.model
 
+import android.annotation.SuppressLint
 import android.app.ActivityManager
 import android.os.BatteryManager
+import android.os.PowerManager
 import com.example.powermanager.preferences.LoadAverageTypes
 import com.example.powermanager.recording.storage.RecordingStorageManager
 import com.example.powermanager.utils.UPTIME_COMMAND
+import com.example.powermanager.utils.WAKELOCK_TAG
+import com.example.powermanager.utils.WAKELOCK_TIMEOUT
 import com.example.powermanager.utils.computeListAverage
 import com.example.powermanager.utils.convertBytesToGigaBytes
 import com.example.powermanager.utils.convertMicroAmpsToMilliAmps
@@ -20,11 +24,13 @@ import java.io.InputStreamReader
 
 object Recorder {
 
+    @SuppressLint("InvalidWakeLockTag")
     suspend fun record(
         samplingPeriod: Long,
         numberOfSamples: Int,
         sessionName: String,
         batteryManager: BatteryManager,
+        powerManager: PowerManager,
         activityManager: ActivityManager,
         outputDirectory: File,
         includeThreadCountInfo : Boolean,
@@ -36,6 +42,10 @@ object Recorder {
             val memoryUsedValues : MutableList<Float> = mutableListOf()
             val cpuLoadValues : MutableList<Float> = mutableListOf()
             val numberOfThreadsValues : MutableList<Int> = mutableListOf()
+
+            // acquire wake lock to keep the CPU on while sampling
+            val wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, WAKELOCK_TAG)
+            wakeLock.acquire(WAKELOCK_TIMEOUT)
 
             // sampling
             for (i in 0 until numberOfSamples) {
@@ -96,6 +106,9 @@ object Recorder {
             )
 
             onRecordingFinished(savedFileName)
+
+            // release the wake lock
+            wakeLock.release()
         }
     }
 

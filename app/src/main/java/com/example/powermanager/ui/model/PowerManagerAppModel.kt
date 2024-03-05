@@ -399,6 +399,7 @@ class PowerManagerAppModel(
                 numberOfSamples = uiState.value.recordingNumberOfSamplesString.toInt(),
                 sessionName = uiState.value.recordingSessionName,
                 batteryManager = batteryManager,
+                powerManager = powerManager,
                 activityManager = activityManager,
                 includeThreadCountInfo = uiState.value.includeThreadCountInfo,
                 outputDirectory = recordingResultsDirectory,

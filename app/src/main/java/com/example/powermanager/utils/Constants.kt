@@ -57,6 +57,8 @@ const val CONFIRM_DELETION_TEXT = "Are you sure you want to delete recording res
 const val RECORDING_RESULTS_DIRECTORY_NAME = "recording_results"
 const val DOT_JSON = ".json"
 const val DOT_PROVIDER = ".provider"
+const val WAKELOCK_TIMEOUT = 30L * 60 * 1000 // half an hour
+const val WAKELOCK_TAG = "RecordingWakeLockTag"
 
 // notifications
 const val NOTIFICATION_CHANNEL_ID = "power_manager"
