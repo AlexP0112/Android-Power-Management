@@ -34,6 +34,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.powermanager.R
+import com.example.powermanager.control.cpufreq.DEFAULT_GOVERNOR_STRING
+import com.example.powermanager.control.cpufreq.GOVERNOR_NAME_TO_DESCRIPTION_STRING_ID
 import com.example.powermanager.ui.model.PowerManagerAppModel
 import com.example.powermanager.ui.screens.common.InfoDialog
 import com.example.powermanager.ui.screens.common.SectionHeader
@@ -56,6 +58,9 @@ fun ControlScreen(
             .verticalScroll(rememberScrollState())
     ) {
         val isDozeModeInfoDialogOpen = remember { mutableStateOf(false) }
+        val isScalingGovernorsGeneralInfoDialogOpen = remember { mutableStateOf(false) }
+        val isParticularScalingGovernorInfoDialogOpen = remember { mutableStateOf(false) }
+
         val uiState: State<AppUiState> = model.uiState.collectAsState()
         val availableScalingGovernors : List<String> = model.getAvailableScalingGovernors()
 
@@ -85,15 +90,22 @@ fun ControlScreen(
         // ================= CPU section ==================== //
         SectionHeader(sectionName = stringResource(id = R.string.cpu))
 
-        SelectScalingGovernorText()
+        SelectScalingGovernorRow {
+            isScalingGovernorsGeneralInfoDialogOpen.value = true
+        }
 
         availableScalingGovernors.forEach { scalingGovernor ->
             ScalingGovernorRow(
                 governorName = scalingGovernor,
-                isSelected = scalingGovernor == uiState.value.currentScalingGovernor
-            ) {
-                model.changeScalingGovernor(scalingGovernor)
-            }
+                isSelected = scalingGovernor == uiState.value.currentScalingGovernor,
+                onSelected = {
+                    model.changeScalingGovernor(scalingGovernor)
+                },
+                onIconButtonPressed = {
+                    model.changeSelectedScalingGovernorInfoButton(scalingGovernor)
+                    isParticularScalingGovernorInfoDialogOpen.value = true
+                }
+            )
         }
 
         // ================= info dialogs ==================== //
@@ -103,6 +115,25 @@ fun ControlScreen(
                 cardHeight = 250.dp
             ) {
                 isDozeModeInfoDialogOpen.value = false
+            }
+        }
+
+        if (isScalingGovernorsGeneralInfoDialogOpen.value) {
+            InfoDialog(
+                textId = R.string.scaling_governors_explanation,
+                cardHeight = 180.dp
+            ) {
+                isScalingGovernorsGeneralInfoDialogOpen.value = false
+            }
+        }
+
+        if (isParticularScalingGovernorInfoDialogOpen.value &&
+            GOVERNOR_NAME_TO_DESCRIPTION_STRING_ID.containsKey(uiState.value.selectedScalingGovernorInfoButton)) {
+            InfoDialog(
+                textId = GOVERNOR_NAME_TO_DESCRIPTION_STRING_ID[uiState.value.selectedScalingGovernorInfoButton]!!,
+                cardHeight = 240.dp
+            ) {
+                isParticularScalingGovernorInfoDialogOpen.value = false
             }
         }
     }
@@ -144,11 +175,29 @@ fun ScreenBrightnessText() {
 }
 
 @Composable
-fun SelectScalingGovernorText() {
-    Text(
-        text = stringResource(R.string.select_scaling_governor),
-        fontSize = 18.sp
-    )
+fun SelectScalingGovernorRow(
+    onIconButtonPressed : () -> Unit
+) {
+    Row (
+        modifier = Modifier.fillMaxSize(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = stringResource(R.string.select_scaling_governor),
+            fontSize = 18.sp
+        )
+
+        IconButton(onClick = onIconButtonPressed) {
+            Icon(
+                imageVector = Icons.Default.Info,
+                contentDescription = null,
+                modifier = Modifier
+                    .size(18.dp)
+                    .align(Alignment.CenterVertically)
+            )
+        }
+    }
 }
 
 @Composable
@@ -184,27 +233,65 @@ fun DozeModeInfoRow(
 
 /*
  * A Row that corresponds to a scaling governor. It contains a radio button, the name of the
- * governor
+ * governor and an info button that opens a dialog with more information about that governor
+ *
+ * Note that sched_pixel governor does not have an associated info button, since it is not one
+ * of the well-known scaling governors and little to none information about it is available
  */
 @Composable
 fun ScalingGovernorRow(
     governorName : String,
     isSelected : Boolean,
-    onSelected : () -> Unit
+    onSelected : () -> Unit,
+    onIconButtonPressed: () -> Unit
 ) {
-    Row (
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        RadioButton(
-            selected = isSelected,
-            onClick = onSelected,
-            colors = RadioButtonDefaults.colors()
-        )
+    if (GOVERNOR_NAME_TO_DESCRIPTION_STRING_ID.containsKey(governorName)) {
+        // known governor (provide description for it)
+        Row (
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                RadioButton(
+                    selected = isSelected,
+                    onClick = onSelected,
+                    colors = RadioButtonDefaults.colors()
+                )
 
-        Text(
-            text = governorName
-        )
+                Text(
+                    text = governorName
+                )
+            }
+
+            IconButton(onClick = onIconButtonPressed) {
+                Icon(
+                    imageVector = Icons.Default.Info,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(18.dp)
+                        .align(Alignment.CenterVertically)
+                )
+            }
+        }
+    } else {
+        // unknown governor, most probably the OEM-specific default
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            RadioButton(
+                selected = isSelected,
+                onClick = onSelected,
+                colors = RadioButtonDefaults.colors()
+            )
+
+            Text(
+                text = "$governorName $DEFAULT_GOVERNOR_STRING"
+            )
+        }
     }
 }
 

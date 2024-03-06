@@ -19,5 +19,6 @@ data class AppUiState(
     val includeThreadCountInfo : Boolean = true,
 
     // control
-    val currentScalingGovernor : String
+    val currentScalingGovernor : String,
+    val selectedScalingGovernorInfoButton : String = NO_VALUE_STRING
 )

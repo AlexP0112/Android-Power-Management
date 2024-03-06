@@ -572,6 +572,14 @@ class PowerManagerAppModel(
         }
     }
 
+    fun changeSelectedScalingGovernorInfoButton(newValue: String) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                selectedScalingGovernorInfoButton = newValue
+            )
+        }
+    }
+
     // Linux commands invocation
 
     private fun getNumberOfProcessesOrThreads(processes: Boolean) : Int {
