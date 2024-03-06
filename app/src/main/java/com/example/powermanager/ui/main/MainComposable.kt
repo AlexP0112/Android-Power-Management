@@ -181,7 +181,8 @@ fun ScreensNavHost(
         ) {
             ControlScreen(
                 topPadding = topPadding,
-                goToDisplaySettings = goToDisplaySettings
+                goToDisplaySettings = goToDisplaySettings,
+                model = model
             )
         }
 

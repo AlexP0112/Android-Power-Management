@@ -160,6 +160,15 @@ fun getDateTimeNiceString(): String {
     return dateFormat.format(date)
 }
 
+fun readProtectedFileContent(filePath : String) : String {
+    val command = String.format(CAT_FILE_AS_ROOT_COMMAND, filePath)
+    val process = Runtime.getRuntime().exec(command)
+    val fileContent = BufferedReader(InputStreamReader(process.inputStream)).readText()
+    process.waitFor()
+
+    return fileContent
+}
+
 fun getPrettyStringFromNumberOfBytes(byteCount: Long) : String {
     // return as number of bytes
     if (byteCount < NUMBER_OF_BYTES_IN_A_KILOBYTE)

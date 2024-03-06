@@ -63,6 +63,7 @@
     <string name="processes_information">Processes information</string>
     <string name="total_number_of_threads">Total number of threads</string>
     <string name="wi_fi">Wi-Fi</string>
+    <string name="cpu">CPU</string>
     <string name="wifi_text">It is recommended to turn off Wi-Fi during long periods of inactivity (such as during the night), at the same time making sure that Mobile Data connection is disabled. In case you forget to do so, Power Manager will automatically disable Wi-Fi when the device enters Doze mode.</string>
     <string name="doze_mode_explanation_intro">For more information on Doze mode, click here:</string>
     <string name="dark_theme_text">\u2022 Enabling Dark Theme can also extend your battery life, especially on devices with OLED or AMOLED displays.</string>
@@ -70,6 +71,7 @@
     <string name="display">Display</string>
     <string name="screen_brightness_text">\u2022 The display is one of the most important battery drain sources on mobile devices. Reducing its brightness can have a great impact on battery life. If you want automatic adjustments of the brightness level based on the environmental lighting, you can enable Adaptive Brightness.</string>
     <string name="screen_timeout_text">\u2022 A Screen Timeout value as small as possible is another way to save battery.</string>
+    <string name="select_scaling_governor">\u2022 Select scaling governor:</string>
     <string name="go_to_display_settings">Open display settings</string>
     <string name="include_thread_count">Include thread count statistics (might significantly increase total session duration)</string>
 </resources>

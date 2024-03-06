@@ -16,5 +16,8 @@ data class AppUiState(
     val recordingSessionName : String = DEFAULT_RECORDING_NAME,
     val recordingResults : List<String>,
     val currentlySelectedRecordingResult : String = NO_VALUE_STRING,
-    val includeThreadCountInfo : Boolean = true
+    val includeThreadCountInfo : Boolean = true,
+
+    // control
+    val currentScalingGovernor : String
 )

@@ -13,6 +13,7 @@ import androidx.core.content.FileProvider
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.powermanager.R
+import com.example.powermanager.control.cpufreq.CpuFreqManager
 import com.example.powermanager.preferences.HOME_SCREEN_SAMPLING_PERIOD_ID
 import com.example.powermanager.preferences.LIVE_CHARTS_SAMPLING_PERIOD_ID
 import com.example.powermanager.preferences.LIVE_CHARTS_TRACKED_PERIOD_ID
@@ -73,9 +74,11 @@ class PowerManagerAppModel(
     private val _uiState : MutableStateFlow<AppUiState>
     val uiState: StateFlow<AppUiState>
 
+    // constants determined at startup
     private val totalMemory: Float
     private val numberOfCores : Int
     private val systemBootTimestamp : Long
+    private val availableScalingGovernors : List<String>
 
     private val recordingResultsDirectory : File
 
@@ -100,15 +103,16 @@ class PowerManagerAppModel(
 
         recordingResultsDirectory = File(application.applicationContext.filesDir, RECORDING_RESULTS_DIRECTORY_NAME)
 
-        // determine the total amount of memory that the device has
+        // determine the total amount of memory that the device has and the available scaling governors
         val info = ActivityManager.MemoryInfo()
         activityManager.getMemoryInfo(info)
         totalMemory = convertBytesToGigaBytes(info.totalMem)
 
+        availableScalingGovernors = CpuFreqManager.getAvailableScalingGovernors()
+
         // determine the number of processors on the device and the timestamp of the system boot
         numberOfCores = determineNumberOfCPUCores()
 
-        // determine the timestamp of the last system boot
         systemBootTimestamp =
             try {
                 determineSystemBootTimestamp()
@@ -132,12 +136,13 @@ class PowerManagerAppModel(
             preferenceValueAsString = getPreferenceValue(NUMBER_OF_RECORDINGS_LISTED_ID)) as Int
 
         _uiState = MutableStateFlow(AppUiState(
-            recordingResults = RecordingStorageManager.getMostRecentRecordingResultsNames(numberOfRecordingsListedLimit, recordingResultsDirectory)
+            recordingResults = RecordingStorageManager.getMostRecentRecordingResultsNames(numberOfRecordingsListedLimit, recordingResultsDirectory),
+            currentScalingGovernor = CpuFreqManager.getCurrentScalingGovernor()
         ))
         uiState = _uiState.asStateFlow()
     }
 
-    // constants determined at startup
+    // constants retrieval
 
     fun getTotalMemory(): Float {
         return totalMemory
@@ -145,6 +150,10 @@ class PowerManagerAppModel(
 
     fun getNumCores(): Int {
         return numberOfCores
+    }
+
+    fun getAvailableScalingGovernors() : List<String> {
+        return availableScalingGovernors
     }
 
     // sampling for home screen
@@ -389,8 +398,9 @@ class PowerManagerAppModel(
                 activityManager = activityManager,
                 includeThreadCountInfo = uiState.value.includeThreadCountInfo,
                 outputDirectory = recordingResultsDirectory,
-                onRecordingFinished = { onRecordingFinished(it) }
-            ) { getNumberOfProcessesOrThreads(false) }
+                onRecordingFinished = { onRecordingFinished(it) },
+                getNumberOfThreads = { getNumberOfProcessesOrThreads(false) }
+            )
         }
     }
 
@@ -546,6 +556,20 @@ class PowerManagerAppModel(
 
     fun getPreferenceProperties(preferenceKey: String) : PreferenceProperties {
         return preferencesManager.getPreferenceProperties(preferenceKey)
+    }
+
+    // control
+
+    fun changeScalingGovernor(newGovernor: String) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                currentScalingGovernor = newGovernor
+            )
+        }
+
+        viewModelScope.launch {
+            CpuFreqManager.changeScalingGovernor(newGovernor, numberOfCores)
+        }
     }
 
     // Linux commands invocation

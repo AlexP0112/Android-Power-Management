@@ -72,6 +72,8 @@ const val NOTIFICATION_TEXT = "Result saved in %s.json"
 const val CORE_FREQUENCY_PATH = "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_cur_freq"
 const val DEVICES_SYSTEM_CPU_PATH = "/sys/devices/system/cpu/"
 const val NETWORK_INTERFACES_STATS_PATH = "/proc/net/dev"
+const val CURRENT_SCALING_GOVERNOR_PATH = "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_governor"
+const val AVAILABLE_SCALING_GOVERNORS_PATH = "/sys/devices/system/cpu/cpu0/cpufreq/scaling_available_governors"
 
 // linux commands
 const val UPTIME_COMMAND = "uptime"
@@ -80,7 +82,8 @@ const val GET_NUMBER_OF_THREADS_COMMAND = "su -c ps -AT | wc -l"
 const val GET_ALL_WIFI_INTERFACES_COMMAND = "su -c ifconfig -a | grep wlan"
 const val DISABLE_INTERFACE_COMMAND = "su -c ifconfig %s down"
 const val ENABLE_INTERFACE_COMMAND = "su -c ifconfig %s up"
-const val READ_NETWORK_INTERFACES_STATS_COMMAND = "su -c cat $NETWORK_INTERFACES_STATS_PATH"
+const val CAT_FILE_AS_ROOT_COMMAND = "su -c cat %s"
+const val CHANGE_SCALING_GOVERNOR_FOR_CPU_COMMAND = "su -c echo %s > /sys/devices/system/cpu/cpu%d/cpufreq/scaling_governor"
 
 const val WLAN = "wlan"
 const val RMNET = "rmnet"

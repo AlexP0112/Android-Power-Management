@@ -7,7 +7,7 @@ import android.os.PowerManager
 import android.util.Log
 import com.example.powermanager.preferences.LoadAverageTypes
 import com.example.powermanager.recording.storage.RecordingStorageManager
-import com.example.powermanager.utils.READ_NETWORK_INTERFACES_STATS_COMMAND
+import com.example.powermanager.utils.NETWORK_INTERFACES_STATS_PATH
 import com.example.powermanager.utils.RECORDING_TAG
 import com.example.powermanager.utils.UPTIME_COMMAND
 import com.example.powermanager.utils.WAKELOCK_TAG
@@ -19,6 +19,7 @@ import com.example.powermanager.utils.getBytesSentAndReceivedByAllInterfacesFrom
 import com.example.powermanager.utils.getDateTimeNiceString
 import com.example.powermanager.utils.getListMaximum
 import com.example.powermanager.utils.getLoadAverageFromUptimeCommandOutput
+import com.example.powermanager.utils.readProtectedFileContent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
@@ -136,13 +137,13 @@ object Recorder {
     /*
      * Returns a list of 2 long numbers representing the total number of bytes
      * received / sent on any internet interface since system boot
+     *
+     * It reads from /proc/net/dev
      */
     private fun getBytesSentAndReceivedByAllInterfaces(): List<Long> {
-        val process = Runtime.getRuntime().exec(READ_NETWORK_INTERFACES_STATS_COMMAND)
-        val processOutput = BufferedReader(InputStreamReader(process.inputStream)).readText()
-        process.waitFor()
+        val fileContent = readProtectedFileContent(NETWORK_INTERFACES_STATS_PATH)
 
-        return getBytesSentAndReceivedByAllInterfacesFromFileContent(processOutput)
+        return getBytesSentAndReceivedByAllInterfacesFromFileContent(fileContent)
     }
 
 }
