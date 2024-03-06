@@ -322,14 +322,7 @@ class PowerManagerAppModel(
     fun changeTrackedCore(coreNumber: Int) {
         _uiState.update { currentState ->
             currentState.copy(
-                coreTracked = coreNumber,
-                isRecording = uiState.value.isRecording,
-                recordingSamplingPeriod = uiState.value.recordingSamplingPeriod,
-                recordingNumberOfSamplesString = uiState.value.recordingNumberOfSamplesString,
-                recordingSessionName = uiState.value.recordingSessionName,
-                recordingResults = uiState.value.recordingResults,
-                currentlySelectedRecordingResult = uiState.value.currentlySelectedRecordingResult,
-                includeThreadCountInfo = uiState.value.includeThreadCountInfo
+                coreTracked = coreNumber
             )
         }
 
@@ -382,14 +375,7 @@ class PowerManagerAppModel(
     fun startRecording() {
         _uiState.update { currentState ->
             currentState.copy(
-                coreTracked = uiState.value.coreTracked,
-                isRecording = true,
-                recordingSamplingPeriod = uiState.value.recordingSamplingPeriod,
-                recordingNumberOfSamplesString = uiState.value.recordingNumberOfSamplesString,
-                recordingSessionName = uiState.value.recordingSessionName,
-                recordingResults = uiState.value.recordingResults,
-                currentlySelectedRecordingResult = uiState.value.currentlySelectedRecordingResult,
-                includeThreadCountInfo = uiState.value.includeThreadCountInfo
+                isRecording = true
             )
         }
 
@@ -420,14 +406,8 @@ class PowerManagerAppModel(
         // update state
         _uiState.update { currentState ->
             currentState.copy(
-                coreTracked = uiState.value.coreTracked,
                 isRecording = false,
-                recordingSamplingPeriod = uiState.value.recordingSamplingPeriod,
-                recordingNumberOfSamplesString = uiState.value.recordingNumberOfSamplesString,
-                recordingSessionName = uiState.value.recordingSessionName,
-                recordingResults = getMostRecentRecordingResultsNames(),
-                currentlySelectedRecordingResult = uiState.value.currentlySelectedRecordingResult,
-                includeThreadCountInfo = uiState.value.includeThreadCountInfo
+                recordingResults = getMostRecentRecordingResultsNames()
             )
         }
     }
@@ -451,14 +431,7 @@ class PowerManagerAppModel(
     fun changeRecordingSamplingPeriod(newValue: Long) {
         _uiState.update { currentState ->
             currentState.copy(
-                coreTracked = uiState.value.coreTracked,
-                isRecording = uiState.value.isRecording,
-                recordingSamplingPeriod = newValue,
-                recordingNumberOfSamplesString = uiState.value.recordingNumberOfSamplesString,
-                recordingSessionName = uiState.value.recordingSessionName,
-                recordingResults = uiState.value.recordingResults,
-                currentlySelectedRecordingResult = uiState.value.currentlySelectedRecordingResult,
-                includeThreadCountInfo = uiState.value.includeThreadCountInfo
+                recordingSamplingPeriod = newValue
             )
         }
     }
@@ -466,14 +439,7 @@ class PowerManagerAppModel(
     fun changeRecordingNumberOfSamplesString(newValue: String) {
         _uiState.update { currentState ->
             currentState.copy(
-                coreTracked = uiState.value.coreTracked,
-                isRecording = uiState.value.isRecording,
-                recordingSamplingPeriod = uiState.value.recordingSamplingPeriod,
-                recordingNumberOfSamplesString = newValue,
-                recordingSessionName = uiState.value.recordingSessionName,
-                recordingResults = uiState.value.recordingResults,
-                currentlySelectedRecordingResult = uiState.value.currentlySelectedRecordingResult,
-                includeThreadCountInfo = uiState.value.includeThreadCountInfo
+                recordingNumberOfSamplesString = newValue
             )
         }
     }
@@ -481,14 +447,7 @@ class PowerManagerAppModel(
     fun changeRecordingSessionName(newValue: String) {
         _uiState.update { currentState ->
             currentState.copy(
-                coreTracked = uiState.value.coreTracked,
-                isRecording = uiState.value.isRecording,
-                recordingSamplingPeriod = uiState.value.recordingSamplingPeriod,
-                recordingNumberOfSamplesString = uiState.value.recordingNumberOfSamplesString,
-                recordingSessionName = newValue,
-                recordingResults = uiState.value.recordingResults,
-                currentlySelectedRecordingResult = uiState.value.currentlySelectedRecordingResult,
-                includeThreadCountInfo = uiState.value.includeThreadCountInfo
+                recordingSessionName = newValue
             )
         }
     }
@@ -496,13 +455,6 @@ class PowerManagerAppModel(
     fun changeIncludeThreadCountInfoOption(newValue : Boolean) {
         _uiState.update { currentState ->
             currentState.copy(
-                coreTracked = uiState.value.coreTracked,
-                isRecording = uiState.value.isRecording,
-                recordingSamplingPeriod = uiState.value.recordingSamplingPeriod,
-                recordingNumberOfSamplesString = uiState.value.recordingNumberOfSamplesString,
-                recordingSessionName = uiState.value.recordingSessionName,
-                recordingResults = uiState.value.recordingResults,
-                currentlySelectedRecordingResult = uiState.value.currentlySelectedRecordingResult,
                 includeThreadCountInfo = newValue
             )
         }
@@ -511,13 +463,6 @@ class PowerManagerAppModel(
     fun changeSelectedRecordingResult(newValue: String) {
         _uiState.update { currentState ->
             currentState.copy(
-                coreTracked = uiState.value.coreTracked,
-                isRecording = uiState.value.isRecording,
-                recordingSamplingPeriod = uiState.value.recordingSamplingPeriod,
-                recordingNumberOfSamplesString = uiState.value.recordingNumberOfSamplesString,
-                recordingSessionName = uiState.value.recordingSessionName,
-                recordingResults = uiState.value.recordingResults,
-                includeThreadCountInfo = uiState.value.includeThreadCountInfo,
                 currentlySelectedRecordingResult = newValue
             )
         }
@@ -533,14 +478,7 @@ class PowerManagerAppModel(
         if (deleted) {
             _uiState.update { currentState ->
                 currentState.copy(
-                    coreTracked = uiState.value.coreTracked,
-                    isRecording = uiState.value.isRecording,
-                    recordingSamplingPeriod = uiState.value.recordingSamplingPeriod,
-                    recordingNumberOfSamplesString = uiState.value.recordingNumberOfSamplesString,
-                    recordingSessionName = uiState.value.recordingSessionName,
-                    recordingResults = getMostRecentRecordingResultsNames(),
-                    currentlySelectedRecordingResult = uiState.value.currentlySelectedRecordingResult,
-                    includeThreadCountInfo = uiState.value.includeThreadCountInfo
+                    recordingResults = getMostRecentRecordingResultsNames()
                 )
             }
         }
@@ -596,14 +534,7 @@ class PowerManagerAppModel(
         if (preferenceKey == NUMBER_OF_RECORDINGS_LISTED_ID) {
             _uiState.update { currentState ->
                 currentState.copy(
-                    coreTracked = uiState.value.coreTracked,
-                    isRecording = uiState.value.isRecording,
-                    recordingSamplingPeriod = uiState.value.recordingSamplingPeriod,
-                    recordingNumberOfSamplesString = uiState.value.recordingNumberOfSamplesString,
-                    recordingSessionName = uiState.value.recordingSessionName,
-                    recordingResults = getMostRecentRecordingResultsNames(),
-                    currentlySelectedRecordingResult = uiState.value.currentlySelectedRecordingResult,
-                    includeThreadCountInfo = uiState.value.includeThreadCountInfo
+                    recordingResults = getMostRecentRecordingResultsNames()
                 )
             }
         }
