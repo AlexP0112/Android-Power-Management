@@ -39,7 +39,7 @@ object Recorder {
         activityManager: ActivityManager,
         outputDirectory: File,
         includeThreadCountInfo : Boolean,
-        onRecordingFinished: (String) -> Unit,
+        onRecordingFinished: (String?) -> Unit,
         getNumberOfThreads: () -> Int
     ) {
         withContext(Dispatchers.IO) {

@@ -404,7 +404,10 @@ class PowerManagerAppModel(
         }
     }
 
-    private fun onRecordingFinished(savedFileName : String) {
+    private fun onRecordingFinished(savedFileName : String?) {
+        if (savedFileName == null)
+            return
+
         // send the notification, if it is enabled
         val notificationEnabled = PreferenceValueAdaptor.preferenceStringValueToActualValue(
             preferenceID = RECORDING_FINISHED_NOTIFICATION_ENABLED_ID,

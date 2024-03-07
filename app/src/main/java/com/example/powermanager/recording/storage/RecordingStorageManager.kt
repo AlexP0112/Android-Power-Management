@@ -46,7 +46,7 @@ object RecordingStorageManager {
         }
     }
 
-    fun saveRecordingResult(result : RecordingResult, directory: File) : String {
+    fun saveRecordingResult(result : RecordingResult, directory: File) : String? {
         // first convert the result to JSON format
         val gson = GsonBuilder().setPrettyPrinting().create()
         val fileContent = gson.toJson(result)
@@ -56,7 +56,7 @@ object RecordingStorageManager {
             if (!directory.exists())
                 directory.mkdirs()
         } catch (_ : Exception) {
-
+            return null
         }
 
         var fileName : String = result.sessionName
