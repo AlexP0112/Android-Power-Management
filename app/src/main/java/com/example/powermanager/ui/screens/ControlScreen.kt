@@ -14,6 +14,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
@@ -60,9 +62,13 @@ fun ControlScreen(
         val isDozeModeInfoDialogOpen = remember { mutableStateOf(false) }
         val isScalingGovernorsGeneralInfoDialogOpen = remember { mutableStateOf(false) }
         val isParticularScalingGovernorInfoDialogOpen = remember { mutableStateOf(false) }
+        val isCoreEnablingInfoDialogOpen = remember { mutableStateOf(false) }
 
         val uiState: State<AppUiState> = model.uiState.collectAsState()
         val availableScalingGovernors : List<String> = model.getAvailableScalingGovernors()
+
+        val totalNumberOfCores = model.getTotalNumberOfCores()
+        val masterCores = model.getMasterCores()
 
         ControlScreenTitle()
 
@@ -73,7 +79,10 @@ fun ControlScreen(
 
         WifiText()
 
-        DozeModeInfoRow {
+        TextAndInfoButtonRow(
+            textId = R.string.doze_mode_explanation_intro,
+            fontSize = 16
+        ) {
             isDozeModeInfoDialogOpen.value = true
         }
 
@@ -90,7 +99,10 @@ fun ControlScreen(
         // ================= CPU section ==================== //
         SectionHeader(sectionName = stringResource(id = R.string.cpu))
 
-        SelectScalingGovernorRow {
+        TextAndInfoButtonRow(
+            textId = R.string.select_scaling_governor,
+            fontSize = 18
+        ) {
             isScalingGovernorsGeneralInfoDialogOpen.value = true
         }
 
@@ -105,6 +117,22 @@ fun ControlScreen(
                     model.changeSelectedScalingGovernorInfoButton(scalingGovernor)
                     isParticularScalingGovernorInfoDialogOpen.value = true
                 }
+            )
+        }
+
+        TextAndInfoButtonRow(
+            textId = R.string.online_cpu_cores,
+            fontSize = 18
+        ) {
+            isCoreEnablingInfoDialogOpen.value = true
+        }
+
+        ( 0 until totalNumberOfCores).forEach { coreIndex ->
+            CpuCoreOnlineRow(
+                canCoreBeDisabled = !masterCores.contains(coreIndex),
+                coreNumber = coreIndex,
+                onValueChanged = { model.changeCoreEnabledState(coreIndex, it) },
+                isCoreOnline = !uiState.value.disabledCores.contains(coreIndex)
             )
         }
 
@@ -134,6 +162,15 @@ fun ControlScreen(
                 cardHeight = 240.dp
             ) {
                 isParticularScalingGovernorInfoDialogOpen.value = false
+            }
+        }
+
+        if (isCoreEnablingInfoDialogOpen.value) {
+            InfoDialog(
+                textId = R.string.core_enabling_explanation,
+                cardHeight = 160.dp
+            ) {
+                isCoreEnablingInfoDialogOpen.value = false
             }
         }
     }
@@ -175,7 +212,9 @@ fun ScreenBrightnessText() {
 }
 
 @Composable
-fun SelectScalingGovernorRow(
+fun TextAndInfoButtonRow(
+    textId : Int,
+    fontSize : Int,
     onIconButtonPressed : () -> Unit
 ) {
     Row (
@@ -184,8 +223,8 @@ fun SelectScalingGovernorRow(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = stringResource(R.string.select_scaling_governor),
-            fontSize = 18.sp
+            text = stringResource(textId),
+            fontSize = fontSize.sp
         )
 
         IconButton(onClick = onIconButtonPressed) {
@@ -206,29 +245,6 @@ fun DarkThemeText() {
         text = stringResource(R.string.dark_theme_text),
         fontSize = 18.sp
     )
-}
-
-@Composable
-fun DozeModeInfoRow(
-    onIconButtonPressed : () -> Unit
-) {
-    Row(
-        modifier = Modifier.fillMaxSize(),
-        horizontalArrangement = Arrangement.Start,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(text = stringResource(R.string.doze_mode_explanation_intro))
-
-        IconButton(onClick = onIconButtonPressed) {
-            Icon(
-                imageVector = Icons.Default.Info,
-                contentDescription = null,
-                modifier = Modifier
-                    .size(18.dp)
-                    .align(Alignment.CenterVertically)
-            )
-        }
-    }
 }
 
 /*
@@ -292,6 +308,32 @@ fun ScalingGovernorRow(
                 text = "$governorName $DEFAULT_GOVERNOR_STRING"
             )
         }
+    }
+}
+
+/*
+ * Row that corresponds to each cpu core in the system. For some of them (at most half of the
+ * total number of cores) there is a clickable checkbox that can disable/enable them
+ */
+@Composable
+fun CpuCoreOnlineRow(
+    canCoreBeDisabled : Boolean,
+    isCoreOnline : Boolean,
+    onValueChanged: (Boolean) -> Unit,
+    coreNumber : Int
+) {
+    Row (
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Checkbox(
+            checked = isCoreOnline,
+            onCheckedChange = onValueChanged,
+            enabled = canCoreBeDisabled,
+            colors = CheckboxDefaults.colors()
+        )
+
+        Text(text = "Cpu$coreNumber")
     }
 }
 

@@ -74,7 +74,9 @@
     <string name="screen_brightness_text">\u2022 The display is one of the most important battery drain sources on mobile devices. Reducing its brightness can have a great impact on battery life. If you want automatic adjustments of the brightness level based on the environmental lighting, you can enable Adaptive Brightness.</string>
     <string name="screen_timeout_text">\u2022 A Screen Timeout value as small as possible is another way to save battery.</string>
     <string name="select_scaling_governor">\u2022 Select scaling governor:</string>
+    <string name="online_cpu_cores">\u2022 Online CPU cores:</string>
     <string name="go_to_display_settings">Open display settings</string>
+    <string name="core_enabling_explanation">Note that while disabling CPU cores might help save battery, it could also cause significant performance and user experience degradation.</string>
     <string name="include_thread_count">Include thread count statistics (might significantly increase total session duration)</string>
     <string name="performance_governor_description">The \'performance\' governor keeps each core at its maximum available frequency at all times. It is suitable for computationally intensive tasks such as image editing or playing complex video games, but it may consume more power.</string>
     <string name="powersave_governor_description">The \'powersave\' governor keeps each core at its minimum available frequency at all times. While it is likely to reduce power consumption, the performance of the device might be strongly affected. It is suitable for tasks such as reading a PDF file.</string>

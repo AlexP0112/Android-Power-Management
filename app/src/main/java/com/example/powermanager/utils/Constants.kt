@@ -14,6 +14,7 @@ const val MEMORY_CHART_NAME         = "Memory usage (GB) in the last %d seconds"
 const val CPU_FREQUENCY_CHART_NAME  = "CPU frequency (GHz) in the last %d seconds"
 const val CPU_LOAD_CHART_NAME       = "CPU load in the last %d seconds"
 
+// numerical constants
 const val NUMBER_OF_BYTES_IN_A_KILOBYTE : Long = 1024L
 const val NUMBER_OF_BYTES_IN_A_MEGABYTE : Long = 1024L * 1024L
 const val NUMBER_OF_BYTES_IN_A_GIGABYTE : Long = 1024L * 1024 * 1024
@@ -37,10 +38,6 @@ const val MIN = "min"
 const val DAYS = "days"
 const val SPACE = " "
 const val SEMICOLON = ":"
-
-const val NO_VALUE_STRING = "-"
-const val FAILED_TO_DETERMINE = "Failed to determine"
-const val JSON_MIME_TYPE = "application/json"
 
 // charts sampling
 const val STATISTICS_BACKGROUND_SAMPLING_THRESHOLD_MILLIS = 60L * 1000L // 1 min
@@ -75,6 +72,7 @@ const val NETWORK_INTERFACES_STATS_PATH = "/proc/net/dev"
 const val CURRENT_SCALING_GOVERNOR_PATH = "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_governor"
 const val AVAILABLE_SCALING_GOVERNORS_PATH = "/sys/devices/system/cpu/cpu0/cpufreq/scaling_available_governors"
 const val CPUINFO_PATH = "/proc/cpuinfo"
+const val CPUFREQ_DIRECTORY_PATH = "/sys/devices/system/cpu/cpufreq"
 
 // linux commands
 const val UPTIME_COMMAND = "uptime"
@@ -85,7 +83,13 @@ const val DISABLE_INTERFACE_COMMAND = "su -c ifconfig %s down"
 const val ENABLE_INTERFACE_COMMAND = "su -c ifconfig %s up"
 const val CAT_FILE_AS_ROOT_COMMAND = "su -c cat %s"
 const val CHANGE_SCALING_GOVERNOR_FOR_CPU_COMMAND = "su -c echo %s > /sys/devices/system/cpu/cpu%d/cpufreq/scaling_governor"
+const val CHANGE_CORE_STATE_COMMAND = "su -c echo %d > /sys/devices/system/cpu/cpu%d/online"
 
+// others
 const val WLAN = "wlan"
 const val RMNET = "rmnet"
+const val AFFECTED_CPUS = "affected_cpus"
 const val PROCESSOR = "processor"
+const val NO_VALUE_STRING = "-"
+const val FAILED_TO_DETERMINE = "Failed to determine"
+const val JSON_MIME_TYPE = "application/json"

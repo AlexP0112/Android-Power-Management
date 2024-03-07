@@ -2,8 +2,6 @@ package com.example.powermanager.utils
 
 import com.example.powermanager.preferences.LoadAverageTypes
 import java.io.BufferedReader
-import java.io.File
-import java.io.FileFilter
 import java.io.InputStreamReader
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -11,7 +9,6 @@ import java.time.Duration
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
-import java.util.regex.Pattern
 
 fun getHourAndMinuteFromLongTimestamp(timestamp: Long): String {
     val date = Date(timestamp)
@@ -33,23 +30,6 @@ fun convertKHzToGHz(value: Int) : Float {
 
 fun convertMicroAmpsToMilliAmps(value: Int) : Int {
     return value / NUMBER_OF_MICROS_IN_A_MILLI
-}
-
-fun determineNumberOfCPUCores(): Int {
-
-    class CpuFilter : FileFilter {
-        override fun accept(pathname: File): Boolean {
-            return Pattern.matches(CPU_REGEX, pathname.name)
-        }
-    }
-
-    return try {
-        val dir = File(DEVICES_SYSTEM_CPU_PATH)
-        val files = dir.listFiles(CpuFilter()) ?: return 1
-        files.size
-    } catch (e: Exception) {
-        1
-    }
 }
 
 fun determineSystemBootTimestamp() : Long {

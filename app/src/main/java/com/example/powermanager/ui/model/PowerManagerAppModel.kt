@@ -14,6 +14,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.powermanager.R
 import com.example.powermanager.control.cpufreq.CpuFreqManager
+import com.example.powermanager.control.cpufreq.CpuHotplugManager
 import com.example.powermanager.preferences.HOME_SCREEN_SAMPLING_PERIOD_ID
 import com.example.powermanager.preferences.LIVE_CHARTS_SAMPLING_PERIOD_ID
 import com.example.powermanager.preferences.LIVE_CHARTS_TRACKED_PERIOD_ID
@@ -29,7 +30,6 @@ import com.example.powermanager.recording.model.RecordingResult
 import com.example.powermanager.recording.storage.RecordingStorageManager
 import com.example.powermanager.ui.state.AppUiState
 import com.example.powermanager.utils.CORE_FREQUENCY_PATH
-import com.example.powermanager.utils.CPUINFO_PATH
 import com.example.powermanager.utils.DOT_JSON
 import com.example.powermanager.utils.DOT_PROVIDER
 import com.example.powermanager.utils.FAILED_TO_DETERMINE
@@ -47,12 +47,9 @@ import com.example.powermanager.utils.UPTIME_COMMAND
 import com.example.powermanager.utils.convertBytesToGigaBytes
 import com.example.powermanager.utils.convertKHzToGHz
 import com.example.powermanager.utils.convertMicroAmpsToMilliAmps
-import com.example.powermanager.utils.determineNumberOfCPUCores
 import com.example.powermanager.utils.determineSystemBootTimestamp
 import com.example.powermanager.utils.formatDuration
 import com.example.powermanager.utils.getLoadAverageFromUptimeCommandOutput
-import com.example.powermanager.utils.getOnlineCoresFromFileContent
-import com.example.powermanager.utils.readProtectedFileContent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -82,6 +79,7 @@ class PowerManagerAppModel(
     private val totalNumberOfCores : Int
     private val systemBootTimestamp : Long
     private val availableScalingGovernors : List<String>
+    private val masterCores : List<Int>
 
     private val recordingResultsDirectory : File
 
@@ -112,9 +110,10 @@ class PowerManagerAppModel(
         totalMemory = convertBytesToGigaBytes(info.totalMem)
 
         availableScalingGovernors = CpuFreqManager.getAvailableScalingGovernors()
+        masterCores = CpuFreqManager.determineMasterCores()
 
         // determine the number of processors on the device and the timestamp of the system boot
-        totalNumberOfCores = determineNumberOfCPUCores()
+        totalNumberOfCores = CpuHotplugManager.determineTotalNumberOfCPUCores()
 
         systemBootTimestamp =
             try {
@@ -137,11 +136,13 @@ class PowerManagerAppModel(
         val numberOfRecordingsListedLimit = PreferenceValueAdaptor.preferenceStringValueToActualValue(
             preferenceID = NUMBER_OF_RECORDINGS_LISTED_ID,
             preferenceValueAsString = getPreferenceValue(NUMBER_OF_RECORDINGS_LISTED_ID)) as Int
+        val onlineCores = CpuHotplugManager.getOnlineCores()
+        val disabledCores = (0 until totalNumberOfCores).filter { !onlineCores.contains(it) }
 
         _uiState = MutableStateFlow(AppUiState(
             recordingResults = RecordingStorageManager.getMostRecentRecordingResultsNames(numberOfRecordingsListedLimit, recordingResultsDirectory),
             currentScalingGovernor = CpuFreqManager.getCurrentScalingGovernor(),
-            onlineCores = getOnlineCores()
+            disabledCores = disabledCores
         ))
         uiState = _uiState.asStateFlow()
     }
@@ -158,6 +159,10 @@ class PowerManagerAppModel(
 
     fun getAvailableScalingGovernors() : List<String> {
         return availableScalingGovernors
+    }
+
+    fun getMasterCores() : List<Int> {
+        return masterCores
     }
 
     // sampling for home screen
@@ -190,7 +195,7 @@ class PowerManagerAppModel(
             val usedMemoryGB = convertBytesToGigaBytes(usedMemory)
 
             // cpu info
-            val onlineCores = getOnlineCores()
+            val onlineCores = CpuHotplugManager.getOnlineCores()
 
             val cpuFrequenciesGHz : List<Float> = onlineCores.map { core ->
                 val path = String.format(CORE_FREQUENCY_PATH, core)
@@ -268,7 +273,7 @@ class PowerManagerAppModel(
     val cpuFrequencyFlow = flow {
         while (true) {
             val trackedCore = uiState.value.coreTracked
-            val onlineCores = getOnlineCores()
+            val onlineCores = CpuHotplugManager.getOnlineCores()
 
             val path = String.format(CORE_FREQUENCY_PATH, trackedCore)
 
@@ -593,14 +598,30 @@ class PowerManagerAppModel(
         }
     }
 
-    // Linux commands invocation
+    fun changeCoreEnabledState(coreIndex : Int, enable: Boolean) {
+        if (enable && uiState.value.disabledCores.contains(coreIndex)) {
+            // enable core
+            _uiState.update { currentState ->
+                currentState.copy(
+                    disabledCores = uiState.value.disabledCores.filter { it != coreIndex }
+                )
+            }
+        } else if (!enable && !uiState.value.disabledCores.contains(coreIndex)) {
+            // disable core
+            val previouslyDisabledCores = uiState.value.disabledCores.toMutableList()
+            previouslyDisabledCores.add(coreIndex)
 
-    // returns a list of active cores indices like [0, 1, 3]
-    private fun getOnlineCores(): List<Int> {
-        val fileContent = readProtectedFileContent(CPUINFO_PATH)
+            _uiState.update { currentState ->
+                currentState.copy(
+                    disabledCores = previouslyDisabledCores.toList()
+                )
+            }
+        }
 
-        return getOnlineCoresFromFileContent(fileContent)
+        CpuHotplugManager.changeCoreState(coreIndex, enable)
     }
+
+    // Linux commands invocation
 
     private fun getNumberOfProcessesOrThreads(processes: Boolean) : Int {
         val command = if (processes) GET_NUMBER_OF_PROCESSES_COMMAND else GET_NUMBER_OF_THREADS_COMMAND

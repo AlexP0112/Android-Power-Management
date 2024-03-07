@@ -8,7 +8,6 @@ import com.example.powermanager.utils.NO_VALUE_STRING
 data class AppUiState(
     // live charts
     val coreTracked : Int = 0,
-    val onlineCores : List<Int>,
 
     // recording
     val isRecording : Boolean = false,
@@ -21,5 +20,6 @@ data class AppUiState(
 
     // control
     val currentScalingGovernor : String,
-    val selectedScalingGovernorInfoButton : String = NO_VALUE_STRING
+    val selectedScalingGovernorInfoButton : String = NO_VALUE_STRING,
+    val disabledCores : List<Int>
 )
