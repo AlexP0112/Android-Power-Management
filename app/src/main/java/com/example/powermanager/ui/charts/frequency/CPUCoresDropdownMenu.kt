@@ -21,7 +21,7 @@ import com.example.powermanager.ui.model.PowerManagerAppModel
 fun CPUCoresDropdownMenu(
     model: PowerManagerAppModel
 ) {
-    val maxCoreNumber = model.getNumCores() - 1
+    val maxCoreNumber = model.getTotalNumberOfCores() - 1
     val cpuNames = (0 .. maxCoreNumber).map { "cpu${it}" }
 
     var isExpanded by remember {

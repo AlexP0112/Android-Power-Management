@@ -116,21 +116,21 @@ fun HomeScreen(
         // total memory
         SectionMember(
             leftText = stringResource(R.string.total_memory),
-            rightText = "${String.format("%.2f", model.getTotalMemory())}GB"
+            rightText = "${String.format("%.2f", model.getTotalMemory())} GB"
         )
 
         // used memory
         SectionMember(
             leftText = stringResource(R.string.used_memory),
-            rightText = "${String.format("%.2f", homeScreenInfo.value.usedMemoryGB)}GB (${usedMemoryPercentage}%)"
+            rightText = "${String.format("%.2f", homeScreenInfo.value.usedMemoryGB)} GB (${usedMemoryPercentage}%)"
         )
 
         // available memory
         SectionMember(
             leftText = stringResource(R.string.available_memory),
-            rightText = "${String.format("%.2f", model.getTotalMemory() - homeScreenInfo.value.usedMemoryGB)}GB (${freeMemoryPercentage}%)"
+            rightText = "${String.format("%.2f", model.getTotalMemory() - homeScreenInfo.value.usedMemoryGB)} GB (${freeMemoryPercentage}%)"
         )
-        
+
         Spacer(modifier = Modifier.height(10.dp))
 
         // ==============  CPU info section  ===================== //
@@ -138,19 +138,28 @@ fun HomeScreen(
             sectionName = stringResource(R.string.cpu_information)
         )
 
-        // number of cores
+        // total number of cores
         SectionMember(
-            leftText = stringResource(R.string.number_of_cores),
-            rightText = model.getNumCores().toString()
+            leftText = stringResource(R.string.total_number_of_cores),
+            rightText = model.getTotalNumberOfCores().toString()
+        )
+
+        // number of online cores
+        SectionMember(
+            leftText = stringResource(R.string.number_of_online_cores),
+            rightText = homeScreenInfo.value.onlineCores.size.toString()
         )
 
         Spacer(modifier = Modifier.height(10.dp))
 
         // cores frequencies
-        homeScreenInfo.value.cpuFrequenciesGHz.forEachIndexed { index, frequency ->
+        for (i in 0 until homeScreenInfo.value.onlineCores.size) {
+            val coreIndex = homeScreenInfo.value.onlineCores[i]
+            val coreFrequency = homeScreenInfo.value.cpuFrequenciesGHz[i]
+
             SectionMember(
-                leftText = "Cpu${index} frequency",
-                rightText = "${frequency}GHz"
+                leftText = "Cpu${coreIndex} frequency",
+                rightText = "$coreFrequency GHz"
             )
         }
 

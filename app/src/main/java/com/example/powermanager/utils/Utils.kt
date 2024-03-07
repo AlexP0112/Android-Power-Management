@@ -217,3 +217,21 @@ fun getBytesSentAndReceivedByAllInterfacesFromFileContent(fileContent: String) :
 
     return listOf(totalBytesReceived, totalBytesSent)
 }
+
+fun getOnlineCoresFromFileContent(fileContent: String) : List<Int> {
+    val result : MutableList<Int> = mutableListOf()
+
+    fileContent
+        .trim()
+        .split("\n")
+        .filter { line ->
+            line.startsWith(PROCESSOR)
+        }
+        .forEach { processorLine ->
+            // this is a line that looks like this: "processor       : <index>"
+            val parts = processorLine.split("\\s+".toRegex())
+            result.add(parts[2].toInt())
+        }
+
+    return result
+}

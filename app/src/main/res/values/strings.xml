@@ -16,7 +16,8 @@
     <string name="used_memory">Used memory</string>
     <string name="available_memory">Available memory</string>
     <string name="cpu_information">CPU information</string>
-    <string name="number_of_cores">Number of cores</string>
+    <string name="total_number_of_cores">Total number of cores</string>
+    <string name="number_of_online_cores">Number of online cores</string>
     <string name="cpu_load">CPU load</string>
     <string name="power_save_mode_status">Power Save mode status</string>
     <string name="enabled">Enabled</string>

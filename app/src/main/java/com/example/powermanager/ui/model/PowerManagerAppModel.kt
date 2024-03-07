@@ -29,6 +29,7 @@ import com.example.powermanager.recording.model.RecordingResult
 import com.example.powermanager.recording.storage.RecordingStorageManager
 import com.example.powermanager.ui.state.AppUiState
 import com.example.powermanager.utils.CORE_FREQUENCY_PATH
+import com.example.powermanager.utils.CPUINFO_PATH
 import com.example.powermanager.utils.DOT_JSON
 import com.example.powermanager.utils.DOT_PROVIDER
 import com.example.powermanager.utils.FAILED_TO_DETERMINE
@@ -50,6 +51,8 @@ import com.example.powermanager.utils.determineNumberOfCPUCores
 import com.example.powermanager.utils.determineSystemBootTimestamp
 import com.example.powermanager.utils.formatDuration
 import com.example.powermanager.utils.getLoadAverageFromUptimeCommandOutput
+import com.example.powermanager.utils.getOnlineCoresFromFileContent
+import com.example.powermanager.utils.readProtectedFileContent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -76,7 +79,7 @@ class PowerManagerAppModel(
 
     // constants determined at startup
     private val totalMemory: Float
-    private val numberOfCores : Int
+    private val totalNumberOfCores : Int
     private val systemBootTimestamp : Long
     private val availableScalingGovernors : List<String>
 
@@ -111,7 +114,7 @@ class PowerManagerAppModel(
         availableScalingGovernors = CpuFreqManager.getAvailableScalingGovernors()
 
         // determine the number of processors on the device and the timestamp of the system boot
-        numberOfCores = determineNumberOfCPUCores()
+        totalNumberOfCores = determineNumberOfCPUCores()
 
         systemBootTimestamp =
             try {
@@ -137,7 +140,8 @@ class PowerManagerAppModel(
 
         _uiState = MutableStateFlow(AppUiState(
             recordingResults = RecordingStorageManager.getMostRecentRecordingResultsNames(numberOfRecordingsListedLimit, recordingResultsDirectory),
-            currentScalingGovernor = CpuFreqManager.getCurrentScalingGovernor()
+            currentScalingGovernor = CpuFreqManager.getCurrentScalingGovernor(),
+            onlineCores = getOnlineCores()
         ))
         uiState = _uiState.asStateFlow()
     }
@@ -148,8 +152,8 @@ class PowerManagerAppModel(
         return totalMemory
     }
 
-    fun getNumCores(): Int {
-        return numberOfCores
+    fun getTotalNumberOfCores(): Int {
+        return totalNumberOfCores
     }
 
     fun getAvailableScalingGovernors() : List<String> {
@@ -186,7 +190,9 @@ class PowerManagerAppModel(
             val usedMemoryGB = convertBytesToGigaBytes(usedMemory)
 
             // cpu info
-            val cpuFrequenciesGHz : List<Float> = (0 until numberOfCores).map { core ->
+            val onlineCores = getOnlineCores()
+
+            val cpuFrequenciesGHz : List<Float> = onlineCores.map { core ->
                 val path = String.format(CORE_FREQUENCY_PATH, core)
                 val frequencyKHz = File(path).readText().trim().toInt()
                 convertKHzToGHz(frequencyKHz)
@@ -209,7 +215,8 @@ class PowerManagerAppModel(
                     cpuLoad = loadAverage,
                     systemUptimeString = uptimeString,
                     numberOfProcesses = numberOfProcesses,
-                    numberOfThreads = numberOfThreads
+                    numberOfThreads = numberOfThreads,
+                    onlineCores = onlineCores
                 )
             )
 
@@ -261,9 +268,12 @@ class PowerManagerAppModel(
     val cpuFrequencyFlow = flow {
         while (true) {
             val trackedCore = uiState.value.coreTracked
+            val onlineCores = getOnlineCores()
+
             val path = String.format(CORE_FREQUENCY_PATH, trackedCore)
 
-            val frequencyKHz = File(path).readText().trim().toInt()
+            // if tracked core is not online emit value close to 0
+            val frequencyKHz = if (onlineCores.contains(trackedCore)) File(path).readText().trim().toInt() else 1
 
             filterFlowSamples(FlowType.FREQUENCY)
             cpuFrequencySamples.add(
@@ -571,7 +581,7 @@ class PowerManagerAppModel(
         }
 
         viewModelScope.launch {
-            CpuFreqManager.changeScalingGovernor(newGovernor, numberOfCores)
+            CpuFreqManager.changeScalingGovernor(newGovernor, totalNumberOfCores)
         }
     }
 
@@ -584,6 +594,13 @@ class PowerManagerAppModel(
     }
 
     // Linux commands invocation
+
+    // returns a list of active cores indices like [0, 1, 3]
+    private fun getOnlineCores(): List<Int> {
+        val fileContent = readProtectedFileContent(CPUINFO_PATH)
+
+        return getOnlineCoresFromFileContent(fileContent)
+    }
 
     private fun getNumberOfProcessesOrThreads(processes: Boolean) : Int {
         val command = if (processes) GET_NUMBER_OF_PROCESSES_COMMAND else GET_NUMBER_OF_THREADS_COMMAND

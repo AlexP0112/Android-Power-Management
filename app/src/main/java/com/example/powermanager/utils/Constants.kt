@@ -74,6 +74,7 @@ const val DEVICES_SYSTEM_CPU_PATH = "/sys/devices/system/cpu/"
 const val NETWORK_INTERFACES_STATS_PATH = "/proc/net/dev"
 const val CURRENT_SCALING_GOVERNOR_PATH = "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_governor"
 const val AVAILABLE_SCALING_GOVERNORS_PATH = "/sys/devices/system/cpu/cpu0/cpufreq/scaling_available_governors"
+const val CPUINFO_PATH = "/proc/cpuinfo"
 
 // linux commands
 const val UPTIME_COMMAND = "uptime"
@@ -87,3 +88,4 @@ const val CHANGE_SCALING_GOVERNOR_FOR_CPU_COMMAND = "su -c echo %s > /sys/device
 
 const val WLAN = "wlan"
 const val RMNET = "rmnet"
+const val PROCESSOR = "processor"

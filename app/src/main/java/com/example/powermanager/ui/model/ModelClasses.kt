@@ -21,7 +21,8 @@ data class HomeScreenInfo(
     val cpuFrequenciesGHz : List<Float> = listOf(),
     val systemUptimeString : String = NO_VALUE_STRING,
     val numberOfProcesses : Int = 0,
-    val numberOfThreads : Int = 0
+    val numberOfThreads : Int = 0,
+    val onlineCores : List<Int> = listOf()
 )
 
 data class FlowSample(
