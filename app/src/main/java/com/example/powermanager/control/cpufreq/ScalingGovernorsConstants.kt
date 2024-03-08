@@ -7,6 +7,7 @@ const val GOVERNOR_POWERSAVE = "powersave"
 const val GOVERNOR_ONDEMAND = "ondemand"
 const val GOVERNOR_USERSPACE = "userspace"
 const val GOVERNOR_CONSERVATIVE = "conservative"
+const val GOVERNOR_INTERACTIVE = "interactive"
 const val GOVERNOR_SCHEDUTIL = "schedutil"
 
 const val DEFAULT_GOVERNOR_STRING = "(default)"
@@ -17,5 +18,6 @@ val GOVERNOR_NAME_TO_DESCRIPTION_STRING_ID : Map<String, Int> = mapOf(
     GOVERNOR_ONDEMAND to R.string.ondemand_governor_description,
     GOVERNOR_USERSPACE to R.string.userspace_governor_description,
     GOVERNOR_CONSERVATIVE to R.string.conservative_governor_description,
-    GOVERNOR_SCHEDUTIL to R.string.schedutil_governor_description
+    GOVERNOR_SCHEDUTIL to R.string.schedutil_governor_description,
+    GOVERNOR_INTERACTIVE to R.string.interactive_governor_description
 )
