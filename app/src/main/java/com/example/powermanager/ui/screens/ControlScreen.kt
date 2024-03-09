@@ -179,16 +179,17 @@ fun ControlScreen(
             ){
                 Column(
                     modifier = Modifier
-                        .weight(2.5f)
+                        .weight(2.65f)
                         .fillMaxWidth()
                 ) {
                     Text(
                         text = coresText,
-                        fontSize = 17.sp
+                        fontSize = 17.sp,
+                        fontWeight = FontWeight.Bold
                     )
 
                     Text(
-                        text = "Maximum frequency: $maxFrequency Ghz",
+                        text = "Maximum frequency: $maxFrequency GHz",
                         fontSize = 15.sp
                     )
                 }
@@ -241,6 +242,8 @@ fun ControlScreen(
             }
 
         }
+
+        Spacer (modifier = Modifier.height(15.dp))
 
         // ================= info dialogs ==================== //
         if (isDozeModeInfoDialogOpen.value) {
