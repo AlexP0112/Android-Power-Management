@@ -14,6 +14,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.powermanager.R
 import com.example.powermanager.control.cpufreq.CpuFreqManager
+import com.example.powermanager.control.cpufreq.CpuFreqPolicy
 import com.example.powermanager.control.cpufreq.CpuHotplugManager
 import com.example.powermanager.preferences.HOME_SCREEN_SAMPLING_PERIOD_ID
 import com.example.powermanager.preferences.LIVE_CHARTS_SAMPLING_PERIOD_ID
@@ -41,6 +42,7 @@ import com.example.powermanager.utils.NOTIFICATION_CHANNEL_ID
 import com.example.powermanager.utils.NOTIFICATION_ID
 import com.example.powermanager.utils.NOTIFICATION_TEXT
 import com.example.powermanager.utils.NOTIFICATION_TITLE
+import com.example.powermanager.utils.POLICY_FREQUENCY_PATH
 import com.example.powermanager.utils.RECORDING_RESULTS_DIRECTORY_NAME
 import com.example.powermanager.utils.STATISTICS_BACKGROUND_SAMPLING_THRESHOLD_MILLIS
 import com.example.powermanager.utils.UPTIME_COMMAND
@@ -71,6 +73,7 @@ class PowerManagerAppModel(
     application: Application
 ) : AndroidViewModel(application) {
 
+    // ui state
     private val _uiState : MutableStateFlow<AppUiState>
     val uiState: StateFlow<AppUiState>
 
@@ -80,9 +83,14 @@ class PowerManagerAppModel(
     private val systemBootTimestamp : Long
     private val availableScalingGovernors : List<String>
     private val masterCores : List<Int>
+    // map from policy name to its characteristics
+    private val cpuFreqPolicies : Map<String, CpuFreqPolicy>
+    // map from core index to the name of the policy it belongs to
+    private val coreToPolicy : Map<Int, String>
 
     private val recordingResultsDirectory : File
 
+    // managers
     private val activityManager : ActivityManager
     private val powerManager: PowerManager
     private val batteryManager: BatteryManager
@@ -90,6 +98,7 @@ class PowerManagerAppModel(
 
     private val preferencesManager: PreferencesManager
 
+    // flow samples
     private var memoryUsageSamples: MutableList<FlowSample> = mutableListOf()
     private var cpuFrequencySamples: MutableList<FlowSample> = mutableListOf()
     private var cpuLoadSamples: MutableList<FlowSample> = mutableListOf()
@@ -104,7 +113,7 @@ class PowerManagerAppModel(
 
         recordingResultsDirectory = File(application.applicationContext.filesDir, RECORDING_RESULTS_DIRECTORY_NAME)
 
-        // determine the total amount of memory that the device has and the available scaling governors
+        // initialize local members
         val info = ActivityManager.MemoryInfo()
         activityManager.getMemoryInfo(info)
         totalMemory = convertBytesToGigaBytes(info.totalMem)
@@ -112,8 +121,9 @@ class PowerManagerAppModel(
         availableScalingGovernors = CpuFreqManager.getAvailableScalingGovernors()
         masterCores = CpuFreqManager.determineMasterCores()
 
-        // determine the number of processors on the device and the timestamp of the system boot
         totalNumberOfCores = CpuHotplugManager.determineTotalNumberOfCPUCores()
+        cpuFreqPolicies = CpuFreqManager.determineAllCpuFreqPolicies()
+        coreToPolicy = CpuFreqManager.getCoreToPolicyMap(cpuFreqPolicies)
 
         systemBootTimestamp =
             try {
@@ -196,11 +206,19 @@ class PowerManagerAppModel(
 
             // cpu info
             val onlineCores = CpuHotplugManager.getOnlineCores()
+            val policyToCurrentFrequencyKhz : MutableMap<String, Int> = mutableMapOf()
 
-            val cpuFrequenciesGHz : List<Float> = onlineCores.map { core ->
-                val path = String.format(CORE_FREQUENCY_PATH, core)
+            // determine current frequency for each policy
+            cpuFreqPolicies.keys.forEach { policyName ->
+                val path = String.format(POLICY_FREQUENCY_PATH, policyName)
                 val frequencyKHz = File(path).readText().trim().toInt()
-                convertKHzToGHz(frequencyKHz)
+
+                policyToCurrentFrequencyKhz[policyName] = frequencyKHz
+            }
+
+            // determine current frequency for each core that is online
+            val cpuFrequenciesGHz : List<Float> = onlineCores.map { core ->
+                convertKHzToGHz(policyToCurrentFrequencyKhz[coreToPolicy[core]!!]!!)
             }
 
             val loadAverage = getLoadAverage(loadAverageType)

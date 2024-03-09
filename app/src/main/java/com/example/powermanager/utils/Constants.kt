@@ -19,6 +19,7 @@ const val NUMBER_OF_BYTES_IN_A_KILOBYTE : Long = 1024L
 const val NUMBER_OF_BYTES_IN_A_MEGABYTE : Long = 1024L * 1024L
 const val NUMBER_OF_BYTES_IN_A_GIGABYTE : Long = 1024L * 1024 * 1024
 const val NUMBER_OF_KILOHERTZ_IN_A_GIGAHERTZ : Int = 1000 * 1000
+const val NUMBER_OF_KILOHERTZ_IN_A_MEGAHERTZ : Int = 1000
 const val NUMBER_OF_MICROS_IN_A_MILLI : Int = 1000
 const val HOURS_IN_A_DAY = 24L
 const val MINUTES_IN_AN_HOUR = 60L
@@ -67,6 +68,7 @@ const val NOTIFICATION_TEXT = "Result saved in %s.json"
 
 // paths
 const val CORE_FREQUENCY_PATH = "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_cur_freq"
+const val POLICY_FREQUENCY_PATH = "/sys/devices/system/cpu/cpufreq/%s/scaling_cur_freq"
 const val DEVICES_SYSTEM_CPU_PATH = "/sys/devices/system/cpu/"
 const val NETWORK_INTERFACES_STATS_PATH = "/proc/net/dev"
 const val CURRENT_SCALING_GOVERNOR_PATH = "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_governor"
@@ -89,6 +91,7 @@ const val CHANGE_CORE_STATE_COMMAND = "su -c echo %d > /sys/devices/system/cpu/c
 const val WLAN = "wlan"
 const val RMNET = "rmnet"
 const val AFFECTED_CPUS = "affected_cpus"
+const val SCALING_AVAILABLE_FREQUENCIES = "scaling_available_frequencies"
 const val PROCESSOR = "processor"
 const val NO_VALUE_STRING = "-"
 const val FAILED_TO_DETERMINE = "Failed to determine"
