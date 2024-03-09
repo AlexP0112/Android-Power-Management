@@ -114,10 +114,11 @@ class PowerManagerAppModel(
 
         recordingResultsDirectory = File(application.applicationContext.filesDir, RECORDING_RESULTS_DIRECTORY_NAME)
 
-        // initialize local members
+        // initialize other local members/constants
         val info = ActivityManager.MemoryInfo()
         activityManager.getMemoryInfo(info)
         totalMemory = convertBytesToGigaBytes(info.totalMem)
+        systemBootTimestamp = determineSystemBootTimestamp()
 
         availableScalingGovernors = CpuFreqManager.getAvailableScalingGovernors()
         masterCores = CpuFreqManager.determineMasterCores()
@@ -125,13 +126,6 @@ class PowerManagerAppModel(
         totalNumberOfCores = CpuHotplugManager.determineTotalNumberOfCPUCores()
         cpuFreqPolicies = CpuFreqManager.determineAllCpuFreqPolicies()
         coreToPolicy = CpuFreqManager.getCoreToPolicyMap(cpuFreqPolicies)
-
-        systemBootTimestamp =
-            try {
-                determineSystemBootTimestamp()
-            } catch (e: Exception) {
-                0L
-            }
 
         // initialize the user preferences
         viewModelScope.launch {
