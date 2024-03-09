@@ -603,7 +603,10 @@ class PowerManagerAppModel(
         }
 
         viewModelScope.launch {
-            CpuFreqManager.changeScalingGovernor(newGovernor, totalNumberOfCores)
+            CpuFreqManager.changeScalingGovernor(
+                newGovernor = newGovernor,
+                policyNames = cpuFreqPolicies.keys.toList()
+            )
         }
     }
 

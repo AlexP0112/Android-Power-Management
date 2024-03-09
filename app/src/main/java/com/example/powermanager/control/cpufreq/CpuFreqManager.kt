@@ -1,7 +1,7 @@
 package com.example.powermanager.control.cpufreq
 
 import com.example.powermanager.utils.AVAILABLE_SCALING_GOVERNORS_PATH
-import com.example.powermanager.utils.CHANGE_SCALING_GOVERNOR_FOR_CPU_COMMAND
+import com.example.powermanager.utils.CHANGE_SCALING_GOVERNOR_FOR_POLICY_COMMAND
 import com.example.powermanager.utils.CHANGE_SCALING_MAX_FREQUENCY_FOR_POLICY_COMMAND
 import com.example.powermanager.utils.CPUFREQ_DIRECTORY_PATH
 import com.example.powermanager.utils.CURRENT_SCALING_GOVERNOR_PATH
@@ -20,9 +20,7 @@ import java.nio.file.Paths
 object CpuFreqManager {
 
     fun getCurrentScalingGovernor() : String {
-        val filePath = String.format(CURRENT_SCALING_GOVERNOR_PATH, 0)
-
-        return readProtectedFileContent(filePath).trim()
+        return readProtectedFileContent(CURRENT_SCALING_GOVERNOR_PATH).trim()
     }
 
     fun getAvailableScalingGovernors() : List<String> {
@@ -31,10 +29,11 @@ object CpuFreqManager {
         return fileContent.split("\\s+".toRegex())
     }
 
-    suspend fun changeScalingGovernor(newGovernor: String, numberOfCores : Int) {
+    // change scaling governor for all policies at the same time
+    suspend fun changeScalingGovernor(newGovernor: String, policyNames : List<String>) {
         withContext(Dispatchers.IO) {
-            for (coreNumber in 0 until numberOfCores) {
-                val command = String.format(CHANGE_SCALING_GOVERNOR_FOR_CPU_COMMAND, newGovernor, coreNumber)
+            for (policy in policyNames) {
+                val command = String.format(CHANGE_SCALING_GOVERNOR_FOR_POLICY_COMMAND, newGovernor, policy)
 
                 val process = Runtime.getRuntime().exec(command)
                 process.waitFor()
@@ -83,6 +82,10 @@ object CpuFreqManager {
         return result
     }
 
+    /*
+     * Creates a map from policy name (e.g policy0) to a CpuFreqPolicy object containing
+     * information about that policy
+     */
     fun determineAllCpuFreqPolicies() : Map<String, CpuFreqPolicy> {
         val result : MutableMap<String, CpuFreqPolicy> = mutableMapOf()
 
