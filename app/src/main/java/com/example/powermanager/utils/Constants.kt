@@ -68,7 +68,8 @@ const val NOTIFICATION_TEXT = "Result saved in %s.json"
 
 // paths
 const val CORE_FREQUENCY_PATH = "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_cur_freq"
-const val POLICY_FREQUENCY_PATH = "/sys/devices/system/cpu/cpufreq/%s/scaling_cur_freq"
+const val POLICY_CURRENT_FREQUENCY_PATH = "/sys/devices/system/cpu/cpufreq/%s/scaling_cur_freq"
+const val POLICY_MAX_FREQUENCY_PATH = "/sys/devices/system/cpu/cpufreq/%s/scaling_max_freq"
 const val DEVICES_SYSTEM_CPU_PATH = "/sys/devices/system/cpu/"
 const val NETWORK_INTERFACES_STATS_PATH = "/proc/net/dev"
 const val CURRENT_SCALING_GOVERNOR_PATH = "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_governor"
@@ -86,11 +87,12 @@ const val ENABLE_INTERFACE_COMMAND = "su -c ifconfig %s up"
 const val CAT_FILE_AS_ROOT_COMMAND = "su -c cat %s"
 const val CHANGE_SCALING_GOVERNOR_FOR_CPU_COMMAND = "su -c echo %s > /sys/devices/system/cpu/cpu%d/cpufreq/scaling_governor"
 const val CHANGE_CORE_STATE_COMMAND = "su -c echo %d > /sys/devices/system/cpu/cpu%d/online"
+const val CHANGE_SCALING_MAX_FREQUENCY_FOR_POLICY_COMMAND = "su -c echo %d > /sys/devices/system/cpu/cpufreq/%s/scaling_max_freq"
 
 // others
 const val WLAN = "wlan"
 const val RMNET = "rmnet"
-const val AFFECTED_CPUS = "affected_cpus"
+const val RELATED_CPUS = "related_cpus"
 const val SCALING_AVAILABLE_FREQUENCIES = "scaling_available_frequencies"
 const val PROCESSOR = "processor"
 const val NO_VALUE_STRING = "-"

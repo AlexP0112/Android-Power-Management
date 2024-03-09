@@ -1,11 +1,13 @@
 package com.example.powermanager.control.cpufreq
 
-import com.example.powermanager.utils.AFFECTED_CPUS
 import com.example.powermanager.utils.AVAILABLE_SCALING_GOVERNORS_PATH
 import com.example.powermanager.utils.CHANGE_SCALING_GOVERNOR_FOR_CPU_COMMAND
+import com.example.powermanager.utils.CHANGE_SCALING_MAX_FREQUENCY_FOR_POLICY_COMMAND
 import com.example.powermanager.utils.CPUFREQ_DIRECTORY_PATH
 import com.example.powermanager.utils.CURRENT_SCALING_GOVERNOR_PATH
 import com.example.powermanager.utils.NUMBER_OF_KILOHERTZ_IN_A_MEGAHERTZ
+import com.example.powermanager.utils.POLICY_MAX_FREQUENCY_PATH
+import com.example.powermanager.utils.RELATED_CPUS
 import com.example.powermanager.utils.SCALING_AVAILABLE_FREQUENCIES
 import com.example.powermanager.utils.convertKHzToGHz
 import com.example.powermanager.utils.readProtectedFileContent
@@ -40,8 +42,21 @@ object CpuFreqManager {
         }
     }
 
+    fun getCurrentMaxFrequencyForPolicyKhz(policyName: String) : Int {
+        val filePath = String.format(POLICY_MAX_FREQUENCY_PATH, policyName)
+
+        return readProtectedFileContent(filePath).trim().toInt()
+    }
+
+    fun changeMaxFrequencyForPolicy(policyName: String, maxFrequencyKhz: Int) {
+        val command = String.format(CHANGE_SCALING_MAX_FREQUENCY_FOR_POLICY_COMMAND, maxFrequencyKhz, policyName)
+
+        val process = Runtime.getRuntime().exec(command)
+        process.waitFor()
+    }
+
     /*
-     * This function looks inside `/sys/devices/system/cpu/cpufreq/policyX/affected_cpus` files
+     * This function looks inside `/sys/devices/system/cpu/cpufreq/policyX/related_cpus` files
      * and chooses the first half of the cores listed there as master cores
      */
     fun determineMasterCores(): List<Int> {
@@ -49,8 +64,8 @@ object CpuFreqManager {
         val policyDirectories = getPolicyDirectories()
 
         policyDirectories.forEach { directory ->
-            val affectedCpusFile = File(directory, AFFECTED_CPUS)
-            val cpus = affectedCpusFile
+            val relatedCoresFile = File(directory, RELATED_CPUS)
+            val cpus = relatedCoresFile
                 .readText()
                 .trim()
                 .split("\\s+".toRegex())
@@ -76,10 +91,10 @@ object CpuFreqManager {
 
         policyDirectories.forEach { policyDirectory ->
             val policyName = File(policyDirectory).name
-            val affectedCoresFile = File(policyDirectory, AFFECTED_CPUS)
+            val relatedCoresFile = File(policyDirectory, RELATED_CPUS)
             val availableFrequenciesFile = File(policyDirectory, SCALING_AVAILABLE_FREQUENCIES)
 
-            val affectedCores = affectedCoresFile
+            val relatedCores = relatedCoresFile
                 .readText()
                 .trim()
                 .split("\\s+".toRegex())
@@ -96,13 +111,13 @@ object CpuFreqManager {
 
             val frequenciesMhz = if (availableFrequenciesKhz.size <= 9)
                 availableFrequenciesKhz.drop(1).map { it / NUMBER_OF_KILOHERTZ_IN_A_MEGAHERTZ } else
-                    availableFrequenciesKhz.filterIndexed { index, _ -> index % 2 == 1 }.map { it / NUMBER_OF_KILOHERTZ_IN_A_MEGAHERTZ }
+                    availableFrequenciesKhz.filterIndexed { index, _ -> index % 2 == 1 || index == availableFrequenciesKhz.size - 1 }.map { it / NUMBER_OF_KILOHERTZ_IN_A_MEGAHERTZ }
 
             val maximumFrequencyGhz = convertKHzToGHz(availableFrequenciesKhz.last())
 
             val policy = CpuFreqPolicy(
                 name = policyName,
-                affectedCores = affectedCores,
+                relatedCores = relatedCores,
                 frequenciesMhz = frequenciesMhz,
                 maximumFrequencyGhz = maximumFrequencyGhz
             )
@@ -128,8 +143,8 @@ object CpuFreqManager {
         val result : MutableMap<Int, String> = mutableMapOf()
 
         for (policyName in existingPolicies.keys) {
-            for (affectedCore in existingPolicies[policyName]!!.affectedCores) {
-                result[affectedCore] = policyName
+            for (relatedCore in existingPolicies[policyName]!!.relatedCores) {
+                result[relatedCore] = policyName
             }
         }
 

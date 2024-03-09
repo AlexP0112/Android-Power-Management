@@ -42,7 +42,8 @@ import com.example.powermanager.utils.NOTIFICATION_CHANNEL_ID
 import com.example.powermanager.utils.NOTIFICATION_ID
 import com.example.powermanager.utils.NOTIFICATION_TEXT
 import com.example.powermanager.utils.NOTIFICATION_TITLE
-import com.example.powermanager.utils.POLICY_FREQUENCY_PATH
+import com.example.powermanager.utils.NUMBER_OF_KILOHERTZ_IN_A_MEGAHERTZ
+import com.example.powermanager.utils.POLICY_CURRENT_FREQUENCY_PATH
 import com.example.powermanager.utils.RECORDING_RESULTS_DIRECTORY_NAME
 import com.example.powermanager.utils.STATISTICS_BACKGROUND_SAMPLING_THRESHOLD_MILLIS
 import com.example.powermanager.utils.UPTIME_COMMAND
@@ -175,6 +176,10 @@ class PowerManagerAppModel(
         return masterCores
     }
 
+    fun getCpuFreqPolicies(): List<CpuFreqPolicy> {
+        return cpuFreqPolicies.values.toList().sortedBy { it.name }
+    }
+
     // sampling for home screen
 
     @SuppressLint("NewApi")
@@ -210,7 +215,7 @@ class PowerManagerAppModel(
 
             // determine current frequency for each policy
             cpuFreqPolicies.keys.forEach { policyName ->
-                val path = String.format(POLICY_FREQUENCY_PATH, policyName)
+                val path = String.format(POLICY_CURRENT_FREQUENCY_PATH, policyName)
                 val frequencyKHz = File(path).readText().trim().toInt()
 
                 policyToCurrentFrequencyKhz[policyName] = frequencyKHz
@@ -614,6 +619,17 @@ class PowerManagerAppModel(
                 selectedScalingGovernorInfoButton = newValue
             )
         }
+    }
+
+    fun getCurrentMaxFrequencyForPolicyMhz(policyName: String) : Int {
+        return CpuFreqManager.getCurrentMaxFrequencyForPolicyKhz(policyName) / NUMBER_OF_KILOHERTZ_IN_A_MEGAHERTZ
+    }
+
+    fun changeMaxFrequencyForPolicy(policyName : String, maxFrequencyMhz: Int) {
+        CpuFreqManager.changeMaxFrequencyForPolicy(
+            policyName = policyName,
+            maxFrequencyKhz = maxFrequencyMhz * NUMBER_OF_KILOHERTZ_IN_A_MEGAHERTZ
+        )
     }
 
     fun changeCoreEnabledState(coreIndex : Int, enable: Boolean) {

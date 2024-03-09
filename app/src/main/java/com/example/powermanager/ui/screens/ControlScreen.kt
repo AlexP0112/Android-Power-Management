@@ -16,17 +16,27 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -43,6 +53,7 @@ import com.example.powermanager.ui.screens.common.InfoDialog
 import com.example.powermanager.ui.screens.common.SectionHeader
 import com.example.powermanager.ui.state.AppUiState
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ControlScreen(
     topPadding: Dp,
@@ -68,6 +79,7 @@ fun ControlScreen(
         val availableScalingGovernors : List<String> = model.getAvailableScalingGovernors()
 
         val totalNumberOfCores = model.getTotalNumberOfCores()
+        val cpuFreqPolicies = model.getCpuFreqPolicies()
         val masterCores = model.getMasterCores()
 
         ControlScreenTitle()
@@ -134,6 +146,100 @@ fun ControlScreen(
                 onValueChanged = { model.changeCoreEnabledState(coreIndex, it) },
                 isCoreOnline = !uiState.value.disabledCores.contains(coreIndex)
             )
+        }
+        
+        Text(
+            text = stringResource(id = R.string.set_max_frequency),
+            fontSize = 18.sp
+        )
+
+        // dropdown for each group of cores that belong to a policy
+        cpuFreqPolicies.forEach { policy ->
+            val onlineCores = policy.relatedCores.filter { !uiState.value.disabledCores.contains(it) }
+            val maxFrequency = policy.maximumFrequencyGhz
+            val availableFrequencies = policy.frequenciesMhz
+
+            var coresText  = ""
+            onlineCores.forEach { coresText += "Cpu$it/" }
+            coresText = coresText.dropLast(1)
+
+            var isDropdownExpanded by remember {
+                mutableStateOf(false)
+            }
+
+            var currentValue by remember {
+                mutableIntStateOf(model.getCurrentMaxFrequencyForPolicyMhz(policy.name))
+            }
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(start = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ){
+                Column(
+                    modifier = Modifier
+                        .weight(2.5f)
+                        .fillMaxWidth()
+                ) {
+                    Text(
+                        text = coresText,
+                        fontSize = 17.sp
+                    )
+
+                    Text(
+                        text = "Maximum frequency: $maxFrequency Ghz",
+                        fontSize = 15.sp
+                    )
+                }
+
+                Box(
+                    modifier = Modifier.weight(1f)
+                ) {
+                    ExposedDropdownMenuBox(
+                        expanded = isDropdownExpanded,
+                        onExpandedChange = { newValue ->
+                            isDropdownExpanded = newValue
+                        }
+                    ) {
+                        TextField(
+                            value = currentValue.toString(),
+                            onValueChange = {},
+                            readOnly = true,
+                            trailingIcon = {
+                                ExposedDropdownMenuDefaults.TrailingIcon(expanded = isDropdownExpanded)
+                            },
+                            colors = TextFieldDefaults.colors(),
+                            modifier = Modifier.menuAnchor()
+                        )
+
+                        ExposedDropdownMenu(
+                            expanded = isDropdownExpanded,
+                            onDismissRequest = {
+                                isDropdownExpanded = false
+                            }
+                        ) {
+                            availableFrequencies.map { value ->
+                                DropdownMenuItem(
+                                    text = {
+                                        Text(text = value.toString())
+                                    },
+                                    colors = MenuDefaults.itemColors(),
+                                    onClick = {
+                                        currentValue = value
+                                        isDropdownExpanded = false
+                                        model.changeMaxFrequencyForPolicy(
+                                            policyName = policy.name,
+                                            maxFrequencyMhz = value
+                                        )
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
         }
 
         // ================= info dialogs ==================== //
