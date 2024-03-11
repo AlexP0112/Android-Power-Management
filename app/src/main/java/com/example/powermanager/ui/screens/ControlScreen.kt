@@ -19,12 +19,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.RadioButton
@@ -42,8 +44,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.SoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -55,9 +59,12 @@ import com.example.powermanager.R
 import com.example.powermanager.control.cpufreq.DEFAULT_GOVERNOR_STRING
 import com.example.powermanager.control.cpufreq.GOVERNOR_NAME_TO_DESCRIPTION_STRING_ID
 import com.example.powermanager.ui.model.PowerManagerAppModel
+import com.example.powermanager.ui.screens.common.ConfirmFileDeletionAlertDialog
 import com.example.powermanager.ui.screens.common.InfoDialog
+import com.example.powermanager.ui.screens.common.InspectFileInfoDialog
 import com.example.powermanager.ui.screens.common.SectionHeader
 import com.example.powermanager.ui.state.AppUiState
+import com.example.powermanager.utils.CONFIRM_CPU_CONFIGURATION_DELETION_TEXT
 import com.example.powermanager.utils.isFileNameValid
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
@@ -81,6 +88,8 @@ fun ControlScreen(
         val isScalingGovernorsGeneralInfoDialogOpen = remember { mutableStateOf(false) }
         val isParticularScalingGovernorInfoDialogOpen = remember { mutableStateOf(false) }
         val isCoreEnablingInfoDialogOpen = remember { mutableStateOf(false) }
+        val isConfirmConfigurationDeletionDialogOpen = remember { mutableStateOf(false) }
+        val isInspectConfigurationDialogOpen = remember { mutableStateOf(false) }
 
         val uiState: State<AppUiState> = model.uiState.collectAsState()
         val keyboardController = LocalSoftwareKeyboardController.current
@@ -164,8 +173,6 @@ fun ControlScreen(
         // dropdown for each group of cores that belong to a policy
         cpuFreqPolicies.forEach { policy ->
             val onlineCores = policy.relatedCores.filter { !uiState.value.disabledCores.contains(it) }
-            val maxFrequency = policy.maximumFrequencyGhz
-            val availableFrequencies = policy.frequenciesMhz
 
             var coresText  = ""
             onlineCores.forEach { coresText += "Cpu$it/" }
@@ -177,79 +184,28 @@ fun ControlScreen(
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ){
-                Column(
-                    modifier = Modifier
-                        .weight(2.65f)
-                        .fillMaxWidth()
-                ) {
-                    Text(
-                        text = coresText,
-                        fontSize = 17.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-
-                    Text(
-                        text = "Maximum frequency: $maxFrequency GHz",
-                        fontSize = 15.sp
+            SelectMaxFrequencyRow(
+                coresText = coresText,
+                isDropdownExpanded = isDropdownExpanded,
+                onExpendedChange = { isDropdownExpanded = it },
+                maxFrequency = policy.maximumFrequencyGhz,
+                onDismiss = { isDropdownExpanded = false },
+                value = uiState.value.policyToFrequencyLimitMHz[policy.name].toString(),
+                availableFrequencies = policy.frequenciesMhz,
+                onSelectedEntry = {
+                    isDropdownExpanded = false
+                    model.changeMaxFrequencyForPolicy(
+                        policyName = policy.name,
+                        maxFrequencyMhz = it
                     )
                 }
-
-                Box(
-                    modifier = Modifier.weight(1f)
-                ) {
-                    ExposedDropdownMenuBox(
-                        expanded = isDropdownExpanded,
-                        onExpandedChange = { newValue ->
-                            isDropdownExpanded = newValue
-                        }
-                    ) {
-                        TextField(
-                            value = uiState.value.policyToFrequencyLimitMHz[policy.name].toString(),
-                            onValueChange = {},
-                            readOnly = true,
-                            trailingIcon = {
-                                ExposedDropdownMenuDefaults.TrailingIcon(expanded = isDropdownExpanded)
-                            },
-                            colors = TextFieldDefaults.colors(),
-                            modifier = Modifier.menuAnchor()
-                        )
-
-                        ExposedDropdownMenu(
-                            expanded = isDropdownExpanded,
-                            onDismissRequest = {
-                                isDropdownExpanded = false
-                            }
-                        ) {
-                            availableFrequencies.map { value ->
-                                DropdownMenuItem(
-                                    text = {
-                                        Text(text = value.toString())
-                                    },
-                                    colors = MenuDefaults.itemColors(),
-                                    onClick = {
-                                        isDropdownExpanded = false
-                                        model.changeMaxFrequencyForPolicy(
-                                            policyName = policy.name,
-                                            maxFrequencyMhz = value
-                                        )
-                                    }
-                                )
-                            }
-                        }
-                    }
-                }
-            }
+            )
 
         }
 
         Spacer(modifier = Modifier.height(10.dp))
 
+        // save current cpu configuration
         SaveCpuConfigurationText()
 
         Spacer(modifier = Modifier.height(10.dp))
@@ -261,6 +217,54 @@ fun ControlScreen(
             onSaveButtonPressed = { model.saveCurrentCpuConfiguration() },
             buttonEnabled = isFileNameValid(uiState.value.cpuConfigurationName)
         )
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        // previously saved configurations
+        SavedConfigurationsText()
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        if (uiState.value.savedConfigurations.isNotEmpty()) {
+            Divider(
+                modifier = Modifier
+                    .fillMaxSize(),
+                thickness = 0.75.dp,
+                color = MaterialTheme.colorScheme.secondary
+            )
+        } else {
+            Text(
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                text = stringResource(R.string.no_configurations_found),
+                textAlign = TextAlign.Center,
+                fontSize = 18.sp
+            )
+        }
+
+        uiState.value.savedConfigurations.forEach { configurationName ->
+            CpuConfigurationRow(
+                configurationName = configurationName,
+                onDeleteButtonPressed = {
+                    model.changeSelectedCpuConfiguration(configurationName)
+                    isConfirmConfigurationDeletionDialogOpen.value = true
+                },
+                onInspectButtonPressed = {
+                    model.changeSelectedCpuConfiguration(configurationName)
+                    isInspectConfigurationDialogOpen.value = true
+                },
+                onApplyButtonPressed = {
+                    model.changeSelectedCpuConfiguration(configurationName)
+                    model.applySelectedCpuConfiguration()
+                }
+            )
+
+            Divider(
+                modifier = Modifier
+                    .fillMaxSize(),
+                thickness = 0.75.dp,
+                color = MaterialTheme.colorScheme.secondary
+            )
+        }
 
         // ================= info dialogs ==================== //
         if (isDozeModeInfoDialogOpen.value) {
@@ -299,6 +303,96 @@ fun ControlScreen(
                 isCoreEnablingInfoDialogOpen.value = false
             }
         }
+
+        if (isInspectConfigurationDialogOpen.value) {
+            InspectFileInfoDialog(
+                content = model.getSelectedConfigurationFileContent(),
+                onDismissRequest = { isInspectConfigurationDialogOpen.value = false }
+            )
+        }
+
+        if (isConfirmConfigurationDeletionDialogOpen.value) {
+            ConfirmFileDeletionAlertDialog(
+                onDismiss = { isConfirmConfigurationDeletionDialogOpen.value = false },
+                onConfirm = {
+                    model.deleteSelectedConfiguration()
+                    isConfirmConfigurationDeletionDialogOpen.value = false
+                },
+                text = String.format(CONFIRM_CPU_CONFIGURATION_DELETION_TEXT, uiState.value.currentlySelectedCpuConfiguration)
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SelectMaxFrequencyRow(
+    coresText : String,
+    isDropdownExpanded : Boolean,
+    onExpendedChange : (Boolean) -> Unit,
+    maxFrequency : Float,
+    onDismiss : () -> Unit,
+    value : String,
+    onSelectedEntry : (Int) -> Unit,
+    availableFrequencies : List<Int>
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ){
+        Column(
+            modifier = Modifier
+                .weight(2.65f)
+                .fillMaxWidth()
+        ) {
+            Text(
+                text = coresText,
+                fontSize = 17.sp,
+                fontWeight = FontWeight.Bold
+            )
+
+            Text(
+                text = "Maximum frequency: $maxFrequency GHz",
+                fontSize = 15.sp
+            )
+        }
+
+        Box(
+            modifier = Modifier.weight(1f)
+        ) {
+            ExposedDropdownMenuBox(
+                expanded = isDropdownExpanded,
+                onExpandedChange = onExpendedChange
+            ) {
+                TextField(
+                    value = value,
+                    onValueChange = {},
+                    readOnly = true,
+                    trailingIcon = {
+                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = isDropdownExpanded)
+                    },
+                    colors = TextFieldDefaults.colors(),
+                    modifier = Modifier.menuAnchor()
+                )
+
+                ExposedDropdownMenu(
+                    expanded = isDropdownExpanded,
+                    onDismissRequest = onDismiss
+                ) {
+                    availableFrequencies.map { value ->
+                        DropdownMenuItem(
+                            text = {
+                                Text(text = value.toString())
+                            },
+                            colors = MenuDefaults.itemColors(),
+                            onClick = { onSelectedEntry(value) }
+                        )
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -320,6 +414,15 @@ fun WifiText() {
         fontSize = 18.sp
     )
 }
+
+@Composable
+fun SavedConfigurationsText() {
+    Text(
+        text = stringResource(R.string.saved_conf),
+        fontSize = 18.sp
+    )
+}
+
 
 @Composable
 fun ScreenTimeoutText() {
@@ -539,6 +642,72 @@ fun GoToDisplaySettingsButton(
             onClick = goToDisplaySettings
         ) {
             Text(stringResource(R.string.go_to_display_settings))
+        }
+    }
+}
+
+/*
+ * A Row composable corresponding to a saved CPU configuration. It contains the name of the
+ * configuration, a button that allows you to inspect it and a button for deleting it (similar
+ * to recording results) and a button for applying it
+ */
+@Composable
+fun CpuConfigurationRow(
+    configurationName: String,
+    onDeleteButtonPressed : () -> Unit,
+    onInspectButtonPressed : () -> Unit,
+    onApplyButtonPressed : () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxSize(),
+        verticalAlignment = Alignment.CenterVertically
+    ){
+        Text(
+            modifier = Modifier.weight(1f),
+            text = configurationName
+        )
+
+        // buttons for delete, inspect and apply
+        Row(
+            modifier = Modifier.weight(1f),
+            horizontalArrangement = Arrangement.End,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // delete button
+            IconButton(
+                onClick = onDeleteButtonPressed
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.garbage_trash),
+                    tint = Color.Red,
+                    contentDescription = null
+                )
+            }
+
+            // view raw file button
+            IconButton(
+                onClick = onInspectButtonPressed
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.magnifier_svgrepo_com),
+                    tint = MaterialTheme.colorScheme.primary,
+                    contentDescription = null
+                )
+            }
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            // apply button
+            OutlinedButton(
+                onClick = onApplyButtonPressed,
+                modifier = Modifier.height(36.dp).width(100.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.apply),
+                    fontSize = 12.sp
+                )
+            }
         }
     }
 }

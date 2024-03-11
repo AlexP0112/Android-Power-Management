@@ -1,6 +1,5 @@
 package com.example.powermanager.ui.screens
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,15 +12,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Divider
@@ -48,7 +43,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.SoftwareKeyboardController
@@ -61,13 +55,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
 import com.example.powermanager.R
 import com.example.powermanager.ui.model.PowerManagerAppModel
+import com.example.powermanager.ui.screens.common.ConfirmFileDeletionAlertDialog
 import com.example.powermanager.ui.screens.common.InfoDialog
+import com.example.powermanager.ui.screens.common.InspectFileInfoDialog
 import com.example.powermanager.ui.screens.common.SectionHeader
 import com.example.powermanager.ui.state.AppUiState
-import com.example.powermanager.utils.CONFIRM_DELETION_TEXT
+import com.example.powermanager.utils.CONFIRM_RECORDING_DELETION_TEXT
 import com.example.powermanager.utils.RECORDING_SAMPLING_PERIOD_POSSIBLE_VALUES
 import com.example.powermanager.utils.isFileNameValid
 import com.example.powermanager.utils.isRecordingNumberOfSamplesStringValid
@@ -218,7 +213,7 @@ fun RecordingScreen(
                 },
                 onShareButtonPressed = {
                     model.changeSelectedRecordingResult(resultName)
-                    model.shareRecordingResult(context)
+                    model.shareSelectedRecordingResult(context)
                 },
                 onInspectButtonPressed = {
                     model.changeSelectedRecordingResult(resultName)
@@ -259,18 +254,18 @@ fun RecordingScreen(
         }
 
         if (isConfirmResultDeletionDialogOpen) {
-            ConfirmResultDeletionAlertDialog(
+            ConfirmFileDeletionAlertDialog(
                 onDismiss = { isConfirmResultDeletionDialogOpen = false },
                 onConfirm = {
-                    model.deleteRecordingResult()
+                    model.deleteSelectedRecordingResult()
                     isConfirmResultDeletionDialogOpen = false
                 },
-                resultName = uiState.value.currentlySelectedRecordingResult
+                text = String.format(CONFIRM_RECORDING_DELETION_TEXT, uiState.value.currentlySelectedRecordingResult)
             )
         }
 
         if (isInspectRawResultDialogOpen) {
-            InspectResultInfoDialog(
+            InspectFileInfoDialog(
                 content = model.getRecordingResultRawFileContent(),
                 onDismissRequest = { isInspectRawResultDialogOpen = false }
             )
@@ -604,81 +599,6 @@ fun RecordingSessionResultRow(
                     contentDescription = null
                 )
             }
-        }
-    }
-}
-
-/*
- * Alert dialog that asks for user confirmation when deleting a recording result
- */
-@Composable
-fun ConfirmResultDeletionAlertDialog(
-    onDismiss: () -> Unit,
-    onConfirm: () -> Unit,
-    resultName: String
-) {
-    AlertDialog(
-        modifier = Modifier,
-        onDismissRequest = onDismiss,
-        text = {
-            Text(
-                text = String.format(CONFIRM_DELETION_TEXT, resultName),
-                fontSize = 17.sp
-            )
-        },
-        confirmButton = {
-            Button(
-                onClick = onConfirm
-            ) {
-                Text(
-                    text = stringResource(R.string.delete),
-                    fontWeight = FontWeight.Bold
-                )
-            }
-        },
-        dismissButton = {
-            Button(
-                onClick = onDismiss
-            ) {
-                Text(
-                    text = stringResource(R.string.cancel),
-                    fontWeight = FontWeight.Bold
-                )
-            }
-        }
-    )
-}
-
-/*
- * Info Dialog that contains the raw content of a session result
- */
-@Composable
-fun InspectResultInfoDialog(
-    content: String,
-    onDismissRequest: () -> Unit
-) {
-    val (height, width) = LocalConfiguration.current.run { screenHeightDp.dp to screenWidthDp.dp }
-
-    Dialog(
-        onDismissRequest = onDismissRequest
-    ) {
-        Card(
-            modifier = Modifier
-                .width(width)
-                .height(height / 2)
-                .verticalScroll(rememberScrollState()),
-            shape = RoundedCornerShape(16.dp),
-            border = BorderStroke(
-                width = 2.dp,
-                color = MaterialTheme.colorScheme.onPrimaryContainer
-            )
-        ) {
-            Text(
-                text = content,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(5.dp)
-            )
         }
     }
 }

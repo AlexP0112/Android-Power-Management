@@ -77,6 +77,7 @@
     <string name="online_cpu_cores">\u2022 Online CPU cores:</string>
     <string name="save_cpu_configuration">\u2022 Save current CPU configuration:</string>
     <string name="set_max_frequency">\u2022 Set frequency limit for cores (MHz):</string>
+    <string name="saved_conf">\u2022 Saved CPU configurations:</string>
     <string name="go_to_display_settings">Open display settings</string>
     <string name="core_enabling_explanation">Note that while disabling CPU cores might help save battery, it could also cause significant performance and user experience degradation.</string>
     <string name="include_thread_count">Include thread count statistics (might significantly increase total session duration)</string>
@@ -89,4 +90,6 @@
     <string name="schedutil_governor_description">The \'schedutil\' governor uses information provided by the scheduler (another component of the Operating System) to make decisions about CPU frequency changes, such as predicting future workload demands and adjusting the frequency accordingly.</string>
     <string name="configuration_name">Configuration name:</string>
     <string name="save">Save</string>
+    <string name="apply">Apply</string>
+    <string name="no_configurations_found">No configurations found!</string>
 </resources>

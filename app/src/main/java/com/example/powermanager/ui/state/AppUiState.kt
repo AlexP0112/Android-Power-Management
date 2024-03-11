@@ -22,6 +22,8 @@ data class AppUiState(
     val currentScalingGovernor : String,
     val selectedScalingGovernorInfoButton : String = NO_VALUE_STRING,
     val disabledCores : List<Int>,
+    val savedConfigurations : List<String>,
+    val currentlySelectedCpuConfiguration : String = NO_VALUE_STRING,
     val policyToFrequencyLimitMHz : Map<String, Int>,
     val cpuConfigurationName : String = DEFAULT_NAME
 )

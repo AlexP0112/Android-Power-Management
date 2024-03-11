@@ -51,7 +51,7 @@ const val DEFAULT_RECORDING_NUMBER_OF_SAMPLES = 30
 const val DEFAULT_NAME = "default"
 const val MINIMUM_NUMBER_OF_RECORDING_SAMPLES_ALLOWED = 5
 const val MAXIMUM_NUMBER_OF_RECORDING_SAMPLES_ALLOWED = 200
-const val CONFIRM_DELETION_TEXT = "Are you sure you want to delete recording result %s?"
+const val CONFIRM_RECORDING_DELETION_TEXT = "Are you sure you want to delete recording result %s?"
 const val RECORDING_RESULTS_DIRECTORY_NAME = "recording_results"
 const val DOT_JSON = ".json"
 const val DOT_PROVIDER = ".provider"
@@ -77,6 +77,12 @@ const val AVAILABLE_SCALING_GOVERNORS_PATH = "/sys/devices/system/cpu/cpu0/cpufr
 const val CPUINFO_PATH = "/proc/cpuinfo"
 const val CPUFREQ_DIRECTORY_PATH = "/sys/devices/system/cpu/cpufreq"
 
+// control
+const val SAVED_CPU_CONFIGURATIONS_DIRECTORY_NAME = "cpu_configurations"
+const val RELATED_CPUS = "related_cpus"
+const val SCALING_AVAILABLE_FREQUENCIES = "scaling_available_frequencies"
+const val CONFIRM_CPU_CONFIGURATION_DELETION_TEXT = "Are you sure you want to delete configuration %s?"
+
 // linux commands
 const val UPTIME_COMMAND = "uptime"
 const val GET_NUMBER_OF_PROCESSES_COMMAND = "su -c ps -A | wc -l"
@@ -92,10 +98,7 @@ const val CHANGE_SCALING_MAX_FREQUENCY_FOR_POLICY_COMMAND = "su -c echo %d > /sy
 // others
 const val WLAN = "wlan"
 const val RMNET = "rmnet"
-const val RELATED_CPUS = "related_cpus"
-const val SCALING_AVAILABLE_FREQUENCIES = "scaling_available_frequencies"
 const val PROCESSOR = "processor"
 const val NO_VALUE_STRING = "-"
 const val FAILED_TO_DETERMINE = "Failed to determine"
 const val JSON_MIME_TYPE = "application/json"
-const val SAVED_CPU_CONFIGURATIONS_DIRECTORY_NAME = "cpu_configurations"

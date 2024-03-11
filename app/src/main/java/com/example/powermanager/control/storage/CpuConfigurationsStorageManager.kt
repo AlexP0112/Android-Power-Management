@@ -5,8 +5,6 @@ import com.example.powermanager.utils.NO_VALUE_STRING
 import com.example.powermanager.utils.getPrettyStringFromNumberOfBytes
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.attribute.BasicFileAttributes
@@ -46,30 +44,28 @@ object CpuConfigurationsStorageManager {
         }
     }
 
-    suspend fun saveCpuConfiguration(configuration : CpuConfiguration, directory: File) {
-        withContext (Dispatchers.IO) {
-            // first convert the result to JSON format
-            val gson = GsonBuilder().setPrettyPrinting().create()
-            val fileContent = gson.toJson(configuration)
+    fun saveCpuConfiguration(configuration : CpuConfiguration, directory: File) {
+        // first convert the result to JSON format
+        val gson = GsonBuilder().setPrettyPrinting().create()
+        val fileContent = gson.toJson(configuration)
 
-            // check if the directory exists and if not, create it
-            try {
-                if (!directory.exists())
-                    directory.mkdirs()
-            } catch (_ : Exception) {
-                return@withContext
-            }
-
-            var fileName : String = configuration.name
-
-            // check to see if a file with the same name already exists and if so, append
-            // a timestamp (millis since Epoch) to the name of the current file
-            if (File(directory, "$fileName$DOT_JSON").exists()) {
-                fileName = "${fileName}_${Calendar.getInstance().timeInMillis}"
-            }
-
-            File(directory, "$fileName$DOT_JSON").writeText(fileContent)
+        // check if the directory exists and if not, create it
+        try {
+            if (!directory.exists())
+                directory.mkdirs()
+        } catch (_ : Exception) {
+            return
         }
+
+        var fileName : String = configuration.name
+
+        // check to see if a file with the same name already exists and if so, append
+        // a timestamp (millis since Epoch) to the name of the current file
+        if (File(directory, "$fileName$DOT_JSON").exists()) {
+            fileName = "${fileName}_${Calendar.getInstance().timeInMillis}"
+        }
+
+        File(directory, "$fileName$DOT_JSON").writeText(fileContent)
     }
 
     fun getFileContent(fileName: String, directory: File) : String {

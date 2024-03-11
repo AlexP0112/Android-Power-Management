@@ -1,5 +1,6 @@
 package com.example.powermanager.control.cpufreq
 
+import com.example.powermanager.control.storage.CpuConfiguration
 import com.example.powermanager.utils.AVAILABLE_SCALING_GOVERNORS_PATH
 import com.example.powermanager.utils.CHANGE_SCALING_GOVERNOR_FOR_POLICY_COMMAND
 import com.example.powermanager.utils.CHANGE_SCALING_MAX_FREQUENCY_FOR_POLICY_COMMAND
@@ -152,6 +153,23 @@ object CpuFreqManager {
         }
 
         return result
+    }
+
+    suspend fun applyCpuConfiguration(configuration: CpuConfiguration, policyNames: List<String>, numberOfCores : Int) {
+        withContext(Dispatchers.IO) {
+            // first change scaling governor
+            changeScalingGovernor(configuration.scalingGovernor, policyNames)
+
+            // then set frequency limits
+            configuration.policyToFrequencyLimitMHz.forEach { (policyName, limitMHz) ->
+                changeMaxFrequencyForPolicy(policyName, limitMHz * NUMBER_OF_KILOHERTZ_IN_A_MEGAHERTZ)
+            }
+
+            // and then set cpus states
+            for (coreIndex in 0 until numberOfCores) {
+                CpuHotplugManager.changeCoreState(coreIndex, coreIndex in configuration.onlineCores)
+            }
+        }
     }
 
 }

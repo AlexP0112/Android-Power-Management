@@ -154,6 +154,7 @@ class PowerManagerAppModel(
         _uiState = MutableStateFlow(AppUiState(
             recordingResults = RecordingsStorageManager.getMostRecentRecordingResultsNames(numberOfRecordingsListedLimit, recordingResultsDirectory),
             currentScalingGovernor = CpuFreqManager.getCurrentScalingGovernor(),
+            savedConfigurations = CpuConfigurationsStorageManager.getSavedCpuConfigurationsNames(cpuConfigurationsDirectory),
             disabledCores = disabledCores,
             policyToFrequencyLimitMHz = policyToFrequencyLimitMHz
         ))
@@ -521,7 +522,7 @@ class PowerManagerAppModel(
         }
     }
 
-    fun deleteRecordingResult() {
+    fun deleteSelectedRecordingResult() {
         val deleted = RecordingsStorageManager.deleteRecordingResult(
             name = uiState.value.currentlySelectedRecordingResult,
             directory = recordingResultsDirectory
@@ -537,7 +538,7 @@ class PowerManagerAppModel(
         }
     }
 
-    fun shareRecordingResult(context: Context) {
+    fun shareSelectedRecordingResult(context: Context) {
         val jsonFile = File(recordingResultsDirectory, "${uiState.value.currentlySelectedRecordingResult}$DOT_JSON")
         val fileUri = FileProvider.getUriForFile(context, context.packageName + DOT_PROVIDER, jsonFile)
 
@@ -626,12 +627,66 @@ class PowerManagerAppModel(
         }
     }
 
+    fun changeSelectedCpuConfiguration(newValue: String) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                currentlySelectedCpuConfiguration = newValue
+            )
+        }
+    }
+
+    fun applySelectedCpuConfiguration() {
+        val configuration = CpuConfigurationsStorageManager.getCpuConfigurationForFileName(
+            fileName = uiState.value.currentlySelectedCpuConfiguration,
+            directory = cpuConfigurationsDirectory
+        ) ?: return
+
+        // update ui state
+        val disabledCores = (0 until totalNumberOfCores).filter { it !in configuration.onlineCores }
+
+        _uiState.update { currentState ->
+            currentState.copy(
+                disabledCores = disabledCores,
+                currentScalingGovernor = configuration.scalingGovernor,
+                policyToFrequencyLimitMHz = configuration.policyToFrequencyLimitMHz
+            )
+        }
+
+        viewModelScope.launch {
+            CpuFreqManager.applyCpuConfiguration(
+                configuration = configuration,
+                policyNames = cpuFreqPolicies.keys.toList(),
+                numberOfCores = totalNumberOfCores
+            )
+        }
+    }
+
     fun changeCpuConfigurationName(newValue: String) {
         _uiState.update { currentState ->
             currentState.copy(
                 cpuConfigurationName = newValue
             )
         }
+    }
+
+    fun deleteSelectedConfiguration() {
+        CpuConfigurationsStorageManager.deleteConfiguration(
+            name = uiState.value.currentlySelectedCpuConfiguration,
+            directory = cpuConfigurationsDirectory
+        )
+
+        _uiState.update { currentState ->
+            currentState.copy(
+                savedConfigurations = CpuConfigurationsStorageManager.getSavedCpuConfigurationsNames(cpuConfigurationsDirectory)
+            )
+        }
+    }
+
+    fun getSelectedConfigurationFileContent() : String {
+        return CpuConfigurationsStorageManager.getFileContent(
+            fileName = uiState.value.currentlySelectedCpuConfiguration,
+            directory = cpuConfigurationsDirectory
+        )
     }
 
     fun saveCurrentCpuConfiguration() {
@@ -644,10 +699,14 @@ class PowerManagerAppModel(
             policyToFrequencyLimitMHz = uiState.value.policyToFrequencyLimitMHz
         )
 
-        viewModelScope.launch {
-            CpuConfigurationsStorageManager.saveCpuConfiguration(
-                configuration = currentConfiguration,
-                directory = cpuConfigurationsDirectory
+        CpuConfigurationsStorageManager.saveCpuConfiguration(
+            configuration = currentConfiguration,
+            directory = cpuConfigurationsDirectory
+        )
+
+        _uiState.update { currentState ->
+            currentState.copy(
+                savedConfigurations = CpuConfigurationsStorageManager.getSavedCpuConfigurationsNames(cpuConfigurationsDirectory)
             )
         }
     }
