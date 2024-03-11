@@ -30,7 +30,7 @@ const val MILLIS_IN_A_DAY = HOURS_IN_A_DAY * MINUTES_IN_AN_HOUR * MILLIS_IN_A_MI
 
 // regex
 const val CPU_REGEX = "cpu[0-9]+"
-const val ALPHANUMERIC = "[a-zA-Z0-9_]+"
+const val ALPHANUMERIC = "[a-zA-Z0-9_-]+"
 const val LOAD_AVERAGE_SEMICOLON = "load average:"
 const val UP = " up "
 const val USERS = "users"
@@ -48,7 +48,7 @@ const val BATTERY_LEVEL_NUMBER_OF_SAMPLES = 50
 val RECORDING_SAMPLING_PERIOD_POSSIBLE_VALUES = listOf(500L, 1000L, 2000L, 5000L)
 const val DEFAULT_RECORDING_SAMPLING_PERIOD_MILLIS = 1000L
 const val DEFAULT_RECORDING_NUMBER_OF_SAMPLES = 30
-const val DEFAULT_RECORDING_NAME = "default"
+const val DEFAULT_NAME = "default"
 const val MINIMUM_NUMBER_OF_RECORDING_SAMPLES_ALLOWED = 5
 const val MAXIMUM_NUMBER_OF_RECORDING_SAMPLES_ALLOWED = 200
 const val CONFIRM_DELETION_TEXT = "Are you sure you want to delete recording result %s?"
@@ -98,3 +98,4 @@ const val PROCESSOR = "processor"
 const val NO_VALUE_STRING = "-"
 const val FAILED_TO_DETERMINE = "Failed to determine"
 const val JSON_MIME_TYPE = "application/json"
+const val SAVED_CPU_CONFIGURATIONS_DIRECTORY_NAME = "cpu_configurations"

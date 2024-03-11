@@ -10,7 +10,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
@@ -33,14 +36,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -52,8 +58,9 @@ import com.example.powermanager.ui.model.PowerManagerAppModel
 import com.example.powermanager.ui.screens.common.InfoDialog
 import com.example.powermanager.ui.screens.common.SectionHeader
 import com.example.powermanager.ui.state.AppUiState
+import com.example.powermanager.utils.isFileNameValid
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun ControlScreen(
     topPadding: Dp,
@@ -76,8 +83,9 @@ fun ControlScreen(
         val isCoreEnablingInfoDialogOpen = remember { mutableStateOf(false) }
 
         val uiState: State<AppUiState> = model.uiState.collectAsState()
-        val availableScalingGovernors : List<String> = model.getAvailableScalingGovernors()
+        val keyboardController = LocalSoftwareKeyboardController.current
 
+        val availableScalingGovernors : List<String> = model.getAvailableScalingGovernors()
         val totalNumberOfCores = model.getTotalNumberOfCores()
         val cpuFreqPolicies = model.getCpuFreqPolicies()
         val masterCores = model.getMasterCores()
@@ -167,14 +175,12 @@ fun ControlScreen(
                 mutableStateOf(false)
             }
 
-            var currentValue by remember {
-                mutableIntStateOf(model.getCurrentMaxFrequencyForPolicyMhz(policy.name))
-            }
-
             Spacer(modifier = Modifier.height(10.dp))
 
             Row(
-                modifier = Modifier.fillMaxWidth().padding(start = 8.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ){
                 Column(
@@ -204,7 +210,7 @@ fun ControlScreen(
                         }
                     ) {
                         TextField(
-                            value = currentValue.toString(),
+                            value = uiState.value.policyToFrequencyLimitMHz[policy.name].toString(),
                             onValueChange = {},
                             readOnly = true,
                             trailingIcon = {
@@ -227,7 +233,6 @@ fun ControlScreen(
                                     },
                                     colors = MenuDefaults.itemColors(),
                                     onClick = {
-                                        currentValue = value
                                         isDropdownExpanded = false
                                         model.changeMaxFrequencyForPolicy(
                                             policyName = policy.name,
@@ -243,7 +248,19 @@ fun ControlScreen(
 
         }
 
-        Spacer (modifier = Modifier.height(15.dp))
+        Spacer(modifier = Modifier.height(10.dp))
+
+        SaveCpuConfigurationText()
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        SaveCpuConfigurationRow(
+            currentCpuConfigurationName = uiState.value.cpuConfigurationName,
+            onValueChanged = { model.changeCpuConfigurationName(it) },
+            keyboardController = keyboardController,
+            onSaveButtonPressed = { model.saveCurrentCpuConfiguration() },
+            buttonEnabled = isFileNameValid(uiState.value.cpuConfigurationName)
+        )
 
         // ================= info dialogs ==================== //
         if (isDozeModeInfoDialogOpen.value) {
@@ -354,6 +371,68 @@ fun DarkThemeText() {
         text = stringResource(R.string.dark_theme_text),
         fontSize = 18.sp
     )
+}
+
+@Composable
+fun SaveCpuConfigurationText() {
+    Text(
+        text = stringResource(R.string.save_cpu_configuration),
+        fontSize = 18.sp
+    )
+}
+
+/*
+ * A Row that contains a text field where the user writes the name of the configuration and a
+ * button to save the current configuration
+ */
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+fun SaveCpuConfigurationRow(
+    currentCpuConfigurationName : String,
+    onValueChanged : (String) -> Unit,
+    keyboardController : SoftwareKeyboardController?,
+    onSaveButtonPressed: () -> Unit,
+    buttonEnabled : Boolean
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceEvenly
+    ) {
+        Row(
+            modifier = Modifier.weight(2.65f),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                modifier = Modifier.padding(start = 8.dp),
+                text = stringResource(R.string.configuration_name),
+                fontSize = 14.sp
+            )
+
+            Spacer(modifier = Modifier.width(10.dp))
+
+            TextField(
+                modifier = Modifier.width(120.dp),
+                value = currentCpuConfigurationName,
+                isError = !isFileNameValid(currentCpuConfigurationName),
+                onValueChange = onValueChanged,
+                colors = TextFieldDefaults.colors(),
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    imeAction = ImeAction.Done
+                ),
+                keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
+                singleLine = true
+            )
+        }
+
+        OutlinedButton(
+            onClick = onSaveButtonPressed,
+            modifier = Modifier.weight(1f),
+            enabled = buttonEnabled
+        ) {
+            Text(text = stringResource(R.string.save))
+        }
+    }
 }
 
 /*

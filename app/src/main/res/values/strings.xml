@@ -75,6 +75,7 @@
     <string name="screen_timeout_text">\u2022 A Screen Timeout value as small as possible is another way to save battery.</string>
     <string name="select_scaling_governor">\u2022 Select scaling governor:</string>
     <string name="online_cpu_cores">\u2022 Online CPU cores:</string>
+    <string name="save_cpu_configuration">\u2022 Save current CPU configuration:</string>
     <string name="set_max_frequency">\u2022 Set frequency limit for cores (MHz):</string>
     <string name="go_to_display_settings">Open display settings</string>
     <string name="core_enabling_explanation">Note that while disabling CPU cores might help save battery, it could also cause significant performance and user experience degradation.</string>
@@ -86,4 +87,6 @@
     <string name="interactive_governor_description">The \'interactive\' governor controls the CPU frequency based on the detection of user interactions: it will quickly ramp up the frequency when user interactions are detected and will reduce the frequency when there are no interactions.</string>
     <string name="conservative_governor_description">The \'conservative\' governor dynamically adjusts the CPU frequency based on the system load. It gradually increases the frequency in response to increased load and decreases it slowly as the load decreases.</string>
     <string name="schedutil_governor_description">The \'schedutil\' governor uses information provided by the scheduler (another component of the Operating System) to make decisions about CPU frequency changes, such as predicting future workload demands and adjusting the frequency accordingly.</string>
+    <string name="configuration_name">Configuration name:</string>
+    <string name="save">Save</string>
 </resources>

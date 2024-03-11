@@ -1,4 +1,4 @@
-package com.example.powermanager.recording.model
+package com.example.powermanager.recording.storage
 
 data class RecordingResult(
     val sessionName : String,

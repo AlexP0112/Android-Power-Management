@@ -96,7 +96,7 @@ fun isRecordingNumberOfSamplesStringValid(numberOfSamplesString : String) : Bool
             numberOfSamplesString.toInt() in MINIMUM_NUMBER_OF_RECORDING_SAMPLES_ALLOWED..MAXIMUM_NUMBER_OF_RECORDING_SAMPLES_ALLOWED
 }
 
-fun isRecordingSessionNameValid(name : String) : Boolean {
+fun isFileNameValid(name : String) : Boolean {
     return name.matches(ALPHANUMERIC.toRegex())
 }
 

@@ -21,7 +21,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.powermanager.R
-import com.example.powermanager.recording.model.RecordingResult
+import com.example.powermanager.recording.storage.RecordingResult
 import com.example.powermanager.ui.charts.common.CustomAxisValuesOverrider
 import com.example.powermanager.ui.charts.common.StaticChart
 import com.example.powermanager.ui.model.PowerManagerAppModel

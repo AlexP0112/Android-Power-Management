@@ -16,6 +16,8 @@ import com.example.powermanager.R
 import com.example.powermanager.control.cpufreq.CpuFreqManager
 import com.example.powermanager.control.cpufreq.CpuFreqPolicy
 import com.example.powermanager.control.cpufreq.CpuHotplugManager
+import com.example.powermanager.control.storage.CpuConfiguration
+import com.example.powermanager.control.storage.CpuConfigurationsStorageManager
 import com.example.powermanager.preferences.HOME_SCREEN_SAMPLING_PERIOD_ID
 import com.example.powermanager.preferences.LIVE_CHARTS_SAMPLING_PERIOD_ID
 import com.example.powermanager.preferences.LIVE_CHARTS_TRACKED_PERIOD_ID
@@ -26,9 +28,9 @@ import com.example.powermanager.preferences.PreferenceProperties
 import com.example.powermanager.preferences.PreferenceValueAdaptor
 import com.example.powermanager.preferences.PreferencesManager
 import com.example.powermanager.preferences.RECORDING_FINISHED_NOTIFICATION_ENABLED_ID
-import com.example.powermanager.recording.model.Recorder
-import com.example.powermanager.recording.model.RecordingResult
-import com.example.powermanager.recording.storage.RecordingStorageManager
+import com.example.powermanager.recording.recorder.Recorder
+import com.example.powermanager.recording.storage.RecordingResult
+import com.example.powermanager.recording.storage.RecordingsStorageManager
 import com.example.powermanager.ui.state.AppUiState
 import com.example.powermanager.utils.CORE_FREQUENCY_PATH
 import com.example.powermanager.utils.DOT_JSON
@@ -45,6 +47,7 @@ import com.example.powermanager.utils.NOTIFICATION_TITLE
 import com.example.powermanager.utils.NUMBER_OF_KILOHERTZ_IN_A_MEGAHERTZ
 import com.example.powermanager.utils.POLICY_CURRENT_FREQUENCY_PATH
 import com.example.powermanager.utils.RECORDING_RESULTS_DIRECTORY_NAME
+import com.example.powermanager.utils.SAVED_CPU_CONFIGURATIONS_DIRECTORY_NAME
 import com.example.powermanager.utils.STATISTICS_BACKGROUND_SAMPLING_THRESHOLD_MILLIS
 import com.example.powermanager.utils.UPTIME_COMMAND
 import com.example.powermanager.utils.convertBytesToGigaBytes
@@ -89,6 +92,7 @@ class PowerManagerAppModel(
     // map from core index to the name of the policy it belongs to
     private val coreToPolicy : Map<Int, String>
 
+    private val cpuConfigurationsDirectory : File
     private val recordingResultsDirectory : File
 
     // managers
@@ -113,6 +117,7 @@ class PowerManagerAppModel(
         preferencesManager = PreferencesManager(application.applicationContext)
 
         recordingResultsDirectory = File(application.applicationContext.filesDir, RECORDING_RESULTS_DIRECTORY_NAME)
+        cpuConfigurationsDirectory = File(application.applicationContext.filesDir, SAVED_CPU_CONFIGURATIONS_DIRECTORY_NAME)
 
         // initialize other local members/constants
         val info = ActivityManager.MemoryInfo()
@@ -143,11 +148,14 @@ class PowerManagerAppModel(
             preferenceValueAsString = getPreferenceValue(NUMBER_OF_RECORDINGS_LISTED_ID)) as Int
         val onlineCores = CpuHotplugManager.getOnlineCores()
         val disabledCores = (0 until totalNumberOfCores).filter { !onlineCores.contains(it) }
+        val policyToFrequencyLimitMHz : MutableMap<String, Int> = mutableMapOf()
+        cpuFreqPolicies.keys.forEach { policyToFrequencyLimitMHz[it] = getCurrentMaxFrequencyForPolicyMhz(it) }
 
         _uiState = MutableStateFlow(AppUiState(
-            recordingResults = RecordingStorageManager.getMostRecentRecordingResultsNames(numberOfRecordingsListedLimit, recordingResultsDirectory),
+            recordingResults = RecordingsStorageManager.getMostRecentRecordingResultsNames(numberOfRecordingsListedLimit, recordingResultsDirectory),
             currentScalingGovernor = CpuFreqManager.getCurrentScalingGovernor(),
-            disabledCores = disabledCores
+            disabledCores = disabledCores,
+            policyToFrequencyLimitMHz = policyToFrequencyLimitMHz
         ))
         uiState = _uiState.asStateFlow()
     }
@@ -514,7 +522,7 @@ class PowerManagerAppModel(
     }
 
     fun deleteRecordingResult() {
-        val deleted = RecordingStorageManager.deleteRecordingResult(
+        val deleted = RecordingsStorageManager.deleteRecordingResult(
             name = uiState.value.currentlySelectedRecordingResult,
             directory = recordingResultsDirectory
         )
@@ -549,21 +557,21 @@ class PowerManagerAppModel(
             preferenceID = NUMBER_OF_RECORDINGS_LISTED_ID,
             preferenceValueAsString = getPreferenceValue(NUMBER_OF_RECORDINGS_LISTED_ID)) as Int
 
-        return RecordingStorageManager.getMostRecentRecordingResultsNames(
+        return RecordingsStorageManager.getMostRecentRecordingResultsNames(
             limit = limit,
             directory = recordingResultsDirectory
         )
     }
 
     fun getRecordingResultRawFileContent() : String {
-        return RecordingStorageManager.getFileContent(
+        return RecordingsStorageManager.getFileContent(
             fileName = uiState.value.currentlySelectedRecordingResult,
             directory = recordingResultsDirectory
         )
     }
 
     fun getCurrentlySelectedRecordingResult() : RecordingResult {
-        return RecordingStorageManager.getRecordingResultForFileName(
+        return RecordingsStorageManager.getRecordingResultForFileName(
             fileName = uiState.value.currentlySelectedRecordingResult,
             directory = recordingResultsDirectory
         )!!
@@ -618,11 +626,50 @@ class PowerManagerAppModel(
         }
     }
 
-    fun getCurrentMaxFrequencyForPolicyMhz(policyName: String) : Int {
+    fun changeCpuConfigurationName(newValue: String) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                cpuConfigurationName = newValue
+            )
+        }
+    }
+
+    fun saveCurrentCpuConfiguration() {
+        val onlineCores = (0 until totalNumberOfCores).filter { it !in uiState.value.disabledCores }
+
+        val currentConfiguration = CpuConfiguration(
+            name = uiState.value.cpuConfigurationName,
+            scalingGovernor = uiState.value.currentScalingGovernor,
+            onlineCores = onlineCores,
+            policyToFrequencyLimitMHz = uiState.value.policyToFrequencyLimitMHz
+        )
+
+        viewModelScope.launch {
+            CpuConfigurationsStorageManager.saveCpuConfiguration(
+                configuration = currentConfiguration,
+                directory = cpuConfigurationsDirectory
+            )
+        }
+    }
+
+    private fun getCurrentMaxFrequencyForPolicyMhz(policyName: String) : Int {
         return CpuFreqManager.getCurrentMaxFrequencyForPolicyKhz(policyName) / NUMBER_OF_KILOHERTZ_IN_A_MEGAHERTZ
     }
 
     fun changeMaxFrequencyForPolicy(policyName : String, maxFrequencyMhz: Int) {
+        val newLimits : MutableMap<String, Int> = mutableMapOf()
+        uiState.value.policyToFrequencyLimitMHz.forEach { (key, value) ->
+            newLimits[key] = value
+        }
+
+        newLimits[policyName] = maxFrequencyMhz
+
+        _uiState.update { currentState ->
+            currentState.copy(
+                policyToFrequencyLimitMHz = newLimits
+            )
+        }
+
         CpuFreqManager.changeMaxFrequencyForPolicy(
             policyName = policyName,
             maxFrequencyKhz = maxFrequencyMhz * NUMBER_OF_KILOHERTZ_IN_A_MEGAHERTZ

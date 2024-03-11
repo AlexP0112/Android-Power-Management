@@ -69,8 +69,8 @@ import com.example.powermanager.ui.screens.common.SectionHeader
 import com.example.powermanager.ui.state.AppUiState
 import com.example.powermanager.utils.CONFIRM_DELETION_TEXT
 import com.example.powermanager.utils.RECORDING_SAMPLING_PERIOD_POSSIBLE_VALUES
+import com.example.powermanager.utils.isFileNameValid
 import com.example.powermanager.utils.isRecordingNumberOfSamplesStringValid
-import com.example.powermanager.utils.isRecordingSessionNameValid
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -368,7 +368,7 @@ fun RecordingSessionNameRow(
         TextField(
             modifier = Modifier.weight(1f),
             value = currentSessionName,
-            isError = !isRecordingSessionNameValid(currentSessionName),
+            isError = !isFileNameValid(currentSessionName),
             onValueChange = onValueChanged,
             colors = TextFieldDefaults.colors(),
             keyboardOptions = KeyboardOptions.Default.copy(
@@ -429,7 +429,7 @@ fun StartRecordingButtonAndIndicatorRow(
             onClick = onButtonPressed,
             enabled = !isRecordingInProgress &&
                     isRecordingNumberOfSamplesStringValid(recordingNumberOfSamplesString) &&
-                    isRecordingSessionNameValid(recordingSessionName)
+                    isFileNameValid(recordingSessionName)
         ) {
             Text(
                 text = if (isRecordingInProgress) stringResource(R.string.recording)

@@ -1,4 +1,4 @@
-package com.example.powermanager.recording.model
+package com.example.powermanager.recording.recorder
 
 import android.annotation.SuppressLint
 import android.app.ActivityManager
@@ -6,7 +6,8 @@ import android.os.BatteryManager
 import android.os.PowerManager
 import android.util.Log
 import com.example.powermanager.preferences.LoadAverageTypes
-import com.example.powermanager.recording.storage.RecordingStorageManager
+import com.example.powermanager.recording.storage.RecordingResult
+import com.example.powermanager.recording.storage.RecordingsStorageManager
 import com.example.powermanager.utils.NETWORK_INTERFACES_STATS_PATH
 import com.example.powermanager.utils.RECORDING_TAG
 import com.example.powermanager.utils.UPTIME_COMMAND
@@ -118,7 +119,7 @@ object Recorder {
                 )
 
                 // save the result in a JSON file
-                val savedFileName = RecordingStorageManager.saveRecordingResult(
+                val savedFileName = RecordingsStorageManager.saveRecordingResult(
                     result = result,
                     directory = outputDirectory
                 )
