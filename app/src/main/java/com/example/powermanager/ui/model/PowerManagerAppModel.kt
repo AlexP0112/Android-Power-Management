@@ -8,8 +8,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.BatteryManager
 import android.os.PowerManager
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import androidx.core.app.NotificationCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.AndroidViewModel
@@ -589,8 +587,7 @@ class PowerManagerAppModel(
     fun onRecordingInspectButtonPressed(recordingName : String) {
         _recordingScreensUiState.update { currentState ->
             currentState.copy(
-                currentlySelectedRecordingResult = recordingName,
-                isInspectFileDialogOpen = true
+                currentlySelectedRecordingResult = recordingName
             )
         }
     }
@@ -632,14 +629,6 @@ class PowerManagerAppModel(
         _recordingScreensUiState.update { currentState ->
             currentState.copy(
                 currentlySelectedRecordingResult = recordingName
-            )
-        }
-    }
-
-    fun closeInspectRecordingFileDialog() {
-        _recordingScreensUiState.update { currentState ->
-            currentState.copy(
-                isInspectFileDialogOpen = false
             )
         }
     }
@@ -701,20 +690,10 @@ class PowerManagerAppModel(
         }
     }
 
-    fun changeControlScreenInfoDialogParams(textId: Int?, heightDp: Dp = 0.dp) {
-        _controlScreenUiState.update { currentState ->
-            currentState.copy(
-                infoDialogTextId = textId,
-                infoDialogHeightDp = heightDp
-            )
-        }
-    }
-
     fun onCpuConfigurationInspectButtonPressed(configurationName : String) {
         _controlScreenUiState.update { currentState ->
             currentState.copy(
-                currentlySelectedCpuConfiguration = configurationName,
-                isInspectConfigurationDialogOpen = true
+                currentlySelectedCpuConfiguration = configurationName
             )
         }
     }
@@ -746,14 +725,6 @@ class PowerManagerAppModel(
             currentState.copy(
                 savedConfigurations = CpuConfigurationsStorageManager.getSavedCpuConfigurationsNames(cpuConfigurationsDirectory),
                 isConfirmConfigurationDeletionDialogOpen = false
-            )
-        }
-    }
-
-    fun closeCpuConfigurationInspectDialog() {
-        _controlScreenUiState.update { currentState ->
-            currentState.copy(
-                isInspectConfigurationDialogOpen = false
             )
         }
     }

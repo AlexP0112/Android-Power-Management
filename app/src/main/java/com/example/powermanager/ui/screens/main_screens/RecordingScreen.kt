@@ -1,4 +1,4 @@
-package com.example.powermanager.ui.screens
+package com.example.powermanager.ui.screens.main_screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -51,7 +51,6 @@ import androidx.compose.ui.unit.sp
 import com.example.powermanager.R
 import com.example.powermanager.ui.model.PowerManagerAppModel
 import com.example.powermanager.ui.screens.common.ConfirmFileDeletionAlertDialog
-import com.example.powermanager.ui.screens.common.InspectFileInfoDialog
 import com.example.powermanager.ui.screens.common.SectionHeader
 import com.example.powermanager.ui.state.RecordingScreensUiState
 import com.example.powermanager.utils.CONFIRM_RECORDING_DELETION_TEXT
@@ -62,9 +61,10 @@ import com.example.powermanager.utils.isRecordingNumberOfSamplesStringValid
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun RecordingScreen(
-    topPadding: Dp,
+    topPadding : Dp,
     model : PowerManagerAppModel,
-    onViewResultsButtonPressed: () -> Unit
+    openRecordingResultViewScreen : () -> Unit,
+    openRecordingResultFileInspectScreen : () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -178,10 +178,11 @@ fun RecordingScreen(
                 },
                 onInspectButtonPressed = {
                     model.onRecordingInspectButtonPressed(resultName)
+                    openRecordingResultFileInspectScreen()
                 },
                 onViewResultsButtonPressed = {
                     model.changeSelectedRecordingResult(resultName)
-                    onViewResultsButtonPressed()
+                    openRecordingResultViewScreen()
                 }
             )
 
@@ -198,13 +199,6 @@ fun RecordingScreen(
                 onDismiss = { model.onDismissRecordingDeletionRequest() },
                 onConfirm = { model.onConfirmRecordingDeletionRequest() },
                 text = String.format(CONFIRM_RECORDING_DELETION_TEXT, uiState.value.currentlySelectedRecordingResult)
-            )
-        }
-
-        if (uiState.value.isInspectFileDialogOpen) {
-            InspectFileInfoDialog(
-                content = model.getRecordingResultRawFileContent(),
-                onDismissRequest = { model.closeInspectRecordingFileDialog() }
             )
         }
     }

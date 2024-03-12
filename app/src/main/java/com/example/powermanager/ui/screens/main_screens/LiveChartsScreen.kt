@@ -1,4 +1,4 @@
-package com.example.powermanager.ui.screens
+package com.example.powermanager.ui.screens.main_screens
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column

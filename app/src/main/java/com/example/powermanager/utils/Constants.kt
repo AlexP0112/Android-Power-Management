@@ -1,12 +1,15 @@
 package com.example.powermanager.utils
 
 // screen names
-const val HOME_SCREEN_NAME              = "Home"
-const val LIVE_CHARTS_SCREEN_NAME       = "Live charts"
-const val RECORDING_SCREEN_NAME         = "Recording"
-const val CONTROL_SCREEN_NAME           = "Control"
-const val SETTINGS_SCREEN_NAME          = "Settings"
-const val RECORDING_RESULT_SCREEN_NAME  = "_recording_result"
+const val HOME_SCREEN_NAME                          = "Home"
+const val LIVE_CHARTS_SCREEN_NAME                   = "Live charts"
+const val RECORDING_SCREEN_NAME                     = "Recording"
+const val CONTROL_SCREEN_NAME                       = "Control"
+const val SETTINGS_SCREEN_NAME                      = "Settings"
+const val RECORDING_RESULT_SCREEN_NAME              = "_recording_result"
+const val SCALING_GOVERNORS_EXPLANATION_SCREEN_NAME = "_scaling_governors"
+const val CPU_CONFIGURATION_INSPECT_SCREEN_NAME     = "_cpu_configuration_inspect"
+const val RECORDING_RESULT_FILE_INSPECT_SCREEN_NAME = "_recording_result_file_inspect"
 
 // chart names
 const val BATTERY_CHART_NAME        = "Battery percentage in the last %d hours"

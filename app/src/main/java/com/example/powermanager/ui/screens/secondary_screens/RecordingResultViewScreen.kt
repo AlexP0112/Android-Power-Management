@@ -1,4 +1,4 @@
-package com.example.powermanager.ui.screens
+package com.example.powermanager.ui.screens.secondary_screens
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer

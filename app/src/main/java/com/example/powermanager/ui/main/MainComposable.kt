@@ -42,17 +42,23 @@ import androidx.navigation.compose.rememberNavController
 import com.example.powermanager.R
 import com.example.powermanager.ui.model.PowerManagerAppModel
 import com.example.powermanager.ui.navigation.navigationItems
-import com.example.powermanager.ui.screens.ControlScreen
-import com.example.powermanager.ui.screens.HomeScreen
-import com.example.powermanager.ui.screens.LiveChartsScreen
-import com.example.powermanager.ui.screens.RecordingResultViewScreen
-import com.example.powermanager.ui.screens.RecordingScreen
-import com.example.powermanager.ui.screens.SettingsScreen
+import com.example.powermanager.ui.screens.main_screens.ControlScreen
+import com.example.powermanager.ui.screens.main_screens.HomeScreen
+import com.example.powermanager.ui.screens.main_screens.LiveChartsScreen
+import com.example.powermanager.ui.screens.main_screens.RecordingScreen
+import com.example.powermanager.ui.screens.main_screens.SettingsScreen
+import com.example.powermanager.ui.screens.secondary_screens.CpuConfigurationFileInspectScreen
+import com.example.powermanager.ui.screens.secondary_screens.RecordingResultFileInspectScreen
+import com.example.powermanager.ui.screens.secondary_screens.RecordingResultViewScreen
+import com.example.powermanager.ui.screens.secondary_screens.ScalingGovernorsExplanationScreen
 import com.example.powermanager.utils.CONTROL_SCREEN_NAME
+import com.example.powermanager.utils.CPU_CONFIGURATION_INSPECT_SCREEN_NAME
 import com.example.powermanager.utils.HOME_SCREEN_NAME
 import com.example.powermanager.utils.LIVE_CHARTS_SCREEN_NAME
+import com.example.powermanager.utils.RECORDING_RESULT_FILE_INSPECT_SCREEN_NAME
 import com.example.powermanager.utils.RECORDING_RESULT_SCREEN_NAME
 import com.example.powermanager.utils.RECORDING_SCREEN_NAME
+import com.example.powermanager.utils.SCALING_GOVERNORS_EXPLANATION_SCREEN_NAME
 import com.example.powermanager.utils.SETTINGS_SCREEN_NAME
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -182,7 +188,13 @@ fun ScreensNavHost(
             ControlScreen(
                 topPadding = topPadding,
                 goToDisplaySettings = goToDisplaySettings,
-                model = model
+                model = model,
+                openScalingGovernorsScreen = {
+                    navController.navigate(SCALING_GOVERNORS_EXPLANATION_SCREEN_NAME)
+                },
+                openCpuConfigurationScreen = {
+                    navController.navigate(CPU_CONFIGURATION_INSPECT_SCREEN_NAME)
+                }
             )
         }
 
@@ -205,8 +217,11 @@ fun ScreensNavHost(
             RecordingScreen(
                 topPadding = topPadding,
                 model = model,
-                onViewResultsButtonPressed = {
+                openRecordingResultViewScreen = {
                     navController.navigate(RECORDING_RESULT_SCREEN_NAME)
+                },
+                openRecordingResultFileInspectScreen = {
+                    navController.navigate(RECORDING_RESULT_FILE_INSPECT_SCREEN_NAME)
                 }
             )
         }
@@ -228,6 +243,71 @@ fun ScreensNavHost(
             },
         ) {
             RecordingResultViewScreen(
+                topPadding = topPadding,
+                model = model
+            )
+        }
+
+        // scaling governors details screen
+        composable(
+            route = SCALING_GOVERNORS_EXPLANATION_SCREEN_NAME,
+            enterTransition = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                    animationSpec = tween(250)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                    animationSpec = tween(250)
+                )
+            },
+        ) {
+            ScalingGovernorsExplanationScreen(
+                topPadding = topPadding
+            )
+        }
+
+        // cpu configuration file inspect screen
+        composable(
+            route = CPU_CONFIGURATION_INSPECT_SCREEN_NAME,
+            enterTransition = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                    animationSpec = tween(250)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                    animationSpec = tween(250)
+                )
+            },
+        ) {
+            CpuConfigurationFileInspectScreen(
+                topPadding = topPadding,
+                model = model
+            )
+        }
+
+        // recording result file inspect screen
+        composable(
+            route = RECORDING_RESULT_FILE_INSPECT_SCREEN_NAME,
+            enterTransition = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                    animationSpec = tween(250)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                    animationSpec = tween(250)
+                )
+            },
+        ) {
+            RecordingResultFileInspectScreen(
                 topPadding = topPadding,
                 model = model
             )

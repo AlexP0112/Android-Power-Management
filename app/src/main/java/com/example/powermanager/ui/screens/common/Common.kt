@@ -6,11 +6,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -20,7 +17,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -91,41 +87,6 @@ fun InfoDialog(
                     .fillMaxSize()
                     .padding(5.dp)
                     .wrapContentSize(Alignment.Center),
-            )
-        }
-    }
-}
-
-/*
- * Info Dialog that contains a title with the name of the file and the size, followed by
- * the actual content of the file
- */
-@Composable
-fun InspectFileInfoDialog(
-    content: String,
-    onDismissRequest: () -> Unit
-) {
-    val (height, width) = LocalConfiguration.current.run { screenHeightDp.dp to screenWidthDp.dp }
-
-    Dialog(
-        onDismissRequest = onDismissRequest
-    ) {
-        Card(
-            modifier = Modifier
-                .width(width)
-                .height(height / 2)
-                .verticalScroll(rememberScrollState()),
-            shape = RoundedCornerShape(16.dp),
-            border = BorderStroke(
-                width = 2.dp,
-                color = MaterialTheme.colorScheme.onPrimaryContainer
-            )
-        ) {
-            Text(
-                text = content,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(5.dp)
             )
         }
     }

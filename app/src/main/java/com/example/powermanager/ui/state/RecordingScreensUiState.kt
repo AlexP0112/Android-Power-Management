@@ -13,6 +13,5 @@ data class RecordingScreensUiState(
     val currentlySelectedRecordingResult : String = NO_VALUE_STRING,
     val includeThreadCountInfo : Boolean = true,
     val isConfirmDeletionDialogOpen : Boolean = false,
-    val isInspectFileDialogOpen : Boolean = false,
     val isSamplingPeriodDropdownExpanded : Boolean = false
 )
