@@ -25,7 +25,7 @@ import com.example.powermanager.recording.storage.RecordingResult
 import com.example.powermanager.ui.charts.common.CustomAxisValuesOverrider
 import com.example.powermanager.ui.charts.common.StaticChart
 import com.example.powermanager.ui.model.PowerManagerAppModel
-import com.example.powermanager.ui.state.AppUiState
+import com.example.powermanager.ui.state.RecordingScreensUiState
 import com.example.powermanager.utils.getListMaximum
 import com.example.powermanager.utils.getListMinimum
 import com.example.powermanager.utils.getPrettyStringFromNumberOfBytes
@@ -45,7 +45,7 @@ fun RecordingResultViewScreen(
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
     ) {
-        val uiState: State<AppUiState> = model.uiState.collectAsState()
+        val uiState: State<RecordingScreensUiState> = model.recordingScreensUiState.collectAsState()
         val result: RecordingResult = model.getCurrentlySelectedRecordingResult()
 
         val totalMemoryGB = model.getTotalMemory()

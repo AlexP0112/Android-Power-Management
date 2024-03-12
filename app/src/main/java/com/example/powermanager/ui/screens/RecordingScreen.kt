@@ -35,10 +35,6 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -61,7 +57,7 @@ import com.example.powermanager.ui.screens.common.ConfirmFileDeletionAlertDialog
 import com.example.powermanager.ui.screens.common.InfoDialog
 import com.example.powermanager.ui.screens.common.InspectFileInfoDialog
 import com.example.powermanager.ui.screens.common.SectionHeader
-import com.example.powermanager.ui.state.AppUiState
+import com.example.powermanager.ui.state.RecordingScreensUiState
 import com.example.powermanager.utils.CONFIRM_RECORDING_DELETION_TEXT
 import com.example.powermanager.utils.RECORDING_SAMPLING_PERIOD_POSSIBLE_VALUES
 import com.example.powermanager.utils.isFileNameValid
@@ -88,29 +84,7 @@ fun RecordingScreen(
         val keyboardController = LocalSoftwareKeyboardController.current
         val context = LocalContext.current
 
-        // ================= screen state variables =================== //
-
-        val uiState: State<AppUiState> = model.uiState.collectAsState()
-
-        var isSamplingPeriodDropdownExpanded by remember {
-            mutableStateOf(false)
-        }
-
-        var isNumberOfSamplesInfoDialogOpen by remember {
-            mutableStateOf(false)
-        }
-
-        var isSamplingPeriodInfoDialogOpen by remember {
-            mutableStateOf(false)
-        }
-
-        var isConfirmResultDeletionDialogOpen by remember {
-            mutableStateOf(false)
-        }
-
-        var isInspectRawResultDialogOpen by remember {
-            mutableStateOf(false)
-        }
+        val uiState: State<RecordingScreensUiState> = model.recordingScreensUiState.collectAsState()
 
         // ================= screen title =================== //
 
@@ -124,26 +98,31 @@ fun RecordingScreen(
 
         RecordingSamplingPeriodRow(
             onDismissDropdownMenu = {
-                isSamplingPeriodDropdownExpanded = false
+                model.changeSamplingPeriodDropdownExpandedState(false)
             },
             onSelectedNewValue = { newValue ->
                 model.changeRecordingSamplingPeriod(newValue)
-                isSamplingPeriodDropdownExpanded = false
             },
             onIconButtonPressed = {
-                isSamplingPeriodInfoDialogOpen = true
+                model.changeRecordingScreensInfoDialogParams(
+                    textId = R.string.sampling_period_additional_info,
+                    heightDp = 200.dp
+                )
             },
-            isSamplingPeriodDropdownExpanded = isSamplingPeriodDropdownExpanded,
+            isSamplingPeriodDropdownExpanded = uiState.value.isSamplingPeriodDropdownExpanded,
             currentValue = uiState.value.recordingSamplingPeriod
         ) { newValue ->
-            if (!isSamplingPeriodDropdownExpanded && uiState.value.isRecording)
+            if (!uiState.value.isSamplingPeriodDropdownExpanded && uiState.value.isRecording)
                 return@RecordingSamplingPeriodRow
-            isSamplingPeriodDropdownExpanded = newValue
+            model.changeSamplingPeriodDropdownExpandedState(newValue)
         }
 
         NumberOfSamplesRow(
             onIconButtonPressed = {
-                isNumberOfSamplesInfoDialogOpen = true
+                model.changeRecordingScreensInfoDialogParams(
+                    textId = R.string.number_of_samples_value_explanation,
+                    heightDp = 100.dp
+                )
             },
             keyboardController = keyboardController,
             currentNumberOfSamplesString = uiState.value.recordingNumberOfSamplesString,
@@ -208,16 +187,13 @@ fun RecordingScreen(
             RecordingSessionResultRow(
                 resultName = resultName,
                 onDeleteButtonPressed = {
-                    model.changeSelectedRecordingResult(resultName)
-                    isConfirmResultDeletionDialogOpen = true
+                    model.onRecordingDeleteButtonPressed(resultName)
                 },
                 onShareButtonPressed = {
-                    model.changeSelectedRecordingResult(resultName)
-                    model.shareSelectedRecordingResult(context)
+                    model.shareRecordingResult(resultName, context)
                 },
                 onInspectButtonPressed = {
-                    model.changeSelectedRecordingResult(resultName)
-                    isInspectRawResultDialogOpen = true
+                    model.onRecordingInspectButtonPressed(resultName)
                 },
                 onViewResultsButtonPressed = {
                     model.changeSelectedRecordingResult(resultName)
@@ -235,39 +211,27 @@ fun RecordingScreen(
 
         // ================= Info/alert dialogs =================== //
 
-        if (isNumberOfSamplesInfoDialogOpen) {
+        if (uiState.value.infoDialogTextId != null) {
             InfoDialog(
-                textId = R.string.number_of_samples_value_explanation,
-                cardHeight = 100.dp
+                textId = uiState.value.infoDialogTextId!!,
+                cardHeight = uiState.value.infoDialogHeightDp
             ) {
-                isNumberOfSamplesInfoDialogOpen = false
+                model.changeRecordingScreensInfoDialogParams(null)
             }
         }
 
-        if (isSamplingPeriodInfoDialogOpen) {
-            InfoDialog(
-                textId = R.string.sampling_period_additional_info,
-                cardHeight = 200.dp
-            ) {
-                isSamplingPeriodInfoDialogOpen = false
-            }
-        }
-
-        if (isConfirmResultDeletionDialogOpen) {
+        if (uiState.value.isConfirmDeletionDialogOpen) {
             ConfirmFileDeletionAlertDialog(
-                onDismiss = { isConfirmResultDeletionDialogOpen = false },
-                onConfirm = {
-                    model.deleteSelectedRecordingResult()
-                    isConfirmResultDeletionDialogOpen = false
-                },
+                onDismiss = { model.onDismissRecordingDeletionRequest() },
+                onConfirm = { model.onConfirmRecordingDeletionRequest() },
                 text = String.format(CONFIRM_RECORDING_DELETION_TEXT, uiState.value.currentlySelectedRecordingResult)
             )
         }
 
-        if (isInspectRawResultDialogOpen) {
+        if (uiState.value.isInspectFileDialogOpen) {
             InspectFileInfoDialog(
                 content = model.getRecordingResultRawFileContent(),
-                onDismissRequest = { isInspectRawResultDialogOpen = false }
+                onDismissRequest = { model.closeInspectRecordingFileDialog() }
             )
         }
     }

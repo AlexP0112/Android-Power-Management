@@ -9,12 +9,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import com.example.powermanager.ui.model.PowerManagerAppModel
+import com.example.powermanager.ui.state.LiveChartsScreenUiState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -24,36 +23,28 @@ fun CPUCoresDropdownMenu(
     val maxCoreNumber = model.getTotalNumberOfCores() - 1
     val cpuNames = (0 .. maxCoreNumber).map { "cpu${it}" }
 
-    var isExpanded by remember {
-        mutableStateOf(false)
-    }
-
-    var text by remember {
-        mutableStateOf("cpu${model.uiState.value.coreTracked}")
-    }
+    val uiState: State<LiveChartsScreenUiState> = model.liveChartsScreenUiState.collectAsState()
 
     ExposedDropdownMenuBox(
-        expanded = isExpanded,
-        onExpandedChange = { newValue ->
-            isExpanded = newValue
-        }
+        expanded = uiState.value.isCoreTrackedDropdownExpanded,
+        onExpandedChange = { model.changeTrackedCoreDropdownMenuState(it) }
     ) {
         TextField(
-            value = text,
+            value = "cpu${uiState.value.coreTracked}",
             onValueChange = {},
             readOnly = true,
             trailingIcon = {
-                ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded)
+                ExposedDropdownMenuDefaults.TrailingIcon(
+                    expanded = uiState.value.isCoreTrackedDropdownExpanded
+                )
             },
             colors = TextFieldDefaults.colors(),
             modifier = Modifier.menuAnchor()
         )
 
         ExposedDropdownMenu(
-            expanded = isExpanded,
-            onDismissRequest = {
-                isExpanded = false
-            }
+            expanded = uiState.value.isCoreTrackedDropdownExpanded,
+            onDismissRequest = { model.changeTrackedCoreDropdownMenuState(false) }
         ) {
             cpuNames.map {
                 DropdownMenuItem(
@@ -62,10 +53,7 @@ fun CPUCoresDropdownMenu(
                     },
                     colors = MenuDefaults.itemColors(),
                     onClick = {
-                        if (text != it)
-                            model.changeTrackedCore(it.substring(3).toInt())
-                        text = it
-                        isExpanded = false
+                        model.changeFrequencyChartTrackedCore(it.substring(3).toInt())
                     }
                 )
             }

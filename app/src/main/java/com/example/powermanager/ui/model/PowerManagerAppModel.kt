@@ -8,6 +8,8 @@ import android.content.Context
 import android.content.Intent
 import android.os.BatteryManager
 import android.os.PowerManager
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.core.app.NotificationCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.AndroidViewModel
@@ -31,7 +33,10 @@ import com.example.powermanager.preferences.RECORDING_FINISHED_NOTIFICATION_ENAB
 import com.example.powermanager.recording.recorder.Recorder
 import com.example.powermanager.recording.storage.RecordingResult
 import com.example.powermanager.recording.storage.RecordingsStorageManager
-import com.example.powermanager.ui.state.AppUiState
+import com.example.powermanager.ui.state.ControlScreenUiState
+import com.example.powermanager.ui.state.HomeScreenUiState
+import com.example.powermanager.ui.state.LiveChartsScreenUiState
+import com.example.powermanager.ui.state.RecordingScreensUiState
 import com.example.powermanager.utils.CORE_FREQUENCY_PATH
 import com.example.powermanager.utils.DOT_JSON
 import com.example.powermanager.utils.DOT_PROVIDER
@@ -77,9 +82,23 @@ class PowerManagerAppModel(
     application: Application
 ) : AndroidViewModel(application) {
 
-    // ui state
-    private val _uiState : MutableStateFlow<AppUiState>
-    val uiState: StateFlow<AppUiState>
+    // screens ui states
+
+    private val _homeScreenUiState : MutableStateFlow<HomeScreenUiState> = MutableStateFlow(
+        HomeScreenUiState()
+    )
+    val homeScreenUiState : StateFlow<HomeScreenUiState> = _homeScreenUiState.asStateFlow()
+
+    private val _liveChartsScreenUiState : MutableStateFlow<LiveChartsScreenUiState> = MutableStateFlow(
+        LiveChartsScreenUiState()
+    )
+    val liveChartsScreenUiState : StateFlow<LiveChartsScreenUiState> = _liveChartsScreenUiState.asStateFlow()
+
+    private val _controlScreenUiState : MutableStateFlow<ControlScreenUiState>
+    val controlScreenUiState: StateFlow<ControlScreenUiState>
+
+    private val _recordingScreensUiState : MutableStateFlow<RecordingScreensUiState>
+    val recordingScreensUiState: StateFlow<RecordingScreensUiState>
 
     // constants determined at startup
     private val totalMemory: Float
@@ -92,6 +111,7 @@ class PowerManagerAppModel(
     // map from core index to the name of the policy it belongs to
     private val coreToPolicy : Map<Int, String>
 
+    // directories where persistent data is stored
     private val cpuConfigurationsDirectory : File
     private val recordingResultsDirectory : File
 
@@ -151,14 +171,22 @@ class PowerManagerAppModel(
         val policyToFrequencyLimitMHz : MutableMap<String, Int> = mutableMapOf()
         cpuFreqPolicies.keys.forEach { policyToFrequencyLimitMHz[it] = getCurrentMaxFrequencyForPolicyMhz(it) }
 
-        _uiState = MutableStateFlow(AppUiState(
-            recordingResults = RecordingsStorageManager.getMostRecentRecordingResultsNames(numberOfRecordingsListedLimit, recordingResultsDirectory),
+        _controlScreenUiState = MutableStateFlow(
+            ControlScreenUiState(
             currentScalingGovernor = CpuFreqManager.getCurrentScalingGovernor(),
             savedConfigurations = CpuConfigurationsStorageManager.getSavedCpuConfigurationsNames(cpuConfigurationsDirectory),
             disabledCores = disabledCores,
             policyToFrequencyLimitMHz = policyToFrequencyLimitMHz
-        ))
-        uiState = _uiState.asStateFlow()
+            )
+        )
+        controlScreenUiState = _controlScreenUiState.asStateFlow()
+
+        _recordingScreensUiState = MutableStateFlow(
+            RecordingScreensUiState(
+            recordingResults = RecordingsStorageManager.getMostRecentRecordingResultsNames(numberOfRecordingsListedLimit, recordingResultsDirectory)
+            )
+        )
+        recordingScreensUiState = _recordingScreensUiState.asStateFlow()
     }
 
     // constants retrieval
@@ -298,7 +326,7 @@ class PowerManagerAppModel(
     // cpu frequency sampling
     val cpuFrequencyFlow = flow {
         while (true) {
-            val trackedCore = uiState.value.coreTracked
+            val trackedCore = liveChartsScreenUiState.value.coreTracked
             val onlineCores = CpuHotplugManager.getOnlineCores()
 
             val path = String.format(CORE_FREQUENCY_PATH, trackedCore)
@@ -369,16 +397,6 @@ class PowerManagerAppModel(
             initialValue = mutableListOf()
         )
 
-    fun changeTrackedCore(coreNumber: Int) {
-        _uiState.update { currentState ->
-            currentState.copy(
-                coreTracked = coreNumber
-            )
-        }
-
-        cpuFrequencySamples.clear()
-    }
-
     private fun filterFlowSamples(flowType: FlowType) {
         val samplingPeriod = PreferenceValueAdaptor.preferenceStringValueToActualValue(
             preferenceID = LIVE_CHARTS_SAMPLING_PERIOD_ID,
@@ -420,10 +438,10 @@ class PowerManagerAppModel(
         }
     }
 
-    // recording
+    // recording events
 
     fun startRecording() {
-        _uiState.update { currentState ->
+        _recordingScreensUiState.update { currentState ->
             currentState.copy(
                 isRecording = true
             )
@@ -431,13 +449,13 @@ class PowerManagerAppModel(
 
         viewModelScope.launch {
             Recorder.record(
-                samplingPeriod = uiState.value.recordingSamplingPeriod,
-                numberOfSamples = uiState.value.recordingNumberOfSamplesString.toInt(),
-                sessionName = uiState.value.recordingSessionName,
+                samplingPeriod = recordingScreensUiState.value.recordingSamplingPeriod,
+                numberOfSamples = recordingScreensUiState.value.recordingNumberOfSamplesString.toInt(),
+                sessionName = recordingScreensUiState.value.recordingSessionName,
                 batteryManager = batteryManager,
                 powerManager = powerManager,
                 activityManager = activityManager,
-                includeThreadCountInfo = uiState.value.includeThreadCountInfo,
+                includeThreadCountInfo = recordingScreensUiState.value.includeThreadCountInfo,
                 outputDirectory = recordingResultsDirectory,
                 onRecordingFinished = { onRecordingFinished(it) },
                 getNumberOfThreads = { getNumberOfProcessesOrThreads(false) }
@@ -458,10 +476,11 @@ class PowerManagerAppModel(
             sendRecordingFinishedNotification(savedFileName)
 
         // update state
-        _uiState.update { currentState ->
+        _recordingScreensUiState.update { currentState ->
             currentState.copy(
                 isRecording = false,
-                recordingResults = getMostRecentRecordingResultsNames()
+                recordingResults = getMostRecentRecordingResultsNames(),
+                recordingSessionName = ""
             )
         }
     }
@@ -482,16 +501,78 @@ class PowerManagerAppModel(
         )
     }
 
-    fun changeRecordingSamplingPeriod(newValue: Long) {
-        _uiState.update { currentState ->
+    // ================ state handling ======================= //
+
+    // home screen
+
+    fun changeHomeScreenInfoDialogState(newValue: Boolean) {
+        _homeScreenUiState.update { currentState ->
             currentState.copy(
-                recordingSamplingPeriod = newValue
+                isCPULoadInfoDialogOpen = newValue
+            )
+        }
+    }
+
+    // live charts screen
+
+    fun changeFrequencyChartTrackedCore(coreNumber: Int) {
+        if (coreNumber == liveChartsScreenUiState.value.coreTracked) {
+            _liveChartsScreenUiState.update { currentState ->
+                currentState.copy(
+                    isCoreTrackedDropdownExpanded = false
+                )
+            }
+            return
+        }
+
+        _liveChartsScreenUiState.update { currentState ->
+            currentState.copy(
+                coreTracked = coreNumber,
+                isCoreTrackedDropdownExpanded = false
+            )
+        }
+
+        cpuFrequencySamples.clear()
+    }
+
+    fun changeTrackedCoreDropdownMenuState(newValue: Boolean) {
+        _liveChartsScreenUiState.update { currentState ->
+            currentState.copy(
+                isCoreTrackedDropdownExpanded = newValue
+            )
+        }
+    }
+
+    // recording screen
+
+    fun changeRecordingSamplingPeriod(newValue: Long) {
+        _recordingScreensUiState.update { currentState ->
+            currentState.copy(
+                recordingSamplingPeriod = newValue,
+                isSamplingPeriodDropdownExpanded = false
+            )
+        }
+    }
+
+    fun changeSamplingPeriodDropdownExpandedState(newValue: Boolean) {
+        _recordingScreensUiState.update { currentState ->
+            currentState.copy(
+                isSamplingPeriodDropdownExpanded = newValue
+            )
+        }
+    }
+
+    fun changeRecordingScreensInfoDialogParams(textId: Int?, heightDp: Dp = 0.dp) {
+        _recordingScreensUiState.update { currentState ->
+            currentState.copy(
+                infoDialogTextId = textId,
+                infoDialogHeightDp = heightDp
             )
         }
     }
 
     fun changeRecordingNumberOfSamplesString(newValue: String) {
-        _uiState.update { currentState ->
+        _recordingScreensUiState.update { currentState ->
             currentState.copy(
                 recordingNumberOfSamplesString = newValue
             )
@@ -499,7 +580,7 @@ class PowerManagerAppModel(
     }
 
     fun changeRecordingSessionName(newValue: String) {
-        _uiState.update { currentState ->
+        _recordingScreensUiState.update { currentState ->
             currentState.copy(
                 recordingSessionName = newValue
             )
@@ -507,39 +588,73 @@ class PowerManagerAppModel(
     }
 
     fun changeIncludeThreadCountInfoOption(newValue : Boolean) {
-        _uiState.update { currentState ->
+        _recordingScreensUiState.update { currentState ->
             currentState.copy(
                 includeThreadCountInfo = newValue
             )
         }
     }
 
-    fun changeSelectedRecordingResult(newValue: String) {
-        _uiState.update { currentState ->
+    fun onRecordingInspectButtonPressed(recordingName : String) {
+        _recordingScreensUiState.update { currentState ->
             currentState.copy(
-                currentlySelectedRecordingResult = newValue
+                currentlySelectedRecordingResult = recordingName,
+                isInspectFileDialogOpen = true
             )
         }
     }
 
-    fun deleteSelectedRecordingResult() {
+    fun onRecordingDeleteButtonPressed(recordingName: String) {
+        _recordingScreensUiState.update { currentState ->
+            currentState.copy(
+                currentlySelectedRecordingResult = recordingName,
+                isConfirmDeletionDialogOpen = true
+            )
+        }
+    }
+
+    fun onDismissRecordingDeletionRequest() {
+        _recordingScreensUiState.update { currentState ->
+            currentState.copy(
+                isConfirmDeletionDialogOpen = false
+            )
+        }
+    }
+
+    fun onConfirmRecordingDeletionRequest() {
         val deleted = RecordingsStorageManager.deleteRecordingResult(
-            name = uiState.value.currentlySelectedRecordingResult,
+            name = recordingScreensUiState.value.currentlySelectedRecordingResult,
             directory = recordingResultsDirectory
         )
 
-        // update state, if the file was successfully deleted
         if (deleted) {
-            _uiState.update { currentState ->
+            _recordingScreensUiState.update { currentState ->
                 currentState.copy(
-                    recordingResults = getMostRecentRecordingResultsNames()
+                    recordingResults = getMostRecentRecordingResultsNames(),
+                    isConfirmDeletionDialogOpen = false
                 )
             }
         }
     }
 
-    fun shareSelectedRecordingResult(context: Context) {
-        val jsonFile = File(recordingResultsDirectory, "${uiState.value.currentlySelectedRecordingResult}$DOT_JSON")
+    fun changeSelectedRecordingResult(recordingName: String) {
+        _recordingScreensUiState.update { currentState ->
+            currentState.copy(
+                currentlySelectedRecordingResult = recordingName
+            )
+        }
+    }
+
+    fun closeInspectRecordingFileDialog() {
+        _recordingScreensUiState.update { currentState ->
+            currentState.copy(
+                isInspectFileDialogOpen = false
+            )
+        }
+    }
+
+    fun shareRecordingResult(recordingName : String, context: Context) {
+        val jsonFile = File(recordingResultsDirectory, "${recordingName}$DOT_JSON")
         val fileUri = FileProvider.getUriForFile(context, context.packageName + DOT_PROVIDER, jsonFile)
 
         val shareIntent = Intent(Intent.ACTION_SEND).apply {
@@ -566,46 +681,22 @@ class PowerManagerAppModel(
 
     fun getRecordingResultRawFileContent() : String {
         return RecordingsStorageManager.getFileContent(
-            fileName = uiState.value.currentlySelectedRecordingResult,
+            fileName = recordingScreensUiState.value.currentlySelectedRecordingResult,
             directory = recordingResultsDirectory
         )
     }
 
     fun getCurrentlySelectedRecordingResult() : RecordingResult {
         return RecordingsStorageManager.getRecordingResultForFileName(
-            fileName = uiState.value.currentlySelectedRecordingResult,
+            fileName = recordingScreensUiState.value.currentlySelectedRecordingResult,
             directory = recordingResultsDirectory
         )!!
     }
 
-    // preferences
-
-    fun onPreferenceValueChanged(preferenceKey : String, newValue : String) {
-        viewModelScope.launch {
-            preferencesManager.updatePreferenceValue(preferenceKey, newValue)
-        }
-
-        if (preferenceKey == NUMBER_OF_RECORDINGS_LISTED_ID) {
-            _uiState.update { currentState ->
-                currentState.copy(
-                    recordingResults = getMostRecentRecordingResultsNames()
-                )
-            }
-        }
-    }
-
-    fun getPreferenceValue(preferenceKey: String) : String {
-        return preferencesManager.getCurrentValueForPreference(preferenceKey)
-    }
-
-    fun getPreferenceProperties(preferenceKey: String) : PreferenceProperties {
-        return preferencesManager.getPreferenceProperties(preferenceKey)
-    }
-
-    // control
+    // control screen
 
     fun changeScalingGovernor(newGovernor: String) {
-        _uiState.update { currentState ->
+        _controlScreenUiState.update { currentState ->
             currentState.copy(
                 currentScalingGovernor = newGovernor
             )
@@ -619,32 +710,73 @@ class PowerManagerAppModel(
         }
     }
 
-    fun changeSelectedScalingGovernorInfoButton(newValue: String) {
-        _uiState.update { currentState ->
+    fun changeControlScreenInfoDialogParams(textId: Int?, heightDp: Dp = 0.dp) {
+        _controlScreenUiState.update { currentState ->
             currentState.copy(
-                selectedScalingGovernorInfoButton = newValue
+                infoDialogTextId = textId,
+                infoDialogHeightDp = heightDp
             )
         }
     }
 
-    fun changeSelectedCpuConfiguration(newValue: String) {
-        _uiState.update { currentState ->
+    fun onCpuConfigurationInspectButtonPressed(configurationName : String) {
+        _controlScreenUiState.update { currentState ->
             currentState.copy(
-                currentlySelectedCpuConfiguration = newValue
+                currentlySelectedCpuConfiguration = configurationName,
+                isInspectConfigurationDialogOpen = true
             )
         }
     }
 
-    fun applySelectedCpuConfiguration() {
+    fun onCpuConfigurationDeleteButtonPressed(configurationName: String) {
+        _controlScreenUiState.update { currentState ->
+            currentState.copy(
+                currentlySelectedCpuConfiguration = configurationName,
+                isConfirmConfigurationDeletionDialogOpen = true
+            )
+        }
+    }
+
+    fun onDismissCpuConfigurationDeletionRequest() {
+        _controlScreenUiState.update { currentState ->
+            currentState.copy(
+                isConfirmConfigurationDeletionDialogOpen = false
+            )
+        }
+    }
+
+    fun onConfirmCpuConfigurationDeletionRequest() {
+        CpuConfigurationsStorageManager.deleteConfiguration(
+            name = controlScreenUiState.value.currentlySelectedCpuConfiguration,
+            directory = cpuConfigurationsDirectory
+        )
+
+        _controlScreenUiState.update { currentState ->
+            currentState.copy(
+                savedConfigurations = CpuConfigurationsStorageManager.getSavedCpuConfigurationsNames(cpuConfigurationsDirectory),
+                isConfirmConfigurationDeletionDialogOpen = false
+            )
+        }
+    }
+
+    fun closeCpuConfigurationInspectDialog() {
+        _controlScreenUiState.update { currentState ->
+            currentState.copy(
+                isInspectConfigurationDialogOpen = false
+            )
+        }
+    }
+
+    fun applySelectedCpuConfiguration(configurationName: String) {
         val configuration = CpuConfigurationsStorageManager.getCpuConfigurationForFileName(
-            fileName = uiState.value.currentlySelectedCpuConfiguration,
+            fileName = configurationName,
             directory = cpuConfigurationsDirectory
         ) ?: return
 
         // update ui state
         val disabledCores = (0 until totalNumberOfCores).filter { it !in configuration.onlineCores }
 
-        _uiState.update { currentState ->
+        _controlScreenUiState.update { currentState ->
             currentState.copy(
                 disabledCores = disabledCores,
                 currentScalingGovernor = configuration.scalingGovernor,
@@ -662,41 +794,28 @@ class PowerManagerAppModel(
     }
 
     fun changeCpuConfigurationName(newValue: String) {
-        _uiState.update { currentState ->
+        _controlScreenUiState.update { currentState ->
             currentState.copy(
                 cpuConfigurationName = newValue
             )
         }
     }
 
-    fun deleteSelectedConfiguration() {
-        CpuConfigurationsStorageManager.deleteConfiguration(
-            name = uiState.value.currentlySelectedCpuConfiguration,
-            directory = cpuConfigurationsDirectory
-        )
-
-        _uiState.update { currentState ->
-            currentState.copy(
-                savedConfigurations = CpuConfigurationsStorageManager.getSavedCpuConfigurationsNames(cpuConfigurationsDirectory)
-            )
-        }
-    }
-
     fun getSelectedConfigurationFileContent() : String {
         return CpuConfigurationsStorageManager.getFileContent(
-            fileName = uiState.value.currentlySelectedCpuConfiguration,
+            fileName = controlScreenUiState.value.currentlySelectedCpuConfiguration,
             directory = cpuConfigurationsDirectory
         )
     }
 
     fun saveCurrentCpuConfiguration() {
-        val onlineCores = (0 until totalNumberOfCores).filter { it !in uiState.value.disabledCores }
+        val onlineCores = (0 until totalNumberOfCores).filter { it !in controlScreenUiState.value.disabledCores }
 
         val currentConfiguration = CpuConfiguration(
-            name = uiState.value.cpuConfigurationName,
-            scalingGovernor = uiState.value.currentScalingGovernor,
+            name = controlScreenUiState.value.cpuConfigurationName,
+            scalingGovernor = controlScreenUiState.value.currentScalingGovernor,
             onlineCores = onlineCores,
-            policyToFrequencyLimitMHz = uiState.value.policyToFrequencyLimitMHz
+            policyToFrequencyLimitMHz = controlScreenUiState.value.policyToFrequencyLimitMHz
         )
 
         CpuConfigurationsStorageManager.saveCpuConfiguration(
@@ -704,9 +823,10 @@ class PowerManagerAppModel(
             directory = cpuConfigurationsDirectory
         )
 
-        _uiState.update { currentState ->
+        _controlScreenUiState.update { currentState ->
             currentState.copy(
-                savedConfigurations = CpuConfigurationsStorageManager.getSavedCpuConfigurationsNames(cpuConfigurationsDirectory)
+                savedConfigurations = CpuConfigurationsStorageManager.getSavedCpuConfigurationsNames(cpuConfigurationsDirectory),
+                cpuConfigurationName = ""
             )
         }
     }
@@ -717,13 +837,13 @@ class PowerManagerAppModel(
 
     fun changeMaxFrequencyForPolicy(policyName : String, maxFrequencyMhz: Int) {
         val newLimits : MutableMap<String, Int> = mutableMapOf()
-        uiState.value.policyToFrequencyLimitMHz.forEach { (key, value) ->
+        controlScreenUiState.value.policyToFrequencyLimitMHz.forEach { (key, value) ->
             newLimits[key] = value
         }
 
         newLimits[policyName] = maxFrequencyMhz
 
-        _uiState.update { currentState ->
+        _controlScreenUiState.update { currentState ->
             currentState.copy(
                 policyToFrequencyLimitMHz = newLimits
             )
@@ -736,19 +856,19 @@ class PowerManagerAppModel(
     }
 
     fun changeCoreEnabledState(coreIndex : Int, enable: Boolean) {
-        if (enable && uiState.value.disabledCores.contains(coreIndex)) {
+        if (enable && controlScreenUiState.value.disabledCores.contains(coreIndex)) {
             // enable core
-            _uiState.update { currentState ->
+            _controlScreenUiState.update { currentState ->
                 currentState.copy(
-                    disabledCores = uiState.value.disabledCores.filter { it != coreIndex }
+                    disabledCores = controlScreenUiState.value.disabledCores.filter { it != coreIndex }
                 )
             }
-        } else if (!enable && !uiState.value.disabledCores.contains(coreIndex)) {
+        } else if (!enable && !controlScreenUiState.value.disabledCores.contains(coreIndex)) {
             // disable core
-            val previouslyDisabledCores = uiState.value.disabledCores.toMutableList()
+            val previouslyDisabledCores = controlScreenUiState.value.disabledCores.toMutableList()
             previouslyDisabledCores.add(coreIndex)
 
-            _uiState.update { currentState ->
+            _controlScreenUiState.update { currentState ->
                 currentState.copy(
                     disabledCores = previouslyDisabledCores.toList()
                 )
@@ -756,6 +876,30 @@ class PowerManagerAppModel(
         }
 
         CpuHotplugManager.changeCoreState(coreIndex, enable)
+    }
+
+    // preferences
+
+    fun onPreferenceValueChanged(preferenceKey : String, newValue : String) {
+        viewModelScope.launch {
+            preferencesManager.updatePreferenceValue(preferenceKey, newValue)
+        }
+
+        if (preferenceKey == NUMBER_OF_RECORDINGS_LISTED_ID) {
+            _recordingScreensUiState.update { currentState ->
+                currentState.copy(
+                    recordingResults = getMostRecentRecordingResultsNames()
+                )
+            }
+        }
+    }
+
+    fun getPreferenceValue(preferenceKey: String) : String {
+        return preferencesManager.getCurrentValueForPreference(preferenceKey)
+    }
+
+    fun getPreferenceProperties(preferenceKey: String) : PreferenceProperties {
+        return preferencesManager.getPreferenceProperties(preferenceKey)
     }
 
     // Linux commands invocation

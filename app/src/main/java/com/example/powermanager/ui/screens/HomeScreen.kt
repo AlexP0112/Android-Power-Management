@@ -18,8 +18,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -33,6 +33,7 @@ import com.example.powermanager.ui.model.HomeScreenInfo
 import com.example.powermanager.ui.model.PowerManagerAppModel
 import com.example.powermanager.ui.screens.common.InfoDialog
 import com.example.powermanager.ui.screens.common.SectionHeader
+import com.example.powermanager.ui.state.HomeScreenUiState
 import com.example.powermanager.utils.formatDuration
 import kotlin.math.roundToInt
 
@@ -58,7 +59,7 @@ fun HomeScreen(
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        val isCPULoadInfoDialogOpen = remember { mutableStateOf(false) }
+        val uiState: State<HomeScreenUiState> = model.homeScreenUiState.collectAsState()
 
         // ==============  battery and uptime section  ===================== //
         SectionHeader(
@@ -178,7 +179,7 @@ fun HomeScreen(
                     fontSize = 18.sp
                 )
                 IconButton(onClick = {
-                    isCPULoadInfoDialogOpen.value = true
+                    model.changeHomeScreenInfoDialogState(true)
                 }) {
                     Icon(
                         imageVector = Icons.Default.Info,
@@ -219,12 +220,12 @@ fun HomeScreen(
             GoToOtherScreenButton(onClick = onGoToControlScreenButtonClicked, buttonTextStringID = R.string.go_to_control_screen)
         }
 
-        if (isCPULoadInfoDialogOpen.value) {
+        if (uiState.value.isCPULoadInfoDialogOpen) {
             InfoDialog(
                 textId = R.string.cpu_load_explanation,
                 cardHeight = 220.dp
             ) {
-                isCPULoadInfoDialogOpen.value = false
+                model.changeHomeScreenInfoDialogState(false)
             }
         }
     }

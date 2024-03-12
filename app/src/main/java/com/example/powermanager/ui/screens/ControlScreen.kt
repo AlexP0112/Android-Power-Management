@@ -63,11 +63,11 @@ import com.example.powermanager.ui.screens.common.ConfirmFileDeletionAlertDialog
 import com.example.powermanager.ui.screens.common.InfoDialog
 import com.example.powermanager.ui.screens.common.InspectFileInfoDialog
 import com.example.powermanager.ui.screens.common.SectionHeader
-import com.example.powermanager.ui.state.AppUiState
+import com.example.powermanager.ui.state.ControlScreenUiState
 import com.example.powermanager.utils.CONFIRM_CPU_CONFIGURATION_DELETION_TEXT
 import com.example.powermanager.utils.isFileNameValid
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun ControlScreen(
     topPadding: Dp,
@@ -84,14 +84,7 @@ fun ControlScreen(
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
     ) {
-        val isDozeModeInfoDialogOpen = remember { mutableStateOf(false) }
-        val isScalingGovernorsGeneralInfoDialogOpen = remember { mutableStateOf(false) }
-        val isParticularScalingGovernorInfoDialogOpen = remember { mutableStateOf(false) }
-        val isCoreEnablingInfoDialogOpen = remember { mutableStateOf(false) }
-        val isConfirmConfigurationDeletionDialogOpen = remember { mutableStateOf(false) }
-        val isInspectConfigurationDialogOpen = remember { mutableStateOf(false) }
-
-        val uiState: State<AppUiState> = model.uiState.collectAsState()
+        val uiState: State<ControlScreenUiState> = model.controlScreenUiState.collectAsState()
         val keyboardController = LocalSoftwareKeyboardController.current
 
         val availableScalingGovernors : List<String> = model.getAvailableScalingGovernors()
@@ -112,7 +105,10 @@ fun ControlScreen(
             textId = R.string.doze_mode_explanation_intro,
             fontSize = 16
         ) {
-            isDozeModeInfoDialogOpen.value = true
+            model.changeControlScreenInfoDialogParams(
+                textId = R.string.doze_mode_explanation,
+                heightDp = 250.dp
+            )
         }
 
         // ================= display section ==================== //
@@ -132,7 +128,10 @@ fun ControlScreen(
             textId = R.string.select_scaling_governor,
             fontSize = 18
         ) {
-            isScalingGovernorsGeneralInfoDialogOpen.value = true
+            model.changeControlScreenInfoDialogParams(
+                textId = R.string.scaling_governors_explanation,
+                heightDp = 180.dp
+            )
         }
 
         availableScalingGovernors.forEach { scalingGovernor ->
@@ -143,8 +142,10 @@ fun ControlScreen(
                     model.changeScalingGovernor(scalingGovernor)
                 },
                 onIconButtonPressed = {
-                    model.changeSelectedScalingGovernorInfoButton(scalingGovernor)
-                    isParticularScalingGovernorInfoDialogOpen.value = true
+                    model.changeControlScreenInfoDialogParams(
+                        textId = GOVERNOR_NAME_TO_DESCRIPTION_STRING_ID[scalingGovernor]!!,
+                        heightDp = 240.dp
+                    )
                 }
             )
         }
@@ -153,7 +154,10 @@ fun ControlScreen(
             textId = R.string.online_cpu_cores,
             fontSize = 18
         ) {
-            isCoreEnablingInfoDialogOpen.value = true
+            model.changeControlScreenInfoDialogParams(
+                textId = R.string.core_enabling_explanation,
+                heightDp = 160.dp
+            )
         }
 
         ( 0 until totalNumberOfCores).forEach { coreIndex ->
@@ -245,16 +249,13 @@ fun ControlScreen(
             CpuConfigurationRow(
                 configurationName = configurationName,
                 onDeleteButtonPressed = {
-                    model.changeSelectedCpuConfiguration(configurationName)
-                    isConfirmConfigurationDeletionDialogOpen.value = true
+                    model.onCpuConfigurationDeleteButtonPressed(configurationName)
                 },
                 onInspectButtonPressed = {
-                    model.changeSelectedCpuConfiguration(configurationName)
-                    isInspectConfigurationDialogOpen.value = true
+                    model.onCpuConfigurationInspectButtonPressed(configurationName)
                 },
                 onApplyButtonPressed = {
-                    model.changeSelectedCpuConfiguration(configurationName)
-                    model.applySelectedCpuConfiguration()
+                    model.applySelectedCpuConfiguration(configurationName)
                 }
             )
 
@@ -267,57 +268,26 @@ fun ControlScreen(
         }
 
         // ================= info dialogs ==================== //
-        if (isDozeModeInfoDialogOpen.value) {
+        if (uiState.value.infoDialogTextId != null) {
             InfoDialog(
-                textId = R.string.doze_mode_explanation,
-                cardHeight = 250.dp
+                textId = uiState.value.infoDialogTextId!!,
+                cardHeight = uiState.value.infoDialogHeightDp
             ) {
-                isDozeModeInfoDialogOpen.value = false
+                model.changeControlScreenInfoDialogParams(null)
             }
         }
 
-        if (isScalingGovernorsGeneralInfoDialogOpen.value) {
-            InfoDialog(
-                textId = R.string.scaling_governors_explanation,
-                cardHeight = 180.dp
-            ) {
-                isScalingGovernorsGeneralInfoDialogOpen.value = false
-            }
-        }
-
-        if (isParticularScalingGovernorInfoDialogOpen.value &&
-            GOVERNOR_NAME_TO_DESCRIPTION_STRING_ID.containsKey(uiState.value.selectedScalingGovernorInfoButton)) {
-            InfoDialog(
-                textId = GOVERNOR_NAME_TO_DESCRIPTION_STRING_ID[uiState.value.selectedScalingGovernorInfoButton]!!,
-                cardHeight = 240.dp
-            ) {
-                isParticularScalingGovernorInfoDialogOpen.value = false
-            }
-        }
-
-        if (isCoreEnablingInfoDialogOpen.value) {
-            InfoDialog(
-                textId = R.string.core_enabling_explanation,
-                cardHeight = 160.dp
-            ) {
-                isCoreEnablingInfoDialogOpen.value = false
-            }
-        }
-
-        if (isInspectConfigurationDialogOpen.value) {
+        if (uiState.value.isInspectConfigurationDialogOpen) {
             InspectFileInfoDialog(
                 content = model.getSelectedConfigurationFileContent(),
-                onDismissRequest = { isInspectConfigurationDialogOpen.value = false }
+                onDismissRequest = { model.closeCpuConfigurationInspectDialog() }
             )
         }
 
-        if (isConfirmConfigurationDeletionDialogOpen.value) {
+        if (uiState.value.isConfirmConfigurationDeletionDialogOpen) {
             ConfirmFileDeletionAlertDialog(
-                onDismiss = { isConfirmConfigurationDeletionDialogOpen.value = false },
-                onConfirm = {
-                    model.deleteSelectedConfiguration()
-                    isConfirmConfigurationDeletionDialogOpen.value = false
-                },
+                onDismiss = { model.onDismissCpuConfigurationDeletionRequest() },
+                onConfirm = { model.onConfirmCpuConfigurationDeletionRequest() },
                 text = String.format(CONFIRM_CPU_CONFIGURATION_DELETION_TEXT, uiState.value.currentlySelectedCpuConfiguration)
             )
         }
@@ -701,7 +671,9 @@ fun CpuConfigurationRow(
             // apply button
             OutlinedButton(
                 onClick = onApplyButtonPressed,
-                modifier = Modifier.height(36.dp).width(100.dp)
+                modifier = Modifier
+                    .height(36.dp)
+                    .width(100.dp)
             ) {
                 Text(
                     text = stringResource(R.string.apply),
