@@ -9,14 +9,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Divider
@@ -54,7 +51,6 @@ import androidx.compose.ui.unit.sp
 import com.example.powermanager.R
 import com.example.powermanager.ui.model.PowerManagerAppModel
 import com.example.powermanager.ui.screens.common.ConfirmFileDeletionAlertDialog
-import com.example.powermanager.ui.screens.common.InfoDialog
 import com.example.powermanager.ui.screens.common.InspectFileInfoDialog
 import com.example.powermanager.ui.screens.common.SectionHeader
 import com.example.powermanager.ui.state.RecordingScreensUiState
@@ -103,12 +99,6 @@ fun RecordingScreen(
             onSelectedNewValue = { newValue ->
                 model.changeRecordingSamplingPeriod(newValue)
             },
-            onIconButtonPressed = {
-                model.changeRecordingScreensInfoDialogParams(
-                    textId = R.string.sampling_period_additional_info,
-                    heightDp = 200.dp
-                )
-            },
             isSamplingPeriodDropdownExpanded = uiState.value.isSamplingPeriodDropdownExpanded,
             currentValue = uiState.value.recordingSamplingPeriod
         ) { newValue ->
@@ -118,12 +108,6 @@ fun RecordingScreen(
         }
 
         NumberOfSamplesRow(
-            onIconButtonPressed = {
-                model.changeRecordingScreensInfoDialogParams(
-                    textId = R.string.number_of_samples_value_explanation,
-                    heightDp = 100.dp
-                )
-            },
             keyboardController = keyboardController,
             currentNumberOfSamplesString = uiState.value.recordingNumberOfSamplesString,
             onValueChanged = { newValue ->
@@ -209,17 +193,6 @@ fun RecordingScreen(
             )
         }
 
-        // ================= Info/alert dialogs =================== //
-
-        if (uiState.value.infoDialogTextId != null) {
-            InfoDialog(
-                textId = uiState.value.infoDialogTextId!!,
-                cardHeight = uiState.value.infoDialogHeightDp
-            ) {
-                model.changeRecordingScreensInfoDialogParams(null)
-            }
-        }
-
         if (uiState.value.isConfirmDeletionDialogOpen) {
             ConfirmFileDeletionAlertDialog(
                 onDismiss = { model.onDismissRecordingDeletionRequest() },
@@ -247,16 +220,15 @@ fun RecordingScreenTitle() {
 }
 
 /*
- * A Row composable that contains a text ("Number of samples"), a button that opens an info
- * dialog and a text field where the number of samples is set by the user
+ * A Row composable that contains a text ("Number of samples (5-200)") and  a text field where the
+ * number of samples is set by the user
  */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun NumberOfSamplesRow(
-    onIconButtonPressed: () -> Unit,
-    keyboardController : SoftwareKeyboardController?,
+    keyboardController: SoftwareKeyboardController?,
     currentNumberOfSamplesString: String,
-    onValueChanged : (String) -> Unit,
+    onValueChanged: (String) -> Unit,
     textFieldEnabled: Boolean
 ) {
     Row (
@@ -265,24 +237,11 @@ fun NumberOfSamplesRow(
             .padding(top = 8.dp, end = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Row (
-            modifier = Modifier.weight(4.5f),
-            verticalAlignment = Alignment.CenterVertically
-        ){
-            Text(
-                text = stringResource(R.string.number_of_samples)
-            )
 
-            IconButton(onClick = onIconButtonPressed) {
-                Icon(
-                    imageVector = Icons.Default.Info,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(18.dp)
-                        .align(Alignment.CenterVertically)
-                )
-            }
-        }
+        Text(
+            modifier = Modifier.weight(4.5f),
+            text = stringResource(R.string.number_of_samples)
+        )
 
         TextField(
             modifier = Modifier.weight(1f),
@@ -419,9 +378,8 @@ fun StartRecordingButtonAndIndicatorRow(
 fun RecordingSamplingPeriodRow(
     onDismissDropdownMenu: () -> Unit,
     onSelectedNewValue: (Long) -> Unit,
-    isSamplingPeriodDropdownExpanded : Boolean,
-    currentValue : Long,
-    onIconButtonPressed : () -> Unit,
+    isSamplingPeriodDropdownExpanded: Boolean,
+    currentValue: Long,
     onChangedExpandedValue: (Boolean) -> Unit
 ) {
     Row(
@@ -430,27 +388,11 @@ fun RecordingSamplingPeriodRow(
             .padding(top = 8.dp, end = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ){
-        // row with text and button
-        Row (
-            modifier = Modifier.weight(2.6f),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = stringResource(R.string.sampling_period_millis)
-            )
 
-            IconButton(
-                onClick = onIconButtonPressed
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Info,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(18.dp)
-                        .align(Alignment.CenterVertically)
-                )
-            }
-        }
+        Text(
+            modifier = Modifier.weight(2.6f),
+            text = stringResource(R.string.sampling_period_millis)
+        )
 
         // the dropdown with the possible values
         Box(

@@ -562,15 +562,6 @@ class PowerManagerAppModel(
         }
     }
 
-    fun changeRecordingScreensInfoDialogParams(textId: Int?, heightDp: Dp = 0.dp) {
-        _recordingScreensUiState.update { currentState ->
-            currentState.copy(
-                infoDialogTextId = textId,
-                infoDialogHeightDp = heightDp
-            )
-        }
-    }
-
     fun changeRecordingNumberOfSamplesString(newValue: String) {
         _recordingScreensUiState.update { currentState ->
             currentState.copy(
