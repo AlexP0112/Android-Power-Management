@@ -92,4 +92,5 @@
     <string name="scaling_governors_more_info_text">Click here for more information on scaling governors:</string>
     <string name="compare_result">Compare to</string>
     <string name="compare">Compare</string>
+    <string name="charts_legend">• Charts legend:</string>
 </resources>
