@@ -90,4 +90,6 @@
     <string name="apply">Apply</string>
     <string name="no_configurations_found">No configurations found!</string>
     <string name="scaling_governors_more_info_text">Click here for more information on scaling governors:</string>
+    <string name="compare_result">Compare to</string>
+    <string name="compare">Compare</string>
 </resources>

@@ -50,11 +50,13 @@ import com.example.powermanager.ui.screens.main_screens.SettingsScreen
 import com.example.powermanager.ui.screens.secondary_screens.CpuConfigurationFileInspectScreen
 import com.example.powermanager.ui.screens.secondary_screens.RecordingResultFileInspectScreen
 import com.example.powermanager.ui.screens.secondary_screens.RecordingResultViewScreen
+import com.example.powermanager.ui.screens.secondary_screens.RecordingResultsComparisonScreen
 import com.example.powermanager.ui.screens.secondary_screens.ScalingGovernorsExplanationScreen
 import com.example.powermanager.utils.CONTROL_SCREEN_NAME
 import com.example.powermanager.utils.CPU_CONFIGURATION_INSPECT_SCREEN_NAME
 import com.example.powermanager.utils.HOME_SCREEN_NAME
 import com.example.powermanager.utils.LIVE_CHARTS_SCREEN_NAME
+import com.example.powermanager.utils.RECORDING_RESULTS_COMPARISON_SCREEN_NAME
 import com.example.powermanager.utils.RECORDING_RESULT_FILE_INSPECT_SCREEN_NAME
 import com.example.powermanager.utils.RECORDING_RESULT_SCREEN_NAME
 import com.example.powermanager.utils.RECORDING_SCREEN_NAME
@@ -63,6 +65,9 @@ import com.example.powermanager.utils.SETTINGS_SCREEN_NAME
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
+/*
+ * The main composable of the app
+ */
 @Composable
 fun PowerManagerApp(
     navController: NavHostController = rememberNavController(),
@@ -106,7 +111,7 @@ fun PowerManagerApp(
 }
 
 /*
- * Navigation host that manages navigation between app screens (Home, Statistics, Control, Settings)
+ * Navigation host that manages navigation between app screens (both main screens and secondary screen)
  */
 @Composable
 fun ScreensNavHost(
@@ -244,7 +249,10 @@ fun ScreensNavHost(
         ) {
             RecordingResultViewScreen(
                 topPadding = topPadding,
-                model = model
+                model = model,
+                openRecordingResultsComparisonScreen = {
+                    navController.navigate(RECORDING_RESULTS_COMPARISON_SCREEN_NAME)
+                }
             )
         }
 
@@ -313,6 +321,28 @@ fun ScreensNavHost(
             )
         }
 
+        // recording results comparison screen
+        composable(
+            route = RECORDING_RESULTS_COMPARISON_SCREEN_NAME,
+            enterTransition = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                    animationSpec = tween(250)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                    animationSpec = tween(250)
+                )
+            },
+        ) {
+            RecordingResultsComparisonScreen(
+                topPadding = topPadding,
+                model = model
+            )
+        }
+
         // settings screen
         composable(
             route = SETTINGS_SCREEN_NAME,
@@ -337,6 +367,9 @@ fun ScreensNavHost(
     }
 }
 
+/*
+ * Top bar, with button that opens the navigation drawer
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopAppBar(

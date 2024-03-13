@@ -237,11 +237,11 @@ fun ControlScreen(
             CpuConfigurationRow(
                 configurationName = savedConfiguration,
                 onDeleteButtonPressed = {
-                    model.onCpuConfigurationDeleteButtonPressed(savedConfiguration)
+                    model.selectCpuConfiguration(savedConfiguration)
                     isConfirmConfigurationDeletionDialogOpen = true
                 },
                 onInspectButtonPressed = {
-                    model.onCpuConfigurationInspectButtonPressed(savedConfiguration)
+                    model.selectCpuConfiguration(savedConfiguration)
                     openCpuConfigurationScreen()
                 },
                 onApplyButtonPressed = {

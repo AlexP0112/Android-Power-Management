@@ -1,18 +1,30 @@
 package com.example.powermanager.ui.screens.secondary_screens
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Divider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -25,15 +37,15 @@ import com.example.powermanager.recording.storage.RecordingResult
 import com.example.powermanager.ui.charts.common.CustomAxisValuesOverrider
 import com.example.powermanager.ui.charts.common.StaticChart
 import com.example.powermanager.ui.model.PowerManagerAppModel
-import com.example.powermanager.ui.state.RecordingScreensUiState
 import com.example.powermanager.utils.getListMaximum
 import com.example.powermanager.utils.getListMinimum
 import com.example.powermanager.utils.getPrettyStringFromNumberOfBytes
 
 @Composable
 fun RecordingResultViewScreen(
-    topPadding: Dp,
-    model: PowerManagerAppModel,
+    topPadding : Dp,
+    model : PowerManagerAppModel,
+    openRecordingResultsComparisonScreen : () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -45,10 +57,12 @@ fun RecordingResultViewScreen(
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
     ) {
-        val uiState: State<RecordingScreensUiState> = model.recordingScreensUiState.collectAsState()
+        val uiState by model.recordingScreensUiState.collectAsState()
         val result: RecordingResult = model.getCurrentlySelectedRecordingResult()
+        var isCompareSectionExpanded by rememberSaveable { mutableStateOf(false) }
 
         val totalMemoryGB = model.getTotalMemory()
+        val otherRecordingResults = uiState.recordingResults.filter { it != uiState.currentlySelectedRecordingResult }
         val batteryChargeValuesFloat = result.batteryChargeValues.map { it.toFloat() }
         val numberOfThreadsValuesFloat = result.numberOfThreadsValues.map { it.toFloat() }
         val batteryDischarge = result.batteryChargeValues.first() - result.batteryChargeValues.last()
@@ -56,7 +70,7 @@ fun RecordingResultViewScreen(
         // title of the screen
         Text(
             modifier = Modifier.align(Alignment.CenterHorizontally),
-            text = "Recording session '${uiState.value.currentlySelectedRecordingResult}'",
+            text = "Recording session '${uiState.currentlySelectedRecordingResult}'",
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center
         )
@@ -208,6 +222,90 @@ fun RecordingResultViewScreen(
                     maxYValue = getListMaximum(numberOfThreadsValuesFloat) + 1f
                 )
             )
+        }
+
+        // button that expands or collapses the comparison section
+        CompareResultHeaderRow(
+            isExpanded = isCompareSectionExpanded
+        ) {
+            isCompareSectionExpanded = !isCompareSectionExpanded
+        }
+
+        // list of available results to compare with, with a button for each result
+        // that takes you to the comparison screen
+        // this list is visible only when the section is expanded
+        if (isCompareSectionExpanded && otherRecordingResults.isNotEmpty()) {
+            Spacer(modifier = Modifier.height(5.dp))
+
+            otherRecordingResults.forEach { recordingName ->
+                Divider(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    thickness = 1.dp,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+
+                RecordingResultToCompareWithRow(
+                    name = recordingName
+                ) {
+                    model.selectRecordingResultForComparison(recordingName)
+                    openRecordingResultsComparisonScreen()
+                }
+            }
+
+            Divider(
+                modifier = Modifier
+                    .fillMaxSize(),
+                thickness = 1.dp,
+                color = MaterialTheme.colorScheme.secondary
+            )
+        }
+
+        Spacer(modifier = Modifier.height(15.dp))
+    }
+}
+
+@Composable
+fun CompareResultHeaderRow(
+    isExpanded : Boolean,
+    onClick : () -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = stringResource(R.string.compare_result)
+        )
+
+        IconButton(onClick = onClick) {
+            Icon(
+                imageVector = if (!isExpanded) Icons.Default.KeyboardArrowDown else Icons.Default.KeyboardArrowUp,
+                contentDescription = null
+            )
+        }
+    }
+}
+
+@Composable
+fun RecordingResultToCompareWithRow(
+    name : String,
+    onSelected : () -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = name
+        )
+
+        OutlinedButton(
+            onClick = onSelected
+        ) {
+            Text(text = stringResource(R.string.compare))
         }
     }
 }

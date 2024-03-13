@@ -180,14 +180,14 @@ fun RecordingScreen(
             RecordingSessionResultRow(
                 resultName = resultName,
                 onDeleteButtonPressed = {
-                    model.onRecordingDeleteButtonPressed(resultName)
+                    model.selectRecordingResult(resultName)
                     isConfirmDeletionDialogOpen = true
                 },
                 onShareButtonPressed = {
                     model.shareRecordingResult(resultName, context)
                 },
                 onInspectButtonPressed = {
-                    model.onRecordingInspectButtonPressed(resultName)
+                    model.selectRecordingResult(resultName)
                     openRecordingResultFileInspectScreen()
                 },
                 onViewResultsButtonPressed = {

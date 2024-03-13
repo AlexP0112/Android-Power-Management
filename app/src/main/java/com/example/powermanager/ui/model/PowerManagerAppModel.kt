@@ -530,17 +530,9 @@ class PowerManagerAppModel(
         cpuFrequencySamples.clear()
     }
 
-    // recording screen
+    // recording screens
 
-    fun onRecordingInspectButtonPressed(recordingName : String) {
-        _recordingScreensUiState.update { currentState ->
-            currentState.copy(
-                currentlySelectedRecordingResult = recordingName
-            )
-        }
-    }
-
-    fun onRecordingDeleteButtonPressed(recordingName: String) {
+    fun selectRecordingResult(recordingName : String) {
         _recordingScreensUiState.update { currentState ->
             currentState.copy(
                 currentlySelectedRecordingResult = recordingName
@@ -567,6 +559,14 @@ class PowerManagerAppModel(
         _recordingScreensUiState.update { currentState ->
             currentState.copy(
                 currentlySelectedRecordingResult = recordingName
+            )
+        }
+    }
+
+    fun selectRecordingResultForComparison(recordingName: String) {
+        _recordingScreensUiState.update { currentState ->
+            currentState.copy(
+                selectedToCompareRecordingResult = recordingName
             )
         }
     }
@@ -611,6 +611,13 @@ class PowerManagerAppModel(
         )!!
     }
 
+    fun getRecordingResultToCompareWith() : RecordingResult {
+        return RecordingsStorageManager.getRecordingResultForFileName(
+            fileName = recordingScreensUiState.value.selectedToCompareRecordingResult,
+            directory = recordingResultsDirectory
+        )!!
+    }
+
     // control screen
 
     fun changeScalingGovernor(newGovernor: String) {
@@ -628,15 +635,7 @@ class PowerManagerAppModel(
         }
     }
 
-    fun onCpuConfigurationInspectButtonPressed(configurationName : String) {
-        _controlScreenUiState.update { currentState ->
-            currentState.copy(
-                currentlySelectedCpuConfiguration = configurationName
-            )
-        }
-    }
-
-    fun onCpuConfigurationDeleteButtonPressed(configurationName: String) {
+    fun selectCpuConfiguration(configurationName : String) {
         _controlScreenUiState.update { currentState ->
             currentState.copy(
                 currentlySelectedCpuConfiguration = configurationName
