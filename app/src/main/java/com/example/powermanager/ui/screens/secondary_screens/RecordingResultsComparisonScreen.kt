@@ -68,7 +68,7 @@ fun RecordingResultsComparisonScreen(
         val maxMemoryUsage = max(leftResult.peakMemoryUsed, rightResult.peakMemoryUsed) + 0.02f
         val minCpuLoad = min(getListMinimum(leftResult.cpuLoadValues), getListMinimum(rightResult.cpuLoadValues)) - 0.1f
         val maxCpuLoad = max(leftResult.peakCpuLoad, rightResult.peakCpuLoad) + 0.1f
-        val minBatteryLevel = max(min(getListMinimum(leftBatteryValuesFloat), getListMinimum(rightBatteryValuesFloat)) - 50, 0f)
+        val minBatteryLevel = max(min(getListMinimum(leftBatteryValuesFloat), getListMinimum(rightBatteryValuesFloat)) - 50f, 0f)
         val maxBatteryLevel = max(getListMaximum(leftBatteryValuesFloat), getListMaximum(rightBatteryValuesFloat)) + 50f
         val minThreadCount = min(getListMinimum(leftThreadCountValuesFloat), getListMinimum(rightThreadCountValuesFloat)) - 50f
         val maxThreadCount = max(getListMaximum(leftThreadCountValuesFloat), getListMaximum(rightThreadCountValuesFloat)) + 50f
