@@ -30,8 +30,12 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -52,8 +56,9 @@ import com.example.powermanager.R
 import com.example.powermanager.ui.model.PowerManagerAppModel
 import com.example.powermanager.ui.screens.common.ConfirmFileDeletionAlertDialog
 import com.example.powermanager.ui.screens.common.SectionHeader
-import com.example.powermanager.ui.state.RecordingScreensUiState
 import com.example.powermanager.utils.CONFIRM_RECORDING_DELETION_TEXT
+import com.example.powermanager.utils.DEFAULT_RECORDING_NUMBER_OF_SAMPLES
+import com.example.powermanager.utils.DEFAULT_RECORDING_SAMPLING_PERIOD_MILLIS
 import com.example.powermanager.utils.RECORDING_SAMPLING_PERIOD_POSSIBLE_VALUES
 import com.example.powermanager.utils.isFileNameValid
 import com.example.powermanager.utils.isRecordingNumberOfSamplesStringValid
@@ -80,7 +85,12 @@ fun RecordingScreen(
         val keyboardController = LocalSoftwareKeyboardController.current
         val context = LocalContext.current
 
-        val uiState: State<RecordingScreensUiState> = model.recordingScreensUiState.collectAsState()
+        val uiState by model.recordingScreensUiState.collectAsState()
+        var isConfirmDeletionDialogOpen by rememberSaveable { mutableStateOf(false) }
+        var recordingSamplingPeriod by rememberSaveable { mutableLongStateOf(DEFAULT_RECORDING_SAMPLING_PERIOD_MILLIS) }
+        var recordingNumberOfSamplesString by rememberSaveable { mutableStateOf(DEFAULT_RECORDING_NUMBER_OF_SAMPLES.toString()) }
+        var recordingSessionName by rememberSaveable { mutableStateOf("") }
+        var includeThreadCountInfo by rememberSaveable { mutableStateOf(true) }
 
         // ================= screen title =================== //
 
@@ -93,55 +103,54 @@ fun RecordingScreen(
         SectionHeader(sectionName = stringResource(R.string.new_session))
 
         RecordingSamplingPeriodRow(
-            onDismissDropdownMenu = {
-                model.changeSamplingPeriodDropdownExpandedState(false)
-            },
             onSelectedNewValue = { newValue ->
-                model.changeRecordingSamplingPeriod(newValue)
+                recordingSamplingPeriod = newValue
             },
-            isSamplingPeriodDropdownExpanded = uiState.value.isSamplingPeriodDropdownExpanded,
-            currentValue = uiState.value.recordingSamplingPeriod
-        ) { newValue ->
-            if (!uiState.value.isSamplingPeriodDropdownExpanded && uiState.value.isRecording)
-                return@RecordingSamplingPeriodRow
-            model.changeSamplingPeriodDropdownExpandedState(newValue)
-        }
+            currentValue = recordingSamplingPeriod
+        )
 
         NumberOfSamplesRow(
             keyboardController = keyboardController,
-            currentNumberOfSamplesString = uiState.value.recordingNumberOfSamplesString,
+            currentNumberOfSamplesString = recordingNumberOfSamplesString,
             onValueChanged = { newValue ->
-                model.changeRecordingNumberOfSamplesString(newValue)
+                recordingNumberOfSamplesString = newValue
             },
-            textFieldEnabled = !uiState.value.isRecording
+            textFieldEnabled = !uiState.isRecording
         )
 
         RecordingSessionNameRow(
             keyboardController = keyboardController,
-            currentSessionName = uiState.value.recordingSessionName,
-            onValueChanged = { input ->
-                model.changeRecordingSessionName(input)
+            currentSessionName = recordingSessionName,
+            onValueChanged = { newValue ->
+                recordingSessionName = newValue
             },
-            textFieldEnabled = !uiState.value.isRecording
+            textFieldEnabled = !uiState.isRecording
         )
 
         ThreadCountInfoCheckboxRow(
-            currentValue = uiState.value.includeThreadCountInfo,
-            onValueChanged = { checked ->
-                model.changeIncludeThreadCountInfoOption(checked)
+            currentValue = includeThreadCountInfo,
+            onValueChanged = { newValue ->
+                includeThreadCountInfo = newValue
             },
-            checkBoxEnabled = !uiState.value.isRecording
+            checkBoxEnabled = !uiState.isRecording
         )
 
         Spacer(modifier = Modifier.height(10.dp))
 
         StartRecordingButtonAndIndicatorRow(
             onButtonPressed = {
-                model.startRecording()
+                model.startRecording(
+                    samplingPeriod = recordingSamplingPeriod,
+                    numberOfSamples = recordingNumberOfSamplesString.toInt(),
+                    sessionName = recordingSessionName,
+                    includeThreadCountInfo = includeThreadCountInfo
+                )
+
+                recordingSessionName = ""
             },
-            isRecordingInProgress = uiState.value.isRecording,
-            recordingNumberOfSamplesString = uiState.value.recordingNumberOfSamplesString,
-            recordingSessionName = uiState.value.recordingSessionName
+            isRecordingInProgress = uiState.isRecording,
+            recordingNumberOfSamplesString = recordingNumberOfSamplesString,
+            recordingSessionName = recordingSessionName
         )
 
         Spacer (modifier = Modifier.height(10.dp))
@@ -152,7 +161,7 @@ fun RecordingScreen(
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        if (uiState.value.recordingResults.isNotEmpty()) {
+        if (uiState.recordingResults.isNotEmpty()) {
             Divider(
                 modifier = Modifier
                     .fillMaxSize(),
@@ -167,11 +176,12 @@ fun RecordingScreen(
             )
         }
 
-        uiState.value.recordingResults.forEach { resultName ->
+        uiState.recordingResults.forEach { resultName ->
             RecordingSessionResultRow(
                 resultName = resultName,
                 onDeleteButtonPressed = {
                     model.onRecordingDeleteButtonPressed(resultName)
+                    isConfirmDeletionDialogOpen = true
                 },
                 onShareButtonPressed = {
                     model.shareRecordingResult(resultName, context)
@@ -194,11 +204,14 @@ fun RecordingScreen(
             )
         }
 
-        if (uiState.value.isConfirmDeletionDialogOpen) {
+        if (isConfirmDeletionDialogOpen) {
             ConfirmFileDeletionAlertDialog(
-                onDismiss = { model.onDismissRecordingDeletionRequest() },
-                onConfirm = { model.onConfirmRecordingDeletionRequest() },
-                text = String.format(CONFIRM_RECORDING_DELETION_TEXT, uiState.value.currentlySelectedRecordingResult)
+                onDismiss = { isConfirmDeletionDialogOpen = false },
+                onConfirm = {
+                    model.onConfirmRecordingDeletionRequest()
+                    isConfirmDeletionDialogOpen = false
+                },
+                text = String.format(CONFIRM_RECORDING_DELETION_TEXT, uiState.currentlySelectedRecordingResult)
             )
         }
     }
@@ -370,12 +383,11 @@ fun StartRecordingButtonAndIndicatorRow(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecordingSamplingPeriodRow(
-    onDismissDropdownMenu: () -> Unit,
     onSelectedNewValue: (Long) -> Unit,
-    isSamplingPeriodDropdownExpanded: Boolean,
-    currentValue: Long,
-    onChangedExpandedValue: (Boolean) -> Unit
+    currentValue: Long
 ) {
+    var dropdownExpandedState by rememberSaveable { mutableStateOf(false) }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -393,23 +405,27 @@ fun RecordingSamplingPeriodRow(
             modifier = Modifier.weight(1f)
         ) {
             ExposedDropdownMenuBox(
-                expanded = isSamplingPeriodDropdownExpanded,
-                onExpandedChange = onChangedExpandedValue
+                expanded = dropdownExpandedState,
+                onExpandedChange = { expanded ->
+                    dropdownExpandedState = expanded
+                }
             ) {
                 TextField(
                     value = currentValue.toString(),
                     onValueChange = {},
                     readOnly = true,
                     trailingIcon = {
-                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = isSamplingPeriodDropdownExpanded)
+                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = dropdownExpandedState)
                     },
                     colors = TextFieldDefaults.colors(),
                     modifier = Modifier.menuAnchor()
                 )
 
                 ExposedDropdownMenu(
-                    expanded = isSamplingPeriodDropdownExpanded,
-                    onDismissRequest = onDismissDropdownMenu
+                    expanded = dropdownExpandedState,
+                    onDismissRequest = {
+                        dropdownExpandedState = false
+                    }
                 ) {
                     RECORDING_SAMPLING_PERIOD_POSSIBLE_VALUES.map { value ->
                         DropdownMenuItem(
@@ -417,7 +433,10 @@ fun RecordingSamplingPeriodRow(
                                 Text(text = value.toString())
                             },
                             colors = MenuDefaults.itemColors(),
-                            onClick = { onSelectedNewValue(value) }
+                            onClick = {
+                                onSelectedNewValue(value)
+                                dropdownExpandedState = false
+                            }
                         )
                     }
                 }
@@ -425,6 +444,7 @@ fun RecordingSamplingPeriodRow(
         }
     }
 }
+
 
 /*
  * A Row composable corresponding to a "Recent results" entry. It contains a text (the name of the

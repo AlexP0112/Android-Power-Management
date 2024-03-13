@@ -18,8 +18,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -33,7 +33,6 @@ import com.example.powermanager.ui.model.HomeScreenInfo
 import com.example.powermanager.ui.model.PowerManagerAppModel
 import com.example.powermanager.ui.screens.common.InfoDialog
 import com.example.powermanager.ui.screens.common.SectionHeader
-import com.example.powermanager.ui.state.HomeScreenUiState
 import com.example.powermanager.utils.formatDuration
 import kotlin.math.roundToInt
 
@@ -59,7 +58,7 @@ fun HomeScreen(
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        val uiState: State<HomeScreenUiState> = model.homeScreenUiState.collectAsState()
+        val uiState by model.homeScreenUiState.collectAsState()
 
         // ==============  battery and uptime section  ===================== //
         SectionHeader(
@@ -220,7 +219,7 @@ fun HomeScreen(
             GoToOtherScreenButton(onClick = onGoToControlScreenButtonClicked, buttonTextStringID = R.string.go_to_control_screen)
         }
 
-        if (uiState.value.isCPULoadInfoDialogOpen) {
+        if (uiState.isCPULoadInfoDialogOpen) {
             InfoDialog(
                 textId = R.string.cpu_load_explanation,
                 cardHeight = 220.dp

@@ -35,11 +35,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -61,7 +61,6 @@ import com.example.powermanager.control.cpufreq.GOVERNOR_NAME_TO_DESCRIPTION_STR
 import com.example.powermanager.ui.model.PowerManagerAppModel
 import com.example.powermanager.ui.screens.common.ConfirmFileDeletionAlertDialog
 import com.example.powermanager.ui.screens.common.SectionHeader
-import com.example.powermanager.ui.state.ControlScreenUiState
 import com.example.powermanager.utils.CONFIRM_CPU_CONFIGURATION_DELETION_TEXT
 import com.example.powermanager.utils.isFileNameValid
 
@@ -84,7 +83,9 @@ fun ControlScreen(
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
     ) {
-        val uiState: State<ControlScreenUiState> = model.controlScreenUiState.collectAsState()
+        val uiState by model.controlScreenUiState.collectAsState()
+        var isConfirmConfigurationDeletionDialogOpen by rememberSaveable { mutableStateOf(false) }
+        var configurationName by rememberSaveable { mutableStateOf("") }
         val keyboardController = LocalSoftwareKeyboardController.current
 
         val availableScalingGovernors : List<String> = model.getAvailableScalingGovernors()
@@ -131,7 +132,7 @@ fun ControlScreen(
         availableScalingGovernors.forEach { scalingGovernor ->
             ScalingGovernorRow(
                 governorName = scalingGovernor,
-                isSelected = scalingGovernor == uiState.value.currentScalingGovernor
+                isSelected = scalingGovernor == uiState.currentScalingGovernor
             ) {
                 model.changeScalingGovernor(scalingGovernor)
             }
@@ -149,7 +150,7 @@ fun ControlScreen(
                 canCoreBeDisabled = !masterCores.contains(coreIndex),
                 coreNumber = coreIndex,
                 onValueChanged = { model.changeCoreEnabledState(coreIndex, it) },
-                isCoreOnline = !uiState.value.disabledCores.contains(coreIndex)
+                isCoreOnline = !uiState.disabledCores.contains(coreIndex)
             )
         }
         
@@ -160,7 +161,7 @@ fun ControlScreen(
 
         // dropdown for each group of cores that belong to a policy
         cpuFreqPolicies.forEach { policy ->
-            val onlineCores = policy.relatedCores.filter { !uiState.value.disabledCores.contains(it) }
+            val onlineCores = policy.relatedCores.filter { !uiState.disabledCores.contains(it) }
 
             var coresText  = ""
             onlineCores.forEach { coresText += "Cpu$it/" }
@@ -178,7 +179,7 @@ fun ControlScreen(
                 onExpendedChange = { isDropdownExpanded = it },
                 maxFrequency = policy.maximumFrequencyGhz,
                 onDismiss = { isDropdownExpanded = false },
-                value = uiState.value.policyToFrequencyLimitMHz[policy.name].toString(),
+                value = uiState.policyToFrequencyLimitMHz[policy.name].toString(),
                 availableFrequencies = policy.frequenciesMhz,
                 onSelectedEntry = {
                     isDropdownExpanded = false
@@ -199,11 +200,14 @@ fun ControlScreen(
         Spacer(modifier = Modifier.height(10.dp))
 
         SaveCpuConfigurationRow(
-            currentCpuConfigurationName = uiState.value.cpuConfigurationName,
-            onValueChanged = { model.changeCpuConfigurationName(it) },
+            currentCpuConfigurationName = configurationName,
+            onValueChanged = { configurationName = it },
             keyboardController = keyboardController,
-            onSaveButtonPressed = { model.saveCurrentCpuConfiguration() },
-            buttonEnabled = isFileNameValid(uiState.value.cpuConfigurationName)
+            onSaveButtonPressed = {
+                model.saveCurrentCpuConfiguration(configurationName)
+                configurationName = ""
+            },
+            buttonEnabled = isFileNameValid(configurationName)
         )
 
         Spacer(modifier = Modifier.height(10.dp))
@@ -213,7 +217,7 @@ fun ControlScreen(
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        if (uiState.value.savedConfigurations.isNotEmpty()) {
+        if (uiState.savedConfigurations.isNotEmpty()) {
             Divider(
                 modifier = Modifier
                     .fillMaxSize(),
@@ -229,18 +233,19 @@ fun ControlScreen(
             )
         }
 
-        uiState.value.savedConfigurations.forEach { configurationName ->
+        uiState.savedConfigurations.forEach { savedConfiguration ->
             CpuConfigurationRow(
-                configurationName = configurationName,
+                configurationName = savedConfiguration,
                 onDeleteButtonPressed = {
-                    model.onCpuConfigurationDeleteButtonPressed(configurationName)
+                    model.onCpuConfigurationDeleteButtonPressed(savedConfiguration)
+                    isConfirmConfigurationDeletionDialogOpen = true
                 },
                 onInspectButtonPressed = {
-                    model.onCpuConfigurationInspectButtonPressed(configurationName)
+                    model.onCpuConfigurationInspectButtonPressed(savedConfiguration)
                     openCpuConfigurationScreen()
                 },
                 onApplyButtonPressed = {
-                    model.applySelectedCpuConfiguration(configurationName)
+                    model.applySelectedCpuConfiguration(savedConfiguration)
                 }
             )
 
@@ -254,11 +259,14 @@ fun ControlScreen(
 
         // ================= dialogs ==================== //
 
-        if (uiState.value.isConfirmConfigurationDeletionDialogOpen) {
+        if (isConfirmConfigurationDeletionDialogOpen) {
             ConfirmFileDeletionAlertDialog(
-                onDismiss = { model.onDismissCpuConfigurationDeletionRequest() },
-                onConfirm = { model.onConfirmCpuConfigurationDeletionRequest() },
-                text = String.format(CONFIRM_CPU_CONFIGURATION_DELETION_TEXT, uiState.value.currentlySelectedCpuConfiguration)
+                onDismiss = { isConfirmConfigurationDeletionDialogOpen = false },
+                onConfirm = {
+                    model.onConfirmCpuConfigurationDeletionRequest()
+                    isConfirmConfigurationDeletionDialogOpen = false
+                },
+                text = String.format(CONFIRM_CPU_CONFIGURATION_DELETION_TEXT, uiState.currentlySelectedCpuConfiguration)
             )
         }
     }

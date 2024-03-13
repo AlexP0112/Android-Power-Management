@@ -438,7 +438,12 @@ class PowerManagerAppModel(
 
     // recording events
 
-    fun startRecording() {
+    fun startRecording(
+        samplingPeriod : Long,
+        numberOfSamples : Int,
+        sessionName : String,
+        includeThreadCountInfo : Boolean
+    ) {
         _recordingScreensUiState.update { currentState ->
             currentState.copy(
                 isRecording = true
@@ -447,13 +452,13 @@ class PowerManagerAppModel(
 
         viewModelScope.launch {
             Recorder.record(
-                samplingPeriod = recordingScreensUiState.value.recordingSamplingPeriod,
-                numberOfSamples = recordingScreensUiState.value.recordingNumberOfSamplesString.toInt(),
-                sessionName = recordingScreensUiState.value.recordingSessionName,
+                samplingPeriod = samplingPeriod,
+                numberOfSamples = numberOfSamples,
+                sessionName = sessionName,
                 batteryManager = batteryManager,
                 powerManager = powerManager,
                 activityManager = activityManager,
-                includeThreadCountInfo = recordingScreensUiState.value.includeThreadCountInfo,
+                includeThreadCountInfo = includeThreadCountInfo,
                 outputDirectory = recordingResultsDirectory,
                 onRecordingFinished = { onRecordingFinished(it) },
                 getNumberOfThreads = { getNumberOfProcessesOrThreads(false) }
@@ -477,8 +482,7 @@ class PowerManagerAppModel(
         _recordingScreensUiState.update { currentState ->
             currentState.copy(
                 isRecording = false,
-                recordingResults = getMostRecentRecordingResultsNames(),
-                recordingSessionName = ""
+                recordingResults = getMostRecentRecordingResultsNames()
             )
         }
     }
@@ -514,75 +518,19 @@ class PowerManagerAppModel(
     // live charts screen
 
     fun changeFrequencyChartTrackedCore(coreNumber: Int) {
-        if (coreNumber == liveChartsScreenUiState.value.coreTracked) {
-            _liveChartsScreenUiState.update { currentState ->
-                currentState.copy(
-                    isCoreTrackedDropdownExpanded = false
-                )
-            }
+        if (coreNumber == liveChartsScreenUiState.value.coreTracked)
             return
-        }
 
         _liveChartsScreenUiState.update { currentState ->
             currentState.copy(
-                coreTracked = coreNumber,
-                isCoreTrackedDropdownExpanded = false
+                coreTracked = coreNumber
             )
         }
 
         cpuFrequencySamples.clear()
     }
 
-    fun changeTrackedCoreDropdownMenuState(newValue: Boolean) {
-        _liveChartsScreenUiState.update { currentState ->
-            currentState.copy(
-                isCoreTrackedDropdownExpanded = newValue
-            )
-        }
-    }
-
     // recording screen
-
-    fun changeRecordingSamplingPeriod(newValue: Long) {
-        _recordingScreensUiState.update { currentState ->
-            currentState.copy(
-                recordingSamplingPeriod = newValue,
-                isSamplingPeriodDropdownExpanded = false
-            )
-        }
-    }
-
-    fun changeSamplingPeriodDropdownExpandedState(newValue: Boolean) {
-        _recordingScreensUiState.update { currentState ->
-            currentState.copy(
-                isSamplingPeriodDropdownExpanded = newValue
-            )
-        }
-    }
-
-    fun changeRecordingNumberOfSamplesString(newValue: String) {
-        _recordingScreensUiState.update { currentState ->
-            currentState.copy(
-                recordingNumberOfSamplesString = newValue
-            )
-        }
-    }
-
-    fun changeRecordingSessionName(newValue: String) {
-        _recordingScreensUiState.update { currentState ->
-            currentState.copy(
-                recordingSessionName = newValue
-            )
-        }
-    }
-
-    fun changeIncludeThreadCountInfoOption(newValue : Boolean) {
-        _recordingScreensUiState.update { currentState ->
-            currentState.copy(
-                includeThreadCountInfo = newValue
-            )
-        }
-    }
 
     fun onRecordingInspectButtonPressed(recordingName : String) {
         _recordingScreensUiState.update { currentState ->
@@ -595,16 +543,7 @@ class PowerManagerAppModel(
     fun onRecordingDeleteButtonPressed(recordingName: String) {
         _recordingScreensUiState.update { currentState ->
             currentState.copy(
-                currentlySelectedRecordingResult = recordingName,
-                isConfirmDeletionDialogOpen = true
-            )
-        }
-    }
-
-    fun onDismissRecordingDeletionRequest() {
-        _recordingScreensUiState.update { currentState ->
-            currentState.copy(
-                isConfirmDeletionDialogOpen = false
+                currentlySelectedRecordingResult = recordingName
             )
         }
     }
@@ -618,8 +557,7 @@ class PowerManagerAppModel(
         if (deleted) {
             _recordingScreensUiState.update { currentState ->
                 currentState.copy(
-                    recordingResults = getMostRecentRecordingResultsNames(),
-                    isConfirmDeletionDialogOpen = false
+                    recordingResults = getMostRecentRecordingResultsNames()
                 )
             }
         }
@@ -701,16 +639,7 @@ class PowerManagerAppModel(
     fun onCpuConfigurationDeleteButtonPressed(configurationName: String) {
         _controlScreenUiState.update { currentState ->
             currentState.copy(
-                currentlySelectedCpuConfiguration = configurationName,
-                isConfirmConfigurationDeletionDialogOpen = true
-            )
-        }
-    }
-
-    fun onDismissCpuConfigurationDeletionRequest() {
-        _controlScreenUiState.update { currentState ->
-            currentState.copy(
-                isConfirmConfigurationDeletionDialogOpen = false
+                currentlySelectedCpuConfiguration = configurationName
             )
         }
     }
@@ -723,8 +652,7 @@ class PowerManagerAppModel(
 
         _controlScreenUiState.update { currentState ->
             currentState.copy(
-                savedConfigurations = CpuConfigurationsStorageManager.getSavedCpuConfigurationsNames(cpuConfigurationsDirectory),
-                isConfirmConfigurationDeletionDialogOpen = false
+                savedConfigurations = CpuConfigurationsStorageManager.getSavedCpuConfigurationsNames(cpuConfigurationsDirectory)
             )
         }
     }
@@ -755,14 +683,6 @@ class PowerManagerAppModel(
         }
     }
 
-    fun changeCpuConfigurationName(newValue: String) {
-        _controlScreenUiState.update { currentState ->
-            currentState.copy(
-                cpuConfigurationName = newValue
-            )
-        }
-    }
-
     fun getSelectedConfigurationFileContent() : String {
         return CpuConfigurationsStorageManager.getFileContent(
             fileName = controlScreenUiState.value.currentlySelectedCpuConfiguration,
@@ -770,11 +690,11 @@ class PowerManagerAppModel(
         )
     }
 
-    fun saveCurrentCpuConfiguration() {
+    fun saveCurrentCpuConfiguration(configurationName: String) {
         val onlineCores = (0 until totalNumberOfCores).filter { it !in controlScreenUiState.value.disabledCores }
 
         val currentConfiguration = CpuConfiguration(
-            name = controlScreenUiState.value.cpuConfigurationName,
+            name = configurationName,
             scalingGovernor = controlScreenUiState.value.currentScalingGovernor,
             onlineCores = onlineCores,
             policyToFrequencyLimitMHz = controlScreenUiState.value.policyToFrequencyLimitMHz
@@ -787,8 +707,7 @@ class PowerManagerAppModel(
 
         _controlScreenUiState.update { currentState ->
             currentState.copy(
-                savedConfigurations = CpuConfigurationsStorageManager.getSavedCpuConfigurationsNames(cpuConfigurationsDirectory),
-                cpuConfigurationName = ""
+                savedConfigurations = CpuConfigurationsStorageManager.getSavedCpuConfigurationsNames(cpuConfigurationsDirectory)
             )
         }
     }

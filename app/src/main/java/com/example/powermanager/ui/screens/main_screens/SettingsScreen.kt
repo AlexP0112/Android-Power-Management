@@ -24,7 +24,7 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -67,11 +67,11 @@ fun SettingsScreen(
         allPreferencesIDs.forEach { preferenceID ->
             val preferenceProperties = model.getPreferenceProperties(preferenceID)
 
-            var isDropdownExpanded by remember {
+            var isDropdownExpanded by rememberSaveable {
                 mutableStateOf(false)
             }
 
-            var currentPreferenceValue by remember {
+            var currentPreferenceValue by rememberSaveable {
                 mutableStateOf(model.getPreferenceValue(preferenceID))
             }
 

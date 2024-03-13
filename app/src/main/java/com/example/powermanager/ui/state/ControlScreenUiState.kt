@@ -7,7 +7,5 @@ data class ControlScreenUiState (
     val disabledCores : List<Int>,
     val savedConfigurations : List<String>,
     val currentlySelectedCpuConfiguration : String = NO_VALUE_STRING,
-    val policyToFrequencyLimitMHz : Map<String, Int>,
-    val cpuConfigurationName : String = "",
-    val isConfirmConfigurationDeletionDialogOpen : Boolean = false
+    val policyToFrequencyLimitMHz : Map<String, Int>
 )
