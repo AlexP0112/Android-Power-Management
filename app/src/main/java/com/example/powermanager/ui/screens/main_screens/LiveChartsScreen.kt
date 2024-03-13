@@ -27,11 +27,11 @@ import androidx.compose.ui.unit.dp
 import com.example.powermanager.preferences.BATTERY_CHART_TRACKED_PERIOD_ID
 import com.example.powermanager.preferences.LIVE_CHARTS_TRACKED_PERIOD_ID
 import com.example.powermanager.preferences.PreferenceValueAdaptor
-import com.example.powermanager.ui.charts.battery.BatteryLevelChart
-import com.example.powermanager.ui.charts.frequency.CPUCoresDropdownMenu
-import com.example.powermanager.ui.charts.frequency.CPUFrequencyChart
-import com.example.powermanager.ui.charts.load.CPULoadChart
-import com.example.powermanager.ui.charts.memory.MemoryChart
+import com.example.powermanager.ui.charts.battery_chart.BatteryLevelChart
+import com.example.powermanager.ui.charts.dynamic_charts.frequency.CPUCoresDropdownMenu
+import com.example.powermanager.ui.charts.dynamic_charts.frequency.CPUFrequencyChart
+import com.example.powermanager.ui.charts.dynamic_charts.load.CPULoadChart
+import com.example.powermanager.ui.charts.dynamic_charts.memory.MemoryChart
 import com.example.powermanager.ui.model.PowerManagerAppModel
 import com.example.powermanager.utils.BATTERY_CHART_NAME
 import com.example.powermanager.utils.CPU_FREQUENCY_CHART_NAME

@@ -34,8 +34,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.powermanager.R
 import com.example.powermanager.recording.storage.RecordingResult
-import com.example.powermanager.ui.charts.common.CustomAxisValuesOverrider
-import com.example.powermanager.ui.charts.common.StaticChart
+import com.example.powermanager.ui.charts.utils.CustomAxisValuesOverrider
+import com.example.powermanager.ui.charts.static_charts.SingleLineStaticChart
 import com.example.powermanager.ui.model.PowerManagerAppModel
 import com.example.powermanager.utils.getListMaximum
 import com.example.powermanager.utils.getListMinimum
@@ -168,7 +168,7 @@ fun RecordingResultViewScreen(
             text = stringResource(R.string.battery_level_mah)
         )
 
-        StaticChart(
+        SingleLineStaticChart(
             chartLineColor = MaterialTheme.colorScheme.tertiary,
             inputData = batteryChargeValuesFloat,
             customAxisValuesOverrider = CustomAxisValuesOverrider(
@@ -183,7 +183,7 @@ fun RecordingResultViewScreen(
             text = stringResource(R.string.memory_usage_gb)
         )
 
-        StaticChart(
+        SingleLineStaticChart(
             chartLineColor = MaterialTheme.colorScheme.secondary,
             inputData = result.memoryUsedValues,
             customAxisValuesOverrider = CustomAxisValuesOverrider(
@@ -198,7 +198,7 @@ fun RecordingResultViewScreen(
             text = stringResource(R.string.cpu_load)
         )
 
-        StaticChart(
+        SingleLineStaticChart(
             chartLineColor = MaterialTheme.colorScheme.onSecondaryContainer,
             inputData = result.cpuLoadValues,
             customAxisValuesOverrider = CustomAxisValuesOverrider(
@@ -214,7 +214,7 @@ fun RecordingResultViewScreen(
                 text = stringResource(R.string.total_number_of_threads)
             )
 
-            StaticChart(
+            SingleLineStaticChart(
                 chartLineColor = MaterialTheme.colorScheme.primary,
                 inputData = numberOfThreadsValuesFloat,
                 customAxisValuesOverrider = CustomAxisValuesOverrider(
