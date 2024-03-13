@@ -79,7 +79,7 @@ object RecordingsStorageManager {
         val attributes: BasicFileAttributes = Files.readAttributes(file.toPath(), BasicFileAttributes::class.java)
         val fileSizeInBytes = attributes.size()
 
-        return "File ${file.name} (${getPrettyStringFromNumberOfBytes(fileSizeInBytes)})\n\n${file.readText()}"
+        return "File: ${file.name}\nSize: ${getPrettyStringFromNumberOfBytes(fileSizeInBytes)}\nContent:\n\n${file.readText()}"
     }
 
     fun getRecordingResultForFileName(fileName: String, directory: File) : RecordingResult? {
