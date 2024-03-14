@@ -113,9 +113,9 @@ object CpuFreqManager {
 
             availableFrequenciesKhz.sort()
 
-            val frequenciesMhz = if (availableFrequenciesKhz.size <= 9)
-                availableFrequenciesKhz.drop(1).map { it / NUMBER_OF_KILOHERTZ_IN_A_MEGAHERTZ } else
-                    availableFrequenciesKhz.filterIndexed { index, _ -> index % 2 == 1 || index == availableFrequenciesKhz.size - 1 }.map { it / NUMBER_OF_KILOHERTZ_IN_A_MEGAHERTZ }
+            val frequenciesMhz = NUMBER_OF_AVAILABLE_FREQUENCIES_TO_CHOSEN_INDICES[availableFrequenciesKhz.size]!!.map {
+                 availableFrequenciesKhz[it] / NUMBER_OF_KILOHERTZ_IN_A_MEGAHERTZ
+            }
 
             val maximumFrequencyGhz = convertKHzToGHz(availableFrequenciesKhz.last())
 

@@ -12,6 +12,7 @@ import java.util.regex.Pattern
 
 object CpuHotplugManager {
 
+    // determines the total number of cores the device has
     fun determineTotalNumberOfCPUCores(): Int {
 
         class CpuFilter : FileFilter {
