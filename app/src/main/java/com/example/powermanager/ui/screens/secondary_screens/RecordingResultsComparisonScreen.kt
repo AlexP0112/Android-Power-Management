@@ -33,6 +33,7 @@ import com.example.powermanager.ui.charts.utils.CustomAxisValuesOverrider
 import com.example.powermanager.ui.model.PowerManagerAppModel
 import com.example.powermanager.utils.getListMaximum
 import com.example.powermanager.utils.getListMinimum
+import com.example.powermanager.utils.getPrettyStringFromNumberOfBytes
 import kotlin.math.max
 import kotlin.math.min
 
@@ -62,6 +63,8 @@ fun RecordingResultsComparisonScreen(
         val rightBatteryValuesFloat = rightResult.batteryChargeValues.map { it.toFloat() }
         val leftThreadCountValuesFloat = leftResult.numberOfThreadsValues.map { it.toFloat() }
         val rightThreadCountValuesFloat = rightResult.numberOfThreadsValues.map { it.toFloat() }
+        val leftBatteryDischarge = leftResult.batteryChargeValues.first() - leftResult.batteryChargeValues.last()
+        val rightBatteryDischarge = rightResult.batteryChargeValues.first() - rightResult.batteryChargeValues.last()
 
         // determine charts boundaries
         val minMemoryUsage = min(getListMinimum(leftResult.memoryUsedValues), getListMinimum(rightResult.memoryUsedValues)) - 0.02f
@@ -79,6 +82,80 @@ fun RecordingResultsComparisonScreen(
             text = "${uiState.currentlySelectedRecordingResult} vs ${uiState.selectedToCompareRecordingResult}",
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        // ========== general info about the recording sessions ========== //
+
+        Text(
+            text = "\u25cb Number of samples: ${
+                if (leftResult.numberOfSamples == rightResult.numberOfSamples) 
+                    leftResult.numberOfSamples else
+                    "${leftResult.numberOfSamples} vs ${rightResult.numberOfSamples}"}"
+        )
+
+        Text(
+            text = "\u25cb Time between samples: ${
+                if (leftResult.samplingPeriodMillis == rightResult.samplingPeriodMillis)
+                    leftResult.samplingPeriodMillis else
+                    "${leftResult.samplingPeriodMillis}ms vs ${rightResult.samplingPeriodMillis}ms"}"
+        )
+
+        Text(
+            text = "\u25cb Thread count information included: ${
+                if (leftResult.numberOfThreadsValues.isEmpty() == rightResult.numberOfThreadsValues.isEmpty())
+                    (if (leftResult.numberOfThreadsValues.isEmpty()) "no" else "yes") else
+                    "${if (leftResult.numberOfThreadsValues.isEmpty()) "no" else "yes"} vs ${if (rightResult.numberOfThreadsValues.isEmpty()) "no" else "yes"}"}"
+        )
+
+        Text(text = "\u25cb Charging status: ${
+            if (leftBatteryDischarge * rightBatteryDischarge >= 0)
+                (if (leftBatteryDischarge >= 0) "not charging" else "charging") else
+                "${(if (leftBatteryDischarge >= 0) "not charging" else "charging")} vs ${(if (rightBatteryDischarge >= 0) "not charging" else "charging")}"}")
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        Divider(
+            modifier = Modifier
+                .fillMaxSize(),
+            thickness = 0.75.dp,
+            color = MaterialTheme.colorScheme.secondary
+        )
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        // ============ cpu, memory and battery stats ========= //
+
+        Text(text = "\u25cb Total battery discharge: $leftBatteryDischarge mAh vs $rightBatteryDischarge mAh")
+
+        Text(text = "\u25cb Average memory usage: ${String.format("%.2f", leftResult.averageMemoryUsed)} GB vs ${String.format("%.2f", rightResult.averageMemoryUsed)} GB")
+
+        Text(text = "\u25cb Peak memory usage: ${String.format("%.2f", leftResult.peakMemoryUsed)} GB vs ${String.format("%.2f", rightResult.peakMemoryUsed)} GB")
+
+        Text(text = "\u25cb Average CPU load: ${String.format("%.2f", leftResult.averageCpuLoad)} vs ${String.format("%.2f", rightResult.averageCpuLoad)}")
+
+        Text(text = "\u25cb Peak CPU load: ${String.format("%.2f", leftResult.peakCpuLoad)} vs ${String.format("%.2f", rightResult.peakCpuLoad)}")
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        Divider(
+            modifier = Modifier
+                .fillMaxSize(),
+            thickness = 0.75.dp,
+            color = MaterialTheme.colorScheme.secondary
+        )
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        // ================== network stats ================== //
+
+        Text(
+            text = "\u25cb Total internet traffic (DL): ${getPrettyStringFromNumberOfBytes(leftResult.numberOfBytesReceived)} vs ${getPrettyStringFromNumberOfBytes(rightResult.numberOfBytesReceived)}"
+        )
+
+        Text(
+            text = "\u25cb Total internet traffic (UL): ${getPrettyStringFromNumberOfBytes(leftResult.numberOfBytesSent)} vs ${getPrettyStringFromNumberOfBytes(rightResult.numberOfBytesSent)}"
         )
 
         Spacer(modifier = Modifier.height(10.dp))

@@ -34,8 +34,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.powermanager.R
 import com.example.powermanager.recording.storage.RecordingResult
-import com.example.powermanager.ui.charts.utils.CustomAxisValuesOverrider
 import com.example.powermanager.ui.charts.static_charts.SingleLineStaticChart
+import com.example.powermanager.ui.charts.utils.CustomAxisValuesOverrider
 import com.example.powermanager.ui.model.PowerManagerAppModel
 import com.example.powermanager.utils.getListMaximum
 import com.example.powermanager.utils.getListMinimum
@@ -94,6 +94,8 @@ fun RecordingResultViewScreen(
             text = "\u25cb Thread count information included: ${if (numberOfThreadsValuesFloat.isEmpty()) "no" else "yes"}"
         )
 
+        Text(text = "\u25cb Charging status during session: ${if (batteryDischarge >= 0) "not charging" else "charging"}")
+
         Spacer(modifier = Modifier.height(6.dp))
 
         Divider(
@@ -106,7 +108,6 @@ fun RecordingResultViewScreen(
         Spacer(modifier = Modifier.height(6.dp))
 
         // cpu, memory and battery stats
-        Text(text = "\u25cb Charging status during session: ${if (batteryDischarge >= 0) "not charging" else "charging"}")
 
         Text(
             text = if (batteryDischarge >= 0) "\u25cb Total battery discharge: $batteryDischarge mAh" else
