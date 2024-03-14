@@ -38,7 +38,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -167,7 +166,7 @@ fun ControlScreen(
             onlineCores.forEach { coresText += "Cpu$it/" }
             coresText = coresText.dropLast(1)
 
-            var isDropdownExpanded by remember {
+            var isDropdownExpanded by rememberSaveable {
                 mutableStateOf(false)
             }
 
