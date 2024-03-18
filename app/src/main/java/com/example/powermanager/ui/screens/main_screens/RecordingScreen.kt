@@ -153,6 +153,14 @@ fun RecordingScreen(
             recordingSessionName = recordingSessionName
         )
 
+        if (uiState.isRecording) {
+            Spacer (modifier = Modifier.height(10.dp))
+
+            OutlinedButton(onClick = { model.stopRecording() }) {
+                Text(text = stringResource(R.string.stop_recording))
+            }
+        }
+
         Spacer (modifier = Modifier.height(10.dp))
 
         // ================= Recent results section =================== //

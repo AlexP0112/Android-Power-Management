@@ -56,8 +56,8 @@ const val BATTERY_LEVEL_NUMBER_OF_SAMPLES = 50
 val RECORDING_SAMPLING_PERIOD_POSSIBLE_VALUES = listOf(500L, 1000L, 2000L, 5000L)
 const val DEFAULT_RECORDING_SAMPLING_PERIOD_MILLIS = 1000L
 const val DEFAULT_RECORDING_NUMBER_OF_SAMPLES = 30
-const val MINIMUM_NUMBER_OF_RECORDING_SAMPLES_ALLOWED = 5
-const val MAXIMUM_NUMBER_OF_RECORDING_SAMPLES_ALLOWED = 200
+const val MINIMUM_NUMBER_OF_RECORDING_SAMPLES_ALLOWED = 10
+const val MAXIMUM_NUMBER_OF_RECORDING_SAMPLES_ALLOWED = 250
 const val CONFIRM_RECORDING_DELETION_TEXT = "Are you sure you want to delete recording result %s?"
 const val RECORDING_RESULTS_DIRECTORY_NAME = "recording_results"
 const val DOT_JSON = ".json"
@@ -69,9 +69,12 @@ const val RECORDING_TAG = "recording"
 // notifications
 const val NOTIFICATION_CHANNEL_ID = "power_manager"
 const val NOTIFICATION_CHANNEL_NAME = "Power Manager"
-const val NOTIFICATION_ID = 12345
-const val NOTIFICATION_TITLE = "Power and performance recording ended"
-const val NOTIFICATION_TEXT = "Result saved in %s.json"
+const val RECORDING_STARTED_NOTIFICATION_ID = 12344
+const val RECORDING_FINISHED_NOTIFICATION_ID = 12345
+const val RECORDING_STARTED_NOTIFICATION_TITLE = "Recording power and performance..."
+const val RECORDING_FINISHED_NOTIFICATION_TITLE = "Power and performance recording ended"
+const val RECORDING_FINISHED_NOTIFICATION_TEXT = "Result saved in %s.json"
+const val RECORDING_STARTED_BUTTON_TEXT = "Stop recording"
 
 // paths
 const val CORE_FREQUENCY_PATH = "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_cur_freq"

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.ActivityManager
 import android.app.Application
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.BatteryManager
@@ -29,6 +30,7 @@ import com.example.powermanager.preferences.PreferenceValueAdaptor
 import com.example.powermanager.preferences.PreferencesManager
 import com.example.powermanager.preferences.RECORDING_FINISHED_NOTIFICATION_ENABLED_ID
 import com.example.powermanager.recording.recorder.Recorder
+import com.example.powermanager.recording.recorder.StopRecordingBroadcastReceiver
 import com.example.powermanager.recording.storage.RecordingResult
 import com.example.powermanager.recording.storage.RecordingsStorageManager
 import com.example.powermanager.ui.state.ControlScreenUiState
@@ -44,12 +46,15 @@ import com.example.powermanager.utils.GET_NUMBER_OF_THREADS_COMMAND
 import com.example.powermanager.utils.JSON_MIME_TYPE
 import com.example.powermanager.utils.MILLIS_IN_A_SECOND
 import com.example.powermanager.utils.NOTIFICATION_CHANNEL_ID
-import com.example.powermanager.utils.NOTIFICATION_ID
-import com.example.powermanager.utils.NOTIFICATION_TEXT
-import com.example.powermanager.utils.NOTIFICATION_TITLE
 import com.example.powermanager.utils.NUMBER_OF_KILOHERTZ_IN_A_MEGAHERTZ
 import com.example.powermanager.utils.POLICY_CURRENT_FREQUENCY_PATH
+import com.example.powermanager.utils.RECORDING_FINISHED_NOTIFICATION_ID
+import com.example.powermanager.utils.RECORDING_FINISHED_NOTIFICATION_TEXT
+import com.example.powermanager.utils.RECORDING_FINISHED_NOTIFICATION_TITLE
 import com.example.powermanager.utils.RECORDING_RESULTS_DIRECTORY_NAME
+import com.example.powermanager.utils.RECORDING_STARTED_BUTTON_TEXT
+import com.example.powermanager.utils.RECORDING_STARTED_NOTIFICATION_ID
+import com.example.powermanager.utils.RECORDING_STARTED_NOTIFICATION_TITLE
 import com.example.powermanager.utils.SAVED_CPU_CONFIGURATIONS_DIRECTORY_NAME
 import com.example.powermanager.utils.STATISTICS_BACKGROUND_SAMPLING_THRESHOLD_MILLIS
 import com.example.powermanager.utils.UPTIME_COMMAND
@@ -436,7 +441,7 @@ class PowerManagerAppModel(
         }
     }
 
-    // recording events
+    // recording events and notifications
 
     fun startRecording(
         samplingPeriod : Long,
@@ -451,9 +456,9 @@ class PowerManagerAppModel(
         }
 
         viewModelScope.launch {
-            Recorder.record(
+            Recorder.startRecording(
                 samplingPeriod = samplingPeriod,
-                numberOfSamples = numberOfSamples,
+                maximumNumberOfSamples = numberOfSamples,
                 sessionName = sessionName,
                 batteryManager = batteryManager,
                 powerManager = powerManager,
@@ -464,6 +469,12 @@ class PowerManagerAppModel(
                 getNumberOfThreads = { getNumberOfProcessesOrThreads(false) }
             )
         }
+
+        sendRecordingStartedNotification()
+    }
+
+    fun stopRecording() {
+        Recorder.stopRecording()
     }
 
     private fun onRecordingFinished(savedFileName : String?) {
@@ -487,18 +498,44 @@ class PowerManagerAppModel(
         }
     }
 
+    private fun sendRecordingStartedNotification() {
+        notificationManager.cancelAll()
+
+        val context = getApplication<Application>().applicationContext
+
+        val intent = Intent(context, StopRecordingBroadcastReceiver::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(context, 0, intent,
+            PendingIntent.FLAG_IMMUTABLE)
+
+        // send a notification with a button that stops the recording
+        val notification = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
+            .setContentTitle(RECORDING_STARTED_NOTIFICATION_TITLE)
+            .setSmallIcon(R.drawable.app_icon)
+            .setAutoCancel(true)
+            .setSilent(true)
+            .addAction(R.drawable.record_video_stop_svgrepo_com, RECORDING_STARTED_BUTTON_TEXT, pendingIntent)
+            .build()
+
+        notificationManager.notify(
+            RECORDING_STARTED_NOTIFICATION_ID,
+            notification
+        )
+    }
+
     private fun sendRecordingFinishedNotification(savedFileName: String) {
+        notificationManager.cancelAll()
+
         val context = getApplication<Application>().applicationContext
 
         val notification = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
-            .setContentTitle(NOTIFICATION_TITLE)
-            .setContentText(String.format(NOTIFICATION_TEXT, savedFileName))
+            .setContentTitle(RECORDING_FINISHED_NOTIFICATION_TITLE)
+            .setContentText(String.format(RECORDING_FINISHED_NOTIFICATION_TEXT, savedFileName))
             .setSmallIcon(R.drawable.app_icon)
             .setAutoCancel(true)
             .build()
 
         notificationManager.notify(
-            NOTIFICATION_ID,
+            RECORDING_FINISHED_NOTIFICATION_ID,
             notification
         )
     }

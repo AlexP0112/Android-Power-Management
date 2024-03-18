@@ -47,7 +47,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    /* create a notification channel used for sending a notification at the end of a recording session */
+    /* create a notification channel */
     private fun createNotificationChannel() {
         val notificationChannel = NotificationChannel(
             NOTIFICATION_CHANNEL_ID,

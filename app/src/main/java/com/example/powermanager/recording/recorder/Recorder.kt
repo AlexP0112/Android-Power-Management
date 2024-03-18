@@ -30,10 +30,13 @@ import java.io.InputStreamReader
 
 object Recorder {
 
+    // flag that signals that the user manually requested for the recording to stop
+    private var stopRecording : Boolean = false
+
     @SuppressLint("InvalidWakeLockTag")
-    suspend fun record(
+    suspend fun startRecording(
         samplingPeriod: Long,
-        numberOfSamples: Int,
+        maximumNumberOfSamples: Int,
         sessionName: String,
         batteryManager: BatteryManager,
         powerManager: PowerManager,
@@ -44,6 +47,8 @@ object Recorder {
         getNumberOfThreads: () -> Int
     ) {
         withContext(Dispatchers.IO) {
+            stopRecording = false
+
             val batteryChargeValues : MutableList<Int> = mutableListOf()
             val memoryUsedValues : MutableList<Float> = mutableListOf()
             val cpuLoadValues : MutableList<Float> = mutableListOf()
@@ -58,7 +63,9 @@ object Recorder {
                 val initialInterfacesStats = getBytesSentAndReceivedByAllInterfaces()
 
                 // sampling
-                for (i in 0 until numberOfSamples) {
+                var sampleNumber = 0
+
+                while(sampleNumber < maximumNumberOfSamples) {
                     // battery sampling
                     val batteryChargeCountMilliAmps =
                         convertMicroAmpsToMilliAmps(batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CHARGE_COUNTER))
@@ -88,8 +95,12 @@ object Recorder {
                         numberOfThreadsValues.add(numberOfThreads)
                     }
 
-                    if (i != numberOfSamples - 1)
+                    if (sampleNumber != maximumNumberOfSamples - 1)
                         delay(samplingPeriod)
+
+                    sampleNumber++
+                    if (stopRecording)
+                        break
                 }
 
                 val finalInterfacesStats = getBytesSentAndReceivedByAllInterfaces()
@@ -105,7 +116,7 @@ object Recorder {
                     sessionName = sessionName,
                     timestamp = getDateTimeNiceString(),
                     samplingPeriodMillis = samplingPeriod,
-                    numberOfSamples = numberOfSamples,
+                    numberOfSamples = sampleNumber,
                     batteryChargeValues = batteryChargeValues,
                     memoryUsedValues = memoryUsedValues,
                     cpuLoadValues = cpuLoadValues,
@@ -133,6 +144,10 @@ object Recorder {
                 wakeLock.release()
             }
         }
+    }
+
+    fun stopRecording() {
+        stopRecording = true
     }
 
     /*
