@@ -1,6 +1,5 @@
 package com.example.powermanager.udfs
 
-import com.example.powermanager.control.cpufreq.CpuFreqPolicy
 import com.example.powermanager.utils.UDFS_NUMBER_OF_LEVELS
 
 object UDFSManager {
@@ -13,19 +12,18 @@ object UDFSManager {
      */
     private var currentLevel : Int = 0
 
-    // the cpufreq policies received from the view model when starting the UDFS process
-    private var cpuFreqPolicies : Map<String, CpuFreqPolicy> = mapOf()
-
-    // callbacks to the view model for sending notifications and updating the control screen UI
+    /*
+     * callbacks to the view model used for changing frequency limits,
+     * sending notifications and updating the control screen UI as these things cannot be
+     * achieved from this singleton class. These are set when `startUDFS` is called
+     */
     private var onCurrentLevelChanged : (Int) -> Unit = {}
     private var onUDFSProcessFinished : (Int) -> Unit = {}
 
     fun startUDFS(
-        policies : Map<String, CpuFreqPolicy>,
         onLevelChanged : (Int) -> Unit,
         onProcessFinished : (Int) -> Unit
     ) {
-        cpuFreqPolicies = policies
         onCurrentLevelChanged = onLevelChanged
         onUDFSProcessFinished = onProcessFinished
         currentLevel = UDFS_NUMBER_OF_LEVELS

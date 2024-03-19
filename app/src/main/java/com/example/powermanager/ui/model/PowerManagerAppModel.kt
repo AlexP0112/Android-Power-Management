@@ -810,7 +810,6 @@ class PowerManagerAppModel(
 
     fun startUDFSProcess() {
         UDFSManager.startUDFS(
-            policies = cpuFreqPolicies,
             onLevelChanged = { onCurrentUDFSLevelChanged(it) },
             onProcessFinished = { onUDFSProcessFinished(it) }
         )
