@@ -873,7 +873,7 @@ class PowerManagerAppModel(
             .setContentText(String.format(UDFS_FINISHED_NOTIFICATION_TEXT, finalLevelCorrected))
             .setSmallIcon(R.drawable.app_icon)
             .setAutoCancel(true)
-            .setSilent(false)
+            .setSilent(true)
             .build()
 
         notificationManager.notify(

@@ -80,7 +80,7 @@ const val RECORDING_FINISHED_NOTIFICATION_TEXT = "Result saved in %s.json"
 const val RECORDING_STARTED_BUTTON_TEXT = "Stop recording"
 const val UDFS_ONGOING_NOTIFICATION_TITLE = "Performing UDFS (level %d/9)..."
 const val UDFS_FINISHED_NOTIFICATION_TITLE = "Finished UDFS session"
-const val UDFS_FINISHED_NOTIFICATION_TEXT = "Optimal level found is %d/9. Open the app to find out more."
+const val UDFS_FINISHED_NOTIFICATION_TEXT = "Optimal level found is %d/9. Open the app to see actual frequencies or to save the configuration."
 const val UDFS_NOTIFICATION_CONTINUE_BUTTON_TEXT = "Continue"
 const val UDFS_NOTIFICATION_STOP_BUTTON_TEXT = "Stop"
 
