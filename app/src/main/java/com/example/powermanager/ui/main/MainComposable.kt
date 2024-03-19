@@ -52,6 +52,7 @@ import com.example.powermanager.ui.screens.secondary_screens.RecordingResultFile
 import com.example.powermanager.ui.screens.secondary_screens.RecordingResultViewScreen
 import com.example.powermanager.ui.screens.secondary_screens.RecordingResultsComparisonScreen
 import com.example.powermanager.ui.screens.secondary_screens.ScalingGovernorsExplanationScreen
+import com.example.powermanager.ui.screens.secondary_screens.UDFSScreen
 import com.example.powermanager.utils.CONTROL_SCREEN_NAME
 import com.example.powermanager.utils.CPU_CONFIGURATION_INSPECT_SCREEN_NAME
 import com.example.powermanager.utils.HOME_SCREEN_NAME
@@ -62,6 +63,7 @@ import com.example.powermanager.utils.RECORDING_RESULT_SCREEN_NAME
 import com.example.powermanager.utils.RECORDING_SCREEN_NAME
 import com.example.powermanager.utils.SCALING_GOVERNORS_EXPLANATION_SCREEN_NAME
 import com.example.powermanager.utils.SETTINGS_SCREEN_NAME
+import com.example.powermanager.utils.UDFS_SCREEN_NAME
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -199,6 +201,9 @@ fun ScreensNavHost(
                 },
                 openCpuConfigurationScreen = {
                     navController.navigate(CPU_CONFIGURATION_INSPECT_SCREEN_NAME)
+                },
+                openUDFSScreen = {
+                    navController.navigate(UDFS_SCREEN_NAME)
                 }
             )
         }
@@ -274,6 +279,31 @@ fun ScreensNavHost(
         ) {
             ScalingGovernorsExplanationScreen(
                 topPadding = topPadding
+            )
+        }
+
+        // UDFS screen
+        composable(
+            route = UDFS_SCREEN_NAME,
+            enterTransition = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                    animationSpec = tween(250)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                    animationSpec = tween(250)
+                )
+            },
+        ) {
+            UDFSScreen(
+                topPadding = topPadding,
+                model = model,
+                openControlScreen = {
+                    navController.navigate(CONTROL_SCREEN_NAME)
+                }
             )
         }
 

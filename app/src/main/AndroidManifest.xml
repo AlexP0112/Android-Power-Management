@@ -25,6 +25,8 @@
         tools:targetApi="31">
 
         <receiver android:name=".recording.recorder.StopRecordingBroadcastReceiver"/>
+        <receiver android:name=".udfs.ContinueUDFSBroadcastReceiver"/>
+        <receiver android:name=".udfs.StopUDFSBroadcastReceiver"/>
 
         <provider
             android:name="androidx.core.content.FileProvider"

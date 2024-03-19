@@ -56,6 +56,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.powermanager.R
 import com.example.powermanager.control.cpufreq.DEFAULT_GOVERNOR_STRING
+import com.example.powermanager.control.cpufreq.FIXED_FREQUENCY_GOVERNORS
 import com.example.powermanager.control.cpufreq.GOVERNOR_NAME_TO_DESCRIPTION_STRING_ID
 import com.example.powermanager.ui.model.PowerManagerAppModel
 import com.example.powermanager.ui.screens.common.ConfirmFileDeletionAlertDialog
@@ -70,7 +71,8 @@ fun ControlScreen(
     goToDisplaySettings: () -> Unit,
     model: PowerManagerAppModel,
     openScalingGovernorsScreen : () -> Unit,
-    openCpuConfigurationScreen : () -> Unit
+    openCpuConfigurationScreen : () -> Unit,
+    openUDFSScreen : () -> Unit
 ) {
     Column(
         Modifier
@@ -190,6 +192,13 @@ fun ControlScreen(
             )
 
         }
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        GoToUDFSRow(
+            goToUDFSScreen = openUDFSScreen,
+            isButtonEnabled = uiState.currentScalingGovernor !in FIXED_FREQUENCY_GOVERNORS
+        )
 
         Spacer(modifier = Modifier.height(10.dp))
 
@@ -366,6 +375,33 @@ fun SelectMaxFrequencyRow(
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun GoToUDFSRow(
+    goToUDFSScreen: () -> Unit,
+    isButtonEnabled : Boolean
+) {
+    Row(
+        modifier = Modifier.fillMaxSize(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            modifier = Modifier
+                .padding(start = 8.dp),
+            text = stringResource(R.string.click_here_to_choose_limit_using_udfs)
+        )
+
+        OutlinedButton(
+            onClick = goToUDFSScreen,
+            enabled = isButtonEnabled
+        ) {
+            Text(
+                text = stringResource(R.string.udfs)
+            )
         }
     }
 }

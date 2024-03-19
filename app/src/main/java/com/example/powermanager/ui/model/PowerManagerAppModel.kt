@@ -33,6 +33,9 @@ import com.example.powermanager.recording.recorder.Recorder
 import com.example.powermanager.recording.recorder.StopRecordingBroadcastReceiver
 import com.example.powermanager.recording.storage.RecordingResult
 import com.example.powermanager.recording.storage.RecordingsStorageManager
+import com.example.powermanager.udfs.ContinueUDFSBroadcastReceiver
+import com.example.powermanager.udfs.StopUDFSBroadcastReceiver
+import com.example.powermanager.udfs.UDFSManager
 import com.example.powermanager.ui.state.ControlScreenUiState
 import com.example.powermanager.ui.state.HomeScreenUiState
 import com.example.powermanager.ui.state.LiveChartsScreenUiState
@@ -57,6 +60,14 @@ import com.example.powermanager.utils.RECORDING_STARTED_NOTIFICATION_ID
 import com.example.powermanager.utils.RECORDING_STARTED_NOTIFICATION_TITLE
 import com.example.powermanager.utils.SAVED_CPU_CONFIGURATIONS_DIRECTORY_NAME
 import com.example.powermanager.utils.STATISTICS_BACKGROUND_SAMPLING_THRESHOLD_MILLIS
+import com.example.powermanager.utils.UDFS_FINISHED_NOTIFICATION_ID
+import com.example.powermanager.utils.UDFS_FINISHED_NOTIFICATION_TEXT
+import com.example.powermanager.utils.UDFS_FINISHED_NOTIFICATION_TITLE
+import com.example.powermanager.utils.UDFS_NOTIFICATION_CONTINUE_BUTTON_TEXT
+import com.example.powermanager.utils.UDFS_NOTIFICATION_STOP_BUTTON_TEXT
+import com.example.powermanager.utils.UDFS_NUMBER_OF_LEVELS
+import com.example.powermanager.utils.UDFS_ONGOING_NOTIFICATION_ID
+import com.example.powermanager.utils.UDFS_ONGOING_NOTIFICATION_TITLE
 import com.example.powermanager.utils.UPTIME_COMMAND
 import com.example.powermanager.utils.convertBytesToGigaBytes
 import com.example.powermanager.utils.convertKHzToGHz
@@ -793,6 +804,82 @@ class PowerManagerAppModel(
         }
 
         CpuHotplugManager.changeCoreState(coreIndex, enable)
+    }
+
+    // user driven frequency scaling
+
+    fun startUDFSProcess() {
+        UDFSManager.startUDFS(
+            policies = cpuFreqPolicies,
+            onLevelChanged = { onCurrentUDFSLevelChanged(it) },
+            onProcessFinished = { onUDFSProcessFinished(it) }
+        )
+    }
+
+    private fun onCurrentUDFSLevelChanged(currentLevel : Int) {
+        val context = getApplication<Application>().applicationContext
+        notificationManager.cancelAll()
+
+        // first change the frequencies to reflect the current level
+        for (policy in cpuFreqPolicies.keys) {
+            changeMaxFrequencyForPolicy(
+                policyName = policy,
+                maxFrequencyMhz = cpuFreqPolicies[policy]!!.frequenciesMhz[currentLevel - 1]
+            )
+        }
+
+        // then send a notification with the two action buttons (Continue and Stop)
+        val intentContinue = Intent(context, ContinueUDFSBroadcastReceiver::class.java)
+        val pendingIntentContinue = PendingIntent.getBroadcast(context, 0, intentContinue, PendingIntent.FLAG_IMMUTABLE)
+
+        val intentStop = Intent(context, StopUDFSBroadcastReceiver::class.java)
+        val pendingIntentStop = PendingIntent.getBroadcast(context, 0, intentStop, PendingIntent.FLAG_IMMUTABLE)
+
+        val notification = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
+            .setContentTitle(String.format(UDFS_ONGOING_NOTIFICATION_TITLE, currentLevel))
+            .setSmallIcon(R.drawable.app_icon)
+            .setAutoCancel(true)
+            .setSilent(true)
+            .addAction(0, UDFS_NOTIFICATION_CONTINUE_BUTTON_TEXT, pendingIntentContinue)
+            .addAction(0, UDFS_NOTIFICATION_STOP_BUTTON_TEXT, pendingIntentStop)
+            .build()
+
+        notificationManager.notify(
+            UDFS_ONGOING_NOTIFICATION_ID,
+            notification
+        )
+    }
+
+    private fun onUDFSProcessFinished(finalLevel : Int) {
+        val context = getApplication<Application>().applicationContext
+        notificationManager.cancelAll()
+
+        var finalLevelCorrected = finalLevel
+        if (finalLevelCorrected == 0)
+            finalLevelCorrected++
+        if (finalLevelCorrected == UDFS_NUMBER_OF_LEVELS + 1)
+            finalLevelCorrected--
+
+        // update the frequency limits and the control screen UI with the final values
+        for (policy in cpuFreqPolicies.keys) {
+            changeMaxFrequencyForPolicy(
+                policyName = policy,
+                maxFrequencyMhz = cpuFreqPolicies[policy]!!.frequenciesMhz[finalLevelCorrected - 1]
+            )
+        }
+
+        val notification = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
+            .setContentTitle(UDFS_FINISHED_NOTIFICATION_TITLE)
+            .setContentText(String.format(UDFS_FINISHED_NOTIFICATION_TEXT, finalLevelCorrected))
+            .setSmallIcon(R.drawable.app_icon)
+            .setAutoCancel(true)
+            .setSilent(false)
+            .build()
+
+        notificationManager.notify(
+            UDFS_FINISHED_NOTIFICATION_ID,
+            notification
+        )
     }
 
     // preferences

@@ -15,6 +15,7 @@ const val SCALING_GOVERNORS_EXPLANATION_SCREEN_NAME = "_scaling_governors"
 const val CPU_CONFIGURATION_INSPECT_SCREEN_NAME     = "_cpu_configuration_inspect"
 const val RECORDING_RESULT_FILE_INSPECT_SCREEN_NAME = "_recording_result_file_inspect"
 const val RECORDING_RESULTS_COMPARISON_SCREEN_NAME  = "_recording_results_comparison"
+const val UDFS_SCREEN_NAME                          = "_udfs"
 
 // chart names
 const val BATTERY_CHART_NAME        = "Battery percentage in the last %d hours"
@@ -71,10 +72,17 @@ const val NOTIFICATION_CHANNEL_ID = "power_manager"
 const val NOTIFICATION_CHANNEL_NAME = "Power Manager"
 const val RECORDING_STARTED_NOTIFICATION_ID = 12344
 const val RECORDING_FINISHED_NOTIFICATION_ID = 12345
+const val UDFS_ONGOING_NOTIFICATION_ID = 4444
+const val UDFS_FINISHED_NOTIFICATION_ID = 5555
 const val RECORDING_STARTED_NOTIFICATION_TITLE = "Recording power and performance..."
 const val RECORDING_FINISHED_NOTIFICATION_TITLE = "Power and performance recording ended"
 const val RECORDING_FINISHED_NOTIFICATION_TEXT = "Result saved in %s.json"
 const val RECORDING_STARTED_BUTTON_TEXT = "Stop recording"
+const val UDFS_ONGOING_NOTIFICATION_TITLE = "Performing UDFS (level %d/9)..."
+const val UDFS_FINISHED_NOTIFICATION_TITLE = "Finished UDFS session"
+const val UDFS_FINISHED_NOTIFICATION_TEXT = "Optimal level found is %d/9. Open the app to find out more."
+const val UDFS_NOTIFICATION_CONTINUE_BUTTON_TEXT = "Continue"
+const val UDFS_NOTIFICATION_STOP_BUTTON_TEXT = "Stop"
 
 // paths
 const val CORE_FREQUENCY_PATH = "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_cur_freq"
@@ -112,3 +120,4 @@ const val PROCESSOR = "processor"
 const val NO_VALUE_STRING = "-"
 const val FAILED_TO_DETERMINE = "Failed to determine"
 const val JSON_MIME_TYPE = "application/json"
+const val UDFS_NUMBER_OF_LEVELS = 9

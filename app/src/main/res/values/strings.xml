@@ -94,4 +94,11 @@
     <string name="compare">Compare</string>
     <string name="charts_legend">• Charts legend:</string>
     <string name="stop_recording">Stop recording</string>
+    <string name="udfs">UDFS</string>
+    <string name="click_here_to_choose_limit_using_udfs">Click here to choose limit using UDFS:</string>
+    <string name="start">Start</string>
+    <string name="udfs_definition">\tUDFS (User Driven Frequency Scaling) is a method of finding the lowest CPU frequencies that still maintain satisfactory user experience.</string>
+    <string name="udfs_explanation1">\tWhen you click the Start button below, this process starts by setting the frequency limit to its maximum value. There are 9 levels for frequency limits, and level 1 represents the minimum frequency that the cores can operate at. You will receive a notification which allows you to interact with the Power Manager application. It will present two options:</string>
+    <string name="udfs_explanation2">\tIf you are comfortable with the current user experience and want to continue the process, click on the Continue button and the level will decrease (the frequency limits will be lower). When you are no longer satisfied by the performance of your device, click on Stop and the previous frequency level that you were comfortable with will be restored. You can then save it as a permanent configuration from the Control Screen of the Power Manager application.</string>
+    <string name="udfs_note">\t! Note that lower CPU frequencies do not always result in longer battery life. You can check if that is the case using the power and performance recording feature.</string>
 </resources>

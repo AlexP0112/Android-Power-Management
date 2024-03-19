@@ -12,6 +12,8 @@ const val GOVERNOR_SCHEDUTIL = "schedutil"
 
 const val DEFAULT_GOVERNOR_STRING = "(default)"
 
+val FIXED_FREQUENCY_GOVERNORS : List<String> = listOf(GOVERNOR_PERFORMANCE, GOVERNOR_POWERSAVE)
+
 // map from governor name to the ID of its description string
 val GOVERNOR_NAME_TO_DESCRIPTION_STRING_ID : Map<String, Int> = mapOf(
     GOVERNOR_PERFORMANCE to R.string.performance_governor_description,
@@ -24,12 +26,12 @@ val GOVERNOR_NAME_TO_DESCRIPTION_STRING_ID : Map<String, Int> = mapOf(
 )
 
 // map from a number that represents the number of possible frequencies for a policy to a list
-// of indices of the chosen values. Each list contains 8 values (8 steps)
+// of indices of the chosen values. Each list contains 9 values (9 steps as used in UDFS)
 val NUMBER_OF_AVAILABLE_FREQUENCIES_TO_CHOSEN_INDICES : Map<Int, List<Int>> = mapOf(
-    8 to listOf(0, 1, 2, 3, 4, 5, 6, 7),
-    9 to listOf(1, 2, 3, 4, 5, 6, 7, 8),
-    10 to listOf(1, 2, 3, 4, 6, 7, 8, 9),
-    11 to listOf(1, 2, 3, 5, 6, 8, 9, 10),
-    14 to listOf(1, 2, 3, 5, 7, 9, 11, 13),
-    17 to listOf(1, 3, 5, 7, 9, 11, 13, 16)
+    8 to listOf(0, 1, 2, 3, 4, 5, 6, 6, 7),
+    9 to listOf(0, 1, 2, 3, 4, 5, 6, 7, 8),
+    10 to listOf(0, 1, 2, 3, 4, 6, 7, 8, 9),
+    11 to listOf(0, 1, 2, 3, 5, 6, 8, 9, 10),
+    14 to listOf(0, 1, 2, 3, 5, 7, 9, 11, 13),
+    17 to listOf(0, 1, 3, 5, 7, 9, 11, 13, 16)
 )
