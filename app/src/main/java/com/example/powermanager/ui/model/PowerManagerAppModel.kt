@@ -19,6 +19,7 @@ import com.example.powermanager.control.cpufreq.CpuFreqPolicy
 import com.example.powermanager.control.cpufreq.CpuHotplugManager
 import com.example.powermanager.control.storage.CpuConfiguration
 import com.example.powermanager.control.storage.CpuConfigurationsStorageManager
+import com.example.powermanager.data.battery.BatteryTemperatureTracker
 import com.example.powermanager.preferences.HOME_SCREEN_SAMPLING_PERIOD_ID
 import com.example.powermanager.preferences.LIVE_CHARTS_SAMPLING_PERIOD_ID
 import com.example.powermanager.preferences.LIVE_CHARTS_TRACKED_PERIOD_ID
@@ -49,6 +50,7 @@ import com.example.powermanager.utils.GET_NUMBER_OF_THREADS_COMMAND
 import com.example.powermanager.utils.JSON_MIME_TYPE
 import com.example.powermanager.utils.MILLIS_IN_A_SECOND
 import com.example.powermanager.utils.NOTIFICATION_CHANNEL_ID
+import com.example.powermanager.utils.NO_VALUE_STRING
 import com.example.powermanager.utils.NUMBER_OF_KILOHERTZ_IN_A_MEGAHERTZ
 import com.example.powermanager.utils.POLICY_CURRENT_FREQUENCY_PATH
 import com.example.powermanager.utils.RECORDING_FINISHED_NOTIFICATION_ID
@@ -142,6 +144,8 @@ class PowerManagerAppModel(
     private var cpuFrequencySamples: MutableList<FlowSample> = mutableListOf()
     private var cpuLoadSamples: MutableList<FlowSample> = mutableListOf()
 
+    private var batteryTemperatureString : String = NO_VALUE_STRING
+
     init {
         // initialize managers
         activityManager = application.applicationContext.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
@@ -165,6 +169,8 @@ class PowerManagerAppModel(
         totalNumberOfCores = CpuHotplugManager.determineTotalNumberOfCPUCores()
         cpuFreqPolicies = CpuFreqManager.determineAllCpuFreqPolicies()
         coreToPolicy = CpuFreqManager.getCoreToPolicyMap(cpuFreqPolicies)
+
+        BatteryTemperatureTracker.changeTemperatureChangeCallback { batteryTemperatureString = "$it \u00b0C" }
 
         // initialize the user preferences
         viewModelScope.launch {
@@ -283,6 +289,7 @@ class PowerManagerAppModel(
                     batteryChargeCount = batteryChargeCountMilliAmps,
                     chargeOrDischargePrediction = chargeOrDischargePrediction,
                     powerSaveState = powerManager.isPowerSaveMode,
+                    batteryTemperatureString = batteryTemperatureString,
                     usedMemoryGB = usedMemoryGB,
                     cpuFrequenciesGHz = cpuFrequenciesGHz,
                     cpuLoad = loadAverage,

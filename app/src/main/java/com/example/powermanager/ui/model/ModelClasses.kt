@@ -15,6 +15,7 @@ data class HomeScreenInfo(
     val batteryChargeCount : Int = 0,
     val chargeOrDischargePrediction : Duration? = null,
     val powerSaveState : Boolean = false,
+    val batteryTemperatureString : String = NO_VALUE_STRING,
     val lowPowerStandbyEnabled : Boolean = false,
     val usedMemoryGB : Float = 0f,
     val cpuLoad : Float = 0f,
