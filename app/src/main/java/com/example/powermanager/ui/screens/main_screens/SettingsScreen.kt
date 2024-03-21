@@ -1,6 +1,6 @@
 package com.example.powermanager.ui.screens.main_screens
 
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,11 +11,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.Text
@@ -38,7 +41,6 @@ import com.example.powermanager.R
 import com.example.powermanager.preferences.allPreferencesIDs
 import com.example.powermanager.ui.model.PowerManagerAppModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
     topPadding: Dp,
@@ -90,9 +92,7 @@ fun SettingsScreen(
                 verticalAlignment = Alignment.CenterVertically
             ){
                 Column(
-                    modifier = Modifier
-                        .weight(2f)
-                        .fillMaxWidth()
+                    modifier = Modifier.weight(2f)
                 ) {
                     // the name of the preference
                     Text(
@@ -107,52 +107,55 @@ fun SettingsScreen(
                         text = stringResource(id = preferenceProperties.descriptionStringId)
                     )
                 }
-                
-                Spacer(modifier = Modifier.width(10.dp))
 
-                // the dropdown with the possible values, default value is marked with Bold
-                Box(
-                    modifier = Modifier.weight(1f)
+                Row(
+                    modifier = Modifier.weight(1f),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.End
                 ) {
-                    ExposedDropdownMenuBox(
-                        expanded = isDropdownExpanded,
-                        onExpandedChange = { newValue ->
-                            isDropdownExpanded = newValue
-                        }
-                    ) {
-                        TextField(
-                            value = currentPreferenceValue,
-                            onValueChange = {},
-                            readOnly = true,
-                            trailingIcon = {
-                                ExposedDropdownMenuDefaults.TrailingIcon(expanded = isDropdownExpanded)
-                            },
-                            colors = TextFieldDefaults.colors(),
-                            modifier = Modifier.menuAnchor()
-                        )
+                    Spacer(modifier = Modifier.width(10.dp))
 
-                        ExposedDropdownMenu(
-                            expanded = isDropdownExpanded,
-                            onDismissRequest = {
-                                isDropdownExpanded = false
-                            }
-                        ) {
-                            preferenceProperties.possibleValues.map { value ->
-                                DropdownMenuItem(
-                                    text = {
-                                        Text(
-                                            text = value,
-                                            fontWeight = if (value == preferenceProperties.defaultValue) FontWeight.ExtraBold else null
-                                        )
-                                    },
-                                    colors = MenuDefaults.itemColors(),
-                                    onClick = {
-                                        currentPreferenceValue = value
-                                        isDropdownExpanded = false
-                                        model.onPreferenceValueChanged(preferenceID, value)
-                                    }
-                                )
-                            }
+                    // the current value of the preference
+                    TextField(
+                        modifier = Modifier.width(100.dp),
+                        value = currentPreferenceValue,
+                        onValueChange = {},
+                        readOnly = true,
+                        colors = TextFieldDefaults.colors()
+                    )
+
+                    // button that expands/collapses the dropdown menu
+                    IconButton(
+                        onClick = { isDropdownExpanded = !isDropdownExpanded }
+                    ) {
+                        Icon(
+                            imageVector = if (!isDropdownExpanded) Icons.Default.KeyboardArrowDown
+                                            else Icons.Default.KeyboardArrowUp,
+                            contentDescription = null
+                        )
+                    }
+
+                    // dropdown menu with options for the preference value
+                    DropdownMenu(
+                        expanded = isDropdownExpanded,
+                        onDismissRequest = { isDropdownExpanded = false }
+                    ) {
+                        preferenceProperties.possibleValues.forEach { value ->
+                            DropdownMenuItem(
+                                text = {
+                                    Text(
+                                        text = value,
+                                        fontWeight = if (value == preferenceProperties.defaultValue)
+                                            FontWeight.ExtraBold else null
+                                    )
+                                },
+                                colors = MenuDefaults.itemColors(),
+                                onClick = {
+                                    currentPreferenceValue = value
+                                    isDropdownExpanded = false
+                                    model.onPreferenceValueChanged(preferenceID, value)
+                                }
+                            )
                         }
                     }
                 }

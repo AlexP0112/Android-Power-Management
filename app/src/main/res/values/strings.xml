@@ -45,7 +45,7 @@
     <string name="battery_chart_tracked_period_name">Battery chart: tracked period</string>
     <string name="battery_chart_tracked_period_description">Period of time (in hours) that is tracked by the battery level live chart</string>
     <string name="number_of_recordings_listed_name">Recording: number of results displayed</string>
-    <string name="number_of_recordings_listed_description">Maximum number of power and performance recording results displayed in the list</string>
+    <string name="number_of_recordings_listed_description">Maximum number of power and performance recording results displayed in the recent results list</string>
     <string name="recording_finished_notification_enabled_name">Recording: enable notifications</string>
     <string name="recording_finished_notification_enabled_description">Controls whether a notification is sent when a recording session ends</string>
     <string name="new_session">New session</string>

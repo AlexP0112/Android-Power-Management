@@ -17,13 +17,13 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -168,22 +168,14 @@ fun ControlScreen(
             onlineCores.forEach { coresText += "Cpu$it/" }
             coresText = coresText.dropLast(1)
 
-            var isDropdownExpanded by rememberSaveable {
-                mutableStateOf(false)
-            }
-
             Spacer(modifier = Modifier.height(10.dp))
 
             SelectMaxFrequencyRow(
                 coresText = coresText,
-                isDropdownExpanded = isDropdownExpanded,
-                onExpendedChange = { isDropdownExpanded = it },
                 maxFrequency = policy.maximumFrequencyGhz,
-                onDismiss = { isDropdownExpanded = false },
                 value = uiState.policyToFrequencyLimitMHz[policy.name].toString(),
                 availableFrequencies = policy.frequenciesMhz,
                 onSelectedEntry = {
-                    isDropdownExpanded = false
                     model.changeMaxFrequencyForPolicy(
                         policyName = policy.name,
                         maxFrequencyMhz = it
@@ -307,27 +299,26 @@ fun ScalingGovernorsExtraInfoRow(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SelectMaxFrequencyRow(
     coresText : String,
-    isDropdownExpanded : Boolean,
-    onExpendedChange : (Boolean) -> Unit,
     maxFrequency : Float,
-    onDismiss : () -> Unit,
     value : String,
     onSelectedEntry : (Int) -> Unit,
     availableFrequencies : List<Int>
 ) {
+    var dropdownExpanded by rememberSaveable { mutableStateOf(false) }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(start = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ){
+        // the active cores that belong to this policy and their maximum frequency
         Column(
             modifier = Modifier
-                .weight(2.65f)
+                .weight(2.2f)
                 .fillMaxWidth()
         ) {
             Text(
@@ -342,37 +333,49 @@ fun SelectMaxFrequencyRow(
             )
         }
 
-        Box(
-            modifier = Modifier.weight(1f)
+        Row(
+            modifier = Modifier.weight(1f),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.End
         ) {
-            ExposedDropdownMenuBox(
-                expanded = isDropdownExpanded,
-                onExpandedChange = onExpendedChange
-            ) {
-                TextField(
-                    value = value,
-                    onValueChange = {},
-                    readOnly = true,
-                    trailingIcon = {
-                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = isDropdownExpanded)
-                    },
-                    colors = TextFieldDefaults.colors(),
-                    modifier = Modifier.menuAnchor()
-                )
+            // text field with the current value of the frequency limit
+            TextField(
+                modifier = Modifier.width(100.dp),
+                value = value,
+                onValueChange = {},
+                readOnly = true,
+                colors = TextFieldDefaults.colors()
+            )
 
-                ExposedDropdownMenu(
-                    expanded = isDropdownExpanded,
-                    onDismissRequest = onDismiss
-                ) {
-                    availableFrequencies.map { value ->
-                        DropdownMenuItem(
-                            text = {
-                                Text(text = value.toString())
-                            },
-                            colors = MenuDefaults.itemColors(),
-                            onClick = { onSelectedEntry(value) }
-                        )
-                    }
+            // button that expands/collapses the dropdown menu
+            IconButton(
+                onClick = { dropdownExpanded = !dropdownExpanded }
+            ) {
+                Icon(
+                    imageVector = if (!dropdownExpanded) Icons.Default.KeyboardArrowDown
+                    else Icons.Default.KeyboardArrowUp,
+                    contentDescription = null
+                )
+            }
+
+            // dropdown menu with the available values
+            DropdownMenu(
+                expanded = dropdownExpanded,
+                onDismissRequest = {
+                    dropdownExpanded = false
+                }
+            ) {
+                availableFrequencies.map { value ->
+                    DropdownMenuItem(
+                        text = {
+                            Text(text = value.toString())
+                        },
+                        colors = MenuDefaults.itemColors(),
+                        onClick = {
+                            dropdownExpanded = false
+                            onSelectedEntry(value)
+                        }
+                    )
                 }
             }
         }

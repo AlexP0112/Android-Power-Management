@@ -1,7 +1,6 @@
 package com.example.powermanager.ui.screens.main_screens
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,13 +13,14 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -388,13 +388,12 @@ fun StartRecordingButtonAndIndicatorRow(
  * A Row composable that contains a text ("Time between samples (milliseconds)"), a button that
  * opens an info dialog and a dropdown menu where the recording sampling period is set by the user
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecordingSamplingPeriodRow(
     onSelectedNewValue: (Long) -> Unit,
     currentValue: Long
 ) {
-    var dropdownExpandedState by rememberSaveable { mutableStateOf(false) }
+    var dropdownExpanded by rememberSaveable { mutableStateOf(false) }
 
     Row(
         modifier = Modifier
@@ -402,51 +401,56 @@ fun RecordingSamplingPeriodRow(
             .padding(top = 8.dp, end = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ){
-
         Text(
-            modifier = Modifier.weight(2.6f),
+            modifier = Modifier.weight(2f),
             text = stringResource(R.string.sampling_period_millis)
         )
 
-        // the dropdown with the possible values
-        Box(
-            modifier = Modifier.weight(1f)
+        Row(
+            modifier = Modifier.weight(1f),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.End
         ) {
-            ExposedDropdownMenuBox(
-                expanded = dropdownExpandedState,
-                onExpandedChange = { expanded ->
-                    dropdownExpandedState = expanded
+            Spacer(modifier = Modifier.width(10.dp))
+
+            // text field with the current value selected
+            TextField(
+                modifier = Modifier.width(100.dp),
+                value = currentValue.toString(),
+                onValueChange = {},
+                readOnly = true,
+                colors = TextFieldDefaults.colors()
+            )
+
+            // button that expands/collapses the dropdown menu
+            IconButton(
+                onClick = { dropdownExpanded = !dropdownExpanded }
+            ) {
+                Icon(
+                    imageVector = if (!dropdownExpanded) Icons.Default.KeyboardArrowDown
+                                    else Icons.Default.KeyboardArrowUp,
+                    contentDescription = null
+                )
+            }
+
+            // dropdown menu with the available values
+            DropdownMenu(
+                expanded = dropdownExpanded,
+                onDismissRequest = {
+                    dropdownExpanded = false
                 }
             ) {
-                TextField(
-                    value = currentValue.toString(),
-                    onValueChange = {},
-                    readOnly = true,
-                    trailingIcon = {
-                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = dropdownExpandedState)
-                    },
-                    colors = TextFieldDefaults.colors(),
-                    modifier = Modifier.menuAnchor()
-                )
-
-                ExposedDropdownMenu(
-                    expanded = dropdownExpandedState,
-                    onDismissRequest = {
-                        dropdownExpandedState = false
-                    }
-                ) {
-                    RECORDING_SAMPLING_PERIOD_POSSIBLE_VALUES.map { value ->
-                        DropdownMenuItem(
-                            text = {
-                                Text(text = value.toString())
-                            },
-                            colors = MenuDefaults.itemColors(),
-                            onClick = {
-                                onSelectedNewValue(value)
-                                dropdownExpandedState = false
-                            }
-                        )
-                    }
+                RECORDING_SAMPLING_PERIOD_POSSIBLE_VALUES.map { value ->
+                    DropdownMenuItem(
+                        text = {
+                            Text(text = value.toString())
+                        },
+                        colors = MenuDefaults.itemColors(),
+                        onClick = {
+                            onSelectedNewValue(value)
+                            dropdownExpanded = false
+                        }
+                    )
                 }
             }
         }
