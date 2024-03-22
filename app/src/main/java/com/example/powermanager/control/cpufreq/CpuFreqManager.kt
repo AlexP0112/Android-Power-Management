@@ -48,11 +48,17 @@ object CpuFreqManager {
         return readProtectedFileContent(filePath).trim().toInt()
     }
 
-    fun changeMaxFrequencyForPolicy(policyName: String, maxFrequencyKhz: Int) {
-        val command = String.format(CHANGE_SCALING_MAX_FREQUENCY_FOR_POLICY_COMMAND, maxFrequencyKhz, policyName)
+    suspend fun changeMaxFrequencyForPolicy(policyName: String, maxFrequencyKhz: Int) {
+        withContext(Dispatchers.IO) {
+            val command = String.format(
+                CHANGE_SCALING_MAX_FREQUENCY_FOR_POLICY_COMMAND,
+                maxFrequencyKhz,
+                policyName
+            )
 
-        val process = Runtime.getRuntime().exec(command)
-        process.waitFor()
+            val process = Runtime.getRuntime().exec(command)
+            process.waitFor()
+        }
     }
 
     /*

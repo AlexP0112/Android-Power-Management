@@ -6,6 +6,8 @@ import com.example.powermanager.utils.CPU_REGEX
 import com.example.powermanager.utils.DEVICES_SYSTEM_CPU_PATH
 import com.example.powermanager.utils.getOnlineCoresFromFileContent
 import com.example.powermanager.utils.readProtectedFileContent
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileFilter
 import java.util.regex.Pattern
@@ -37,11 +39,13 @@ object CpuHotplugManager {
         return getOnlineCoresFromFileContent(fileContent)
     }
 
-    fun changeCoreState(coreIndex: Int, enable: Boolean) {
-        val command = String.format(CHANGE_CORE_STATE_COMMAND, if (enable) 1 else 0, coreIndex)
+    suspend fun changeCoreState(coreIndex: Int, enable: Boolean) {
+        withContext(Dispatchers.IO) {
+            val command = String.format(CHANGE_CORE_STATE_COMMAND, if (enable) 1 else 0, coreIndex)
 
-        val process = Runtime.getRuntime().exec(command)
-        process.waitFor()
+            val process = Runtime.getRuntime().exec(command)
+            process.waitFor()
+        }
     }
 
 }

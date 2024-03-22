@@ -699,15 +699,19 @@ class PowerManagerAppModel(
     }
 
     fun onConfirmCpuConfigurationDeletionRequest() {
-        CpuConfigurationsStorageManager.deleteConfiguration(
+        val deleted = CpuConfigurationsStorageManager.deleteConfiguration(
             name = controlScreenUiState.value.currentlySelectedCpuConfiguration,
             directory = cpuConfigurationsDirectory
         )
 
-        _controlScreenUiState.update { currentState ->
-            currentState.copy(
-                savedConfigurations = CpuConfigurationsStorageManager.getSavedCpuConfigurationsNames(cpuConfigurationsDirectory)
-            )
+        if (deleted) {
+            _controlScreenUiState.update { currentState ->
+                currentState.copy(
+                    savedConfigurations = CpuConfigurationsStorageManager.getSavedCpuConfigurationsNames(
+                        cpuConfigurationsDirectory
+                    )
+                )
+            }
         }
     }
 
@@ -784,10 +788,12 @@ class PowerManagerAppModel(
             )
         }
 
-        CpuFreqManager.changeMaxFrequencyForPolicy(
-            policyName = policyName,
-            maxFrequencyKhz = maxFrequencyMhz * NUMBER_OF_KILOHERTZ_IN_A_MEGAHERTZ
-        )
+        viewModelScope.launch {
+            CpuFreqManager.changeMaxFrequencyForPolicy(
+                policyName = policyName,
+                maxFrequencyKhz = maxFrequencyMhz * NUMBER_OF_KILOHERTZ_IN_A_MEGAHERTZ
+            )
+        }
     }
 
     fun changeCoreEnabledState(coreIndex : Int, enable: Boolean) {
@@ -810,7 +816,9 @@ class PowerManagerAppModel(
             }
         }
 
-        CpuHotplugManager.changeCoreState(coreIndex, enable)
+        viewModelScope.launch {
+            CpuHotplugManager.changeCoreState(coreIndex, enable)
+        }
     }
 
     // user driven frequency scaling
