@@ -37,7 +37,8 @@ class PreferencesManager (
             BATTERY_CHART_TRACKED_PERIOD_ID to PreferencesKeys.batteryChartTrackedPeriod,
             LOAD_AVERAGE_TYPE_ID to PreferencesKeys.loadAverageType,
             NUMBER_OF_RECORDINGS_LISTED_ID to PreferencesKeys.numberOfRecordingsListed,
-            RECORDING_FINISHED_NOTIFICATION_ENABLED_ID to PreferencesKeys.recordingFinishedNotificationEnabled
+            RECORDING_FINISHED_NOTIFICATION_ENABLED_ID to PreferencesKeys.recordingFinishedNotificationEnabled,
+            AUTOMATIC_WIFI_DISABLING_ID to PreferencesKeys.automaticWifiDisabling
         )
 
         preferenceKeyToProperties = mapOf(
@@ -88,6 +89,13 @@ class PreferencesManager (
                 descriptionStringId = R.string.recording_finished_notification_enabled_description,
                 possibleValues = RECORDING_FINISHED_NOTIFICATION_ENABLED_POSSIBLE_VALUES,
                 defaultValue = RECORDING_FINISHED_NOTIFICATION_ENABLED_DEFAULT_VALUE
+            ),
+
+            AUTOMATIC_WIFI_DISABLING_ID to PreferenceProperties(
+                nameStringId = R.string.automatic_wi_fi_disabling_name,
+                descriptionStringId = R.string.automatic_wi_fi_disabling_description,
+                possibleValues = AUTOMATIC_WIFI_DISABLING_POSSIBLE_VALUES,
+                defaultValue = AUTOMATIC_WIFI_DISABLING_DEFAULT_VALUE
             )
         )
     }

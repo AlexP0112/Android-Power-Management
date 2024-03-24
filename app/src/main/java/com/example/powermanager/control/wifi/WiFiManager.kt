@@ -13,6 +13,17 @@ object WiFiManager {
 
     var interfacesTurnedOff = false
 
+    // function that indicates whether the automatic WiFi disabling feature is enabled by the user
+    private var automaticTurnOffEnabled : () -> Boolean = { false }
+
+    fun initialize(featureEnabled : () -> Boolean) {
+        automaticTurnOffEnabled = featureEnabled
+    }
+
+    fun isAutomaticWifiDisablingFeatureEnabled() : Boolean {
+        return automaticTurnOffEnabled()
+    }
+
     // function that disables/enables WiFi interfaces (it does not change the actual
     // system setting for WiFi, as third party apps cannot access that setting)
     suspend fun turnWifiOffOrOn(turnOn : Boolean) {

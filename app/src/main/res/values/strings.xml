@@ -65,7 +65,7 @@
     <string name="total_number_of_threads">Total number of threads</string>
     <string name="wi_fi">Wi-Fi</string>
     <string name="cpu">CPU</string>
-    <string name="wifi_text">It is recommended to turn off Wi-Fi during long periods of inactivity (such as during the night), at the same time making sure that Mobile Data connection is disabled. In case you forget to do so, Power Manager will automatically disable Wi-Fi when the device enters Doze mode (a state of deep sleep triggered by long periods of inactivity).</string>
+    <string name="wifi_text">It is recommended to turn off Wi-Fi during long periods of inactivity (such as during the night), at the same time making sure that Mobile Data connection is disabled. In case you forget to do so, Power Manager can automatically disable Wi-Fi when the device enters Doze mode (a state of deep sleep triggered by long periods of inactivity).</string>
     <string name="dark_theme_text">\u2022 Enabling Dark Theme can also extend your battery life, especially on devices with OLED or AMOLED displays.</string>
     <string name="display">Display</string>
     <string name="scaling_governors_explanation">\tScaling governors are a part of the Linux CPU frequency scaling subsystem that periodically compute the optimum frequency for CPU cores and set it, based on different strategies.\n\tSome well known scaling governors are:</string>
@@ -102,4 +102,7 @@
     <string name="udfs_explanation2">\tIf you are comfortable with the current user experience and want to continue the process, click on the Continue button and the level will decrease (the frequency limits will be lower). When you are no longer satisfied by the performance of your device, click on Stop and the previous frequency limits that you were comfortable with will be restored. You can then save them as a permanent configuration from the Control Screen of the Power Manager application.</string>
     <string name="udfs_note">\t! Note that lower CPU frequencies do not always result in extended battery life. You can check if that is the case using the power and performance recording feature.</string>
     <string name="battery_temperature">Battery temperature</string>
+    <string name="automatic_wi_fi_disabling_name">Control: automatic Wi-Fi disabling</string>
+    <string name="automatic_wi_fi_disabling_description">Controls whether Wi-Fi interfaces are automatically disabled when device enters Doze mode</string>
+    <string name="enable">Enable</string>
 </resources>

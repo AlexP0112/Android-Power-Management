@@ -21,6 +21,8 @@ object PreferenceValueAdaptor {
                 }
             }
 
+            AUTOMATIC_WIFI_DISABLING_ID -> preferenceValueAsString == "Yes"
+
             RECORDING_FINISHED_NOTIFICATION_ENABLED_ID -> preferenceValueAsString == "Yes"
 
             NUMBER_OF_RECORDINGS_LISTED_ID -> preferenceValueAsString.toInt()

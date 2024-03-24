@@ -39,6 +39,10 @@ const val NUMBER_OF_RECORDINGS_LISTED_ID = "number_of_recordings_listed"
 val NUMBER_OF_RECORDINGS_LISTED_POSSIBLE_VALUES = listOf("5", "10", "20", "50")
 const val NUMBER_OF_RECORDINGS_LISTED_DEFAULT_VALUE = "10"
 
+const val AUTOMATIC_WIFI_DISABLING_ID = "enable_automatic_wifi_disabling"
+val AUTOMATIC_WIFI_DISABLING_POSSIBLE_VALUES = listOf("Yes", "No")
+const val AUTOMATIC_WIFI_DISABLING_DEFAULT_VALUE = "No"
+
 // IDs that are used as keys in the Preferences Datastore
 val allPreferencesIDs = listOf(
     HOME_SCREEN_SAMPLING_PERIOD_ID,
@@ -47,7 +51,8 @@ val allPreferencesIDs = listOf(
     BATTERY_CHART_TRACKED_PERIOD_ID,
     LOAD_AVERAGE_TYPE_ID,
     NUMBER_OF_RECORDINGS_LISTED_ID,
-    RECORDING_FINISHED_NOTIFICATION_ENABLED_ID
+    RECORDING_FINISHED_NOTIFICATION_ENABLED_ID,
+    AUTOMATIC_WIFI_DISABLING_ID
 )
 
 object PreferencesKeys {
@@ -58,4 +63,5 @@ object PreferencesKeys {
     val loadAverageType = stringPreferencesKey(LOAD_AVERAGE_TYPE_ID)
     val numberOfRecordingsListed = stringPreferencesKey(NUMBER_OF_RECORDINGS_LISTED_ID)
     val recordingFinishedNotificationEnabled = stringPreferencesKey(RECORDING_FINISHED_NOTIFICATION_ENABLED_ID)
+    val automaticWifiDisabling = stringPreferencesKey(AUTOMATIC_WIFI_DISABLING_ID)
 }

@@ -19,7 +19,9 @@ import com.example.powermanager.control.cpufreq.CpuFreqPolicy
 import com.example.powermanager.control.cpufreq.CpuHotplugManager
 import com.example.powermanager.control.storage.CpuConfiguration
 import com.example.powermanager.control.storage.CpuConfigurationsStorageManager
+import com.example.powermanager.control.wifi.WiFiManager
 import com.example.powermanager.data.battery.BatteryTemperatureTracker
+import com.example.powermanager.preferences.AUTOMATIC_WIFI_DISABLING_ID
 import com.example.powermanager.preferences.HOME_SCREEN_SAMPLING_PERIOD_ID
 import com.example.powermanager.preferences.LIVE_CHARTS_SAMPLING_PERIOD_ID
 import com.example.powermanager.preferences.LIVE_CHARTS_TRACKED_PERIOD_ID
@@ -171,6 +173,7 @@ class PowerManagerAppModel(
         coreToPolicy = CpuFreqManager.getCoreToPolicyMap(cpuFreqPolicies)
 
         BatteryTemperatureTracker.changeTemperatureChangeCallback { batteryTemperatureString = "$it \u00b0C" }
+        WiFiManager.initialize(this::isAutomaticWifiDisablingEnabled)
 
         // initialize the user preferences
         viewModelScope.launch {
@@ -943,6 +946,14 @@ class PowerManagerAppModel(
         process.waitFor()
 
         return getLoadAverageFromUptimeCommandOutput(processOutput, loadAverageType)
+    }
+
+    // others
+
+    private fun isAutomaticWifiDisablingEnabled() : Boolean {
+        return PreferenceValueAdaptor.preferenceStringValueToActualValue(
+            preferenceID = AUTOMATIC_WIFI_DISABLING_ID,
+            preferenceValueAsString = getPreferenceValue(AUTOMATIC_WIFI_DISABLING_ID)) as Boolean
     }
 
 }

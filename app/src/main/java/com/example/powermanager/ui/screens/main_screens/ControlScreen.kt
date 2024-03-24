@@ -70,9 +70,10 @@ fun ControlScreen(
     topPadding: Dp,
     goToDisplaySettings: () -> Unit,
     model: PowerManagerAppModel,
-    openScalingGovernorsScreen : () -> Unit,
-    openCpuConfigurationScreen : () -> Unit,
-    openUDFSScreen : () -> Unit
+    openScalingGovernorsScreen: () -> Unit,
+    openCpuConfigurationScreen: () -> Unit,
+    openUDFSScreen: () -> Unit,
+    goToAppSettings: () -> Unit
 ) {
     Column(
         Modifier
@@ -106,6 +107,12 @@ fun ControlScreen(
             fontSize = 18.sp
         )
 
+        // go to settings button
+        GoToButton(
+            goToFunction = goToAppSettings,
+            textID = R.string.enable
+        )
+
         Spacer(modifier = Modifier.height(8.dp))
 
         // ================= display section ==================== //
@@ -118,7 +125,10 @@ fun ControlScreen(
         DarkThemeText()
 
         // go to display settings button
-        GoToDisplaySettingsButton(goToDisplaySettings)
+        GoToButton(
+            goToFunction = goToDisplaySettings,
+            textID = R.string.go_to_display_settings
+        )
 
         // ================= CPU section ==================== //
         SectionHeader(sectionName = stringResource(id = R.string.cpu))
@@ -567,8 +577,9 @@ fun CpuCoreOnlineRow(
 }
 
 @Composable
-fun GoToDisplaySettingsButton(
-    goToDisplaySettings : () -> Unit
+fun GoToButton(
+    goToFunction : () -> Unit,
+    textID : Int
 ) {
     Box(
         modifier = Modifier
@@ -577,9 +588,9 @@ fun GoToDisplaySettingsButton(
         contentAlignment = Alignment.Center
     ) {
         OutlinedButton(
-            onClick = goToDisplaySettings
+            onClick = goToFunction
         ) {
-            Text(stringResource(R.string.go_to_display_settings))
+            Text(stringResource(textID))
         }
     }
 }

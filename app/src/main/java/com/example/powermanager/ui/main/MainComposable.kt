@@ -204,6 +204,9 @@ fun ScreensNavHost(
                 },
                 openUDFSScreen = {
                     navController.navigate(UDFS_SCREEN_NAME)
+                },
+                goToAppSettings = {
+                    navController.navigate(SETTINGS_SCREEN_NAME)
                 }
             )
         }
