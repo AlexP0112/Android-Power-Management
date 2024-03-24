@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 class DeviceIdleModeChangedBroadcastReceiver : BroadcastReceiver() {
     @OptIn(DelicateCoroutinesApi::class)
     override fun onReceive(context: Context, intent: Intent) {
-        if (WiFiManager.isAutomaticWifiDisablingFeatureEnabled() || intent.action == null ||
+        if (!WiFiManager.isAutomaticWifiDisablingFeatureEnabled() || intent.action == null ||
             !intent.action.equals(PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED))
             return
 
