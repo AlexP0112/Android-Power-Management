@@ -1,7 +1,6 @@
 package com.example.powermanager.ui.model
 
 import com.example.powermanager.utils.NO_VALUE_STRING
-import java.time.Duration
 
 enum class FlowType {
     MEMORY,
@@ -10,10 +9,13 @@ enum class FlowType {
 }
 
 data class HomeScreenInfo(
-    val isBatteryCharging : Boolean = false,
+    val batteryStatus : String = NO_VALUE_STRING,
     val currentBatteryLevel : Int = 0,
     val batteryChargeCount : Int = 0,
-    val chargeOrDischargePrediction : Duration? = null,
+    val batteryVoltageString : String = NO_VALUE_STRING,
+    val batteryCurrentString : String = NO_VALUE_STRING,
+    val batteryHealthString : String = NO_VALUE_STRING,
+    val batteryCyclesString : String = NO_VALUE_STRING,
     val powerSaveState : Boolean = false,
     val batteryTemperatureString : String = NO_VALUE_STRING,
     val lowPowerStandbyEnabled : Boolean = false,

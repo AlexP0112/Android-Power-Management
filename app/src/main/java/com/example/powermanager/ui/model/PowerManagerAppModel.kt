@@ -20,7 +20,7 @@ import com.example.powermanager.control.cpufreq.CpuHotplugManager
 import com.example.powermanager.control.storage.CpuConfiguration
 import com.example.powermanager.control.storage.CpuConfigurationsStorageManager
 import com.example.powermanager.control.wifi.WiFiManager
-import com.example.powermanager.data.battery.BatteryTemperatureTracker
+import com.example.powermanager.data.battery.BatteryDataProvider
 import com.example.powermanager.preferences.AUTOMATIC_WIFI_DISABLING_ID
 import com.example.powermanager.preferences.HOME_SCREEN_SAMPLING_PERIOD_ID
 import com.example.powermanager.preferences.LIVE_CHARTS_SAMPLING_PERIOD_ID
@@ -52,7 +52,6 @@ import com.example.powermanager.utils.GET_NUMBER_OF_THREADS_COMMAND
 import com.example.powermanager.utils.JSON_MIME_TYPE
 import com.example.powermanager.utils.MILLIS_IN_A_SECOND
 import com.example.powermanager.utils.NOTIFICATION_CHANNEL_ID
-import com.example.powermanager.utils.NO_VALUE_STRING
 import com.example.powermanager.utils.NUMBER_OF_KILOHERTZ_IN_A_MEGAHERTZ
 import com.example.powermanager.utils.POLICY_CURRENT_FREQUENCY_PATH
 import com.example.powermanager.utils.RECORDING_FINISHED_NOTIFICATION_ID
@@ -146,8 +145,6 @@ class PowerManagerAppModel(
     private var cpuFrequencySamples: MutableList<FlowSample> = mutableListOf()
     private var cpuLoadSamples: MutableList<FlowSample> = mutableListOf()
 
-    private var batteryTemperatureString : String = NO_VALUE_STRING
-
     init {
         // initialize managers
         activityManager = application.applicationContext.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
@@ -172,7 +169,6 @@ class PowerManagerAppModel(
         cpuFreqPolicies = CpuFreqManager.determineAllCpuFreqPolicies()
         coreToPolicy = CpuFreqManager.getCoreToPolicyMap(cpuFreqPolicies)
 
-        BatteryTemperatureTracker.changeTemperatureChangeCallback { batteryTemperatureString = "$it \u00b0C" }
         WiFiManager.initialize(this::isAutomaticWifiDisablingEnabled)
 
         // initialize the user preferences
@@ -243,16 +239,17 @@ class PowerManagerAppModel(
                 preferenceID = LOAD_AVERAGE_TYPE_ID,
                 preferenceValueAsString = getPreferenceValue(LOAD_AVERAGE_TYPE_ID)) as LoadAverageTypes
 
-            // battery and uptime
+            // battery
+            val batteryStatusString = BatteryDataProvider.getBatteryStatus()
             val currentBatteryLevel = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
             val batteryChargeCountMilliAmps = convertMicroAmpsToMilliAmps(batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CHARGE_COUNTER))
+            val batteryTemperatureString = BatteryDataProvider.getBatteryTemperature()
+            val batteryVoltageString = BatteryDataProvider.getBatteryVoltage()
+            val batteryCurrentString = BatteryDataProvider.getBatteryCurrent()
+            val batteryHealthString = BatteryDataProvider.getBatteryHealth()
+            val batteryCyclesString = BatteryDataProvider.getBatteryCycles()
 
-            val chargeOrDischargePrediction: Duration? = if (!batteryManager.isCharging) {
-                powerManager.batteryDischargePrediction
-            } else {
-                val chargeTimeRemainingMillis = batteryManager.computeChargeTimeRemaining()
-                if (chargeTimeRemainingMillis == -1L) null else Duration.ofMillis(chargeTimeRemainingMillis)
-            }
+            // uptime
             val uptimeString = if (systemBootTimestamp != 0L)
                             formatDuration(Duration.ofMillis(Calendar.getInstance().timeInMillis - systemBootTimestamp))
                             else FAILED_TO_DETERMINE
@@ -287,10 +284,13 @@ class PowerManagerAppModel(
             // emit a single object that contains all the information
             emit(
                 HomeScreenInfo(
-                    isBatteryCharging = batteryManager.isCharging,
+                    batteryStatus = batteryStatusString,
                     currentBatteryLevel = currentBatteryLevel,
                     batteryChargeCount = batteryChargeCountMilliAmps,
-                    chargeOrDischargePrediction = chargeOrDischargePrediction,
+                    batteryVoltageString = batteryVoltageString,
+                    batteryHealthString = batteryHealthString,
+                    batteryCurrentString = batteryCurrentString,
+                    batteryCyclesString = batteryCyclesString,
                     powerSaveState = powerManager.isPowerSaveMode,
                     batteryTemperatureString = batteryTemperatureString,
                     usedMemoryGB = usedMemoryGB,

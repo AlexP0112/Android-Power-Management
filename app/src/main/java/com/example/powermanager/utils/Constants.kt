@@ -30,6 +30,7 @@ const val NUMBER_OF_BYTES_IN_A_GIGABYTE : Long = 1024L * 1024 * 1024
 const val NUMBER_OF_KILOHERTZ_IN_A_GIGAHERTZ : Int = 1000 * 1000
 const val NUMBER_OF_KILOHERTZ_IN_A_MEGAHERTZ : Int = 1000
 const val NUMBER_OF_MICROS_IN_A_MILLI : Int = 1000
+const val NUMBER_OF_MICROS_IN_AN_UNIT : Int = 1000 * 1000
 const val HOURS_IN_A_DAY = 24L
 const val MINUTES_IN_AN_HOUR = 60L
 const val MILLIS_IN_A_MINUTE = 1000L * 60L
@@ -94,6 +95,12 @@ const val CURRENT_SCALING_GOVERNOR_PATH = "/sys/devices/system/cpu/cpu0/cpufreq/
 const val AVAILABLE_SCALING_GOVERNORS_PATH = "/sys/devices/system/cpu/cpu0/cpufreq/scaling_available_governors"
 const val CPUINFO_PATH = "/proc/cpuinfo"
 const val CPUFREQ_DIRECTORY_PATH = "/sys/devices/system/cpu/cpufreq"
+const val BATTERY_TEMPERATURE_PATH = "/sys/class/power_supply/battery/temp"
+const val BATTERY_STATUS_PATH = "/sys/class/power_supply/battery/status"
+const val BATTERY_VOLTAGE_PATH = "/sys/class/power_supply/battery/voltage_now"
+const val BATTERY_CURRENT_PATH = "/sys/class/power_supply/battery/current_now"
+const val BATTERY_HEALTH_PATH = "/sys/class/power_supply/battery/health"
+const val BATTERY_CYCLES_PATH = "/sys/class/power_supply/battery/cycle_count"
 
 // control
 const val SAVED_CPU_CONFIGURATIONS_DIRECTORY_NAME = "cpu_configurations"

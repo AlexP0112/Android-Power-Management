@@ -2,10 +2,10 @@
     <string name="app_name">Power Manager</string>
     <string name="top_bar_title">Power Manager</string>
     <string name="battery_and_uptime">Battery and uptime</string>
-    <string name="charging_status">Charging status</string>
+    <string name="battery_status">Battery status</string>
     <string name="charging">Charging</string>
     <string name="not_charging">Not charging</string>
-    <string name="current_battery_level">Current battery level</string>
+    <string name="current_battery_level">Battery level</string>
     <string name="time_until_full_charge">Time until full charge</string>
     <string name="maximum_battery_life_left">Maximum battery life left</string>
     <string name="load">Load</string>
@@ -33,7 +33,7 @@
     <string name="application_settings">Application settings</string>
     <string name="power_and_performance_recording">Power and performance recording</string>
     <string name="power_and_performance_control">Power and performance control</string>
-    <string name="current_battery_charge">Current battery charge</string>
+    <string name="current_battery_charge">Battery charge</string>
     <string name="home_screen_sampling_period_name">Home screen: sampling period</string>
     <string name="home_screen_sampling_period_description">Time interval (in milliseconds) between two consecutive samples for home screen</string>
     <string name="load_average_type_name">Sampling: CPU load average period</string>
@@ -105,4 +105,8 @@
     <string name="automatic_wi_fi_disabling_name">Control: automatic Wi-Fi disabling</string>
     <string name="automatic_wi_fi_disabling_description">Controls whether Wi-Fi interfaces are automatically disabled when device enters Doze mode</string>
     <string name="enable">Enable</string>
+    <string name="current_battery_voltage">Battery voltage</string>
+    <string name="battery_current">Battery current</string>
+    <string name="battery_health">Battery health</string>
+    <string name="battery_charge_discharge_cycles">Battery charge/discharge cycles</string>
 </resources>

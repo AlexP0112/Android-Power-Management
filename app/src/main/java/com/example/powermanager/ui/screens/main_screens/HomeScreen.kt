@@ -33,7 +33,6 @@ import com.example.powermanager.ui.model.HomeScreenInfo
 import com.example.powermanager.ui.model.PowerManagerAppModel
 import com.example.powermanager.ui.screens.common.InfoDialog
 import com.example.powermanager.ui.screens.common.SectionHeader
-import com.example.powermanager.utils.formatDuration
 import kotlin.math.roundToInt
 
 @Composable
@@ -65,12 +64,16 @@ fun HomeScreen(
             sectionName = stringResource(R.string.battery_and_uptime)
         )
 
-        // charging status
+        // battery status
         SectionMember(
-            leftText = stringResource(R.string.charging_status),
-            rightText = if (homeScreenInfo.value.isBatteryCharging)
-                    stringResource(R.string.charging) else
-                    stringResource(R.string.not_charging)
+            leftText = stringResource(R.string.battery_status),
+            rightText = homeScreenInfo.value.batteryStatus
+        )
+
+        // battery health
+        SectionMember(
+            leftText = stringResource(R.string.battery_health),
+            rightText = homeScreenInfo.value.batteryHealthString
         )
 
         // battery level
@@ -85,18 +88,28 @@ fun HomeScreen(
             rightText = "${homeScreenInfo.value.batteryChargeCount} mAh"
         )
 
+        // battery voltage
+        SectionMember(
+            leftText = stringResource(R.string.current_battery_voltage),
+            rightText = homeScreenInfo.value.batteryVoltageString
+        )
+
+        // battery current
+        SectionMember(
+            leftText = stringResource(R.string.battery_current),
+            rightText = homeScreenInfo.value.batteryCurrentString
+        )
+
         // battery temperature
         SectionMember(
             leftText = stringResource(R.string.battery_temperature),
             rightText = homeScreenInfo.value.batteryTemperatureString
         )
 
-        // battery charge/discharge prediction
+        // battery cycles
         SectionMember(
-            leftText = if (homeScreenInfo.value.isBatteryCharging)
-                    stringResource(R.string.time_until_full_charge) else
-                    stringResource(R.string.maximum_battery_life_left),
-            rightText = formatDuration(homeScreenInfo.value.chargeOrDischargePrediction)
+            leftText = stringResource(R.string.battery_charge_discharge_cycles),
+            rightText = homeScreenInfo.value.batteryCyclesString
         )
 
         // power save mode status
@@ -107,6 +120,7 @@ fun HomeScreen(
                 stringResource(R.string.not_enabled)
         )
 
+        // uptime
         SectionMember(
             leftText = stringResource(R.string.system_uptime),
             rightText = homeScreenInfo.value.systemUptimeString
