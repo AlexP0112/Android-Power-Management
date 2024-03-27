@@ -239,6 +239,25 @@ class PowerManagerAppModel(
                 preferenceID = LOAD_AVERAGE_TYPE_ID,
                 preferenceValueAsString = getPreferenceValue(LOAD_AVERAGE_TYPE_ID)) as LoadAverageTypes
 
+            // cpu info
+            val onlineCores = CpuHotplugManager.getOnlineCores()
+            val policyToCurrentFrequencyKhz : MutableMap<String, Int> = mutableMapOf()
+
+            // determine current frequency for each policy
+            cpuFreqPolicies.keys.forEach { policyName ->
+                val path = String.format(POLICY_CURRENT_FREQUENCY_PATH, policyName)
+                val frequencyKHz = File(path).readText().trim().toInt()
+
+                policyToCurrentFrequencyKhz[policyName] = frequencyKHz
+            }
+
+            // determine current frequency for each core that is online
+            val cpuFrequenciesGHz : List<Float> = onlineCores.map { core ->
+                convertKHzToGHz(policyToCurrentFrequencyKhz[coreToPolicy[core]!!]!!)
+            }
+
+            val loadAverage = getLoadAverage(loadAverageType)
+
             // battery
             val batteryStatusString = BatteryDataProvider.getBatteryStatus()
             val currentBatteryLevel = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
@@ -260,24 +279,7 @@ class PowerManagerAppModel(
             val usedMemory = info.totalMem - info.availMem
             val usedMemoryGB = convertBytesToGigaBytes(usedMemory)
 
-            // cpu info
-            val onlineCores = CpuHotplugManager.getOnlineCores()
-            val policyToCurrentFrequencyKhz : MutableMap<String, Int> = mutableMapOf()
-
-            // determine current frequency for each policy
-            cpuFreqPolicies.keys.forEach { policyName ->
-                val path = String.format(POLICY_CURRENT_FREQUENCY_PATH, policyName)
-                val frequencyKHz = File(path).readText().trim().toInt()
-
-                policyToCurrentFrequencyKhz[policyName] = frequencyKHz
-            }
-
-            // determine current frequency for each core that is online
-            val cpuFrequenciesGHz : List<Float> = onlineCores.map { core ->
-                convertKHzToGHz(policyToCurrentFrequencyKhz[coreToPolicy[core]!!]!!)
-            }
-
-            val loadAverage = getLoadAverage(loadAverageType)
+            // processes information
             val numberOfProcesses = getNumberOfProcessesOrThreads(true)
             val numberOfThreads = getNumberOfProcessesOrThreads(false)
 
