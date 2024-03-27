@@ -29,7 +29,7 @@
     <string name="system_uptime">System uptime</string>
     <string name="cpu_load_explanation">This metric shows the demand for the system\'s CPU and represents the average number of processes that are:\n\u2022 Currently using the CPU\n\u2022 Waiting to use the CPU\n\u2022 Waiting for IO or disk access</string>
     <string name="number_of_samples_value_explanation">Should be a number in the interval 5–200</string>
-    <string name="sampling_period_additional_info">Time interval between the end of a sample and the beginning of the next one. Keep in mind that generating a sample can also take up to 1 second, if thread count information is included.</string>
+    <string name="sampling_period_additional_info">Time interval (ms) between the end of a sample and the beginning of the next one. Keep in mind that generating a sample can also take a significant amount of time, especially if thread count information is included.</string>
     <string name="application_settings">Application settings</string>
     <string name="power_and_performance_recording">Power and performance recording</string>
     <string name="power_and_performance_control">Power and performance control</string>
@@ -52,7 +52,7 @@
     <string name="recent_results">Recent results</string>
     <string name="recording">Recording…</string>
     <string name="start_recording">Start recording</string>
-    <string name="sampling_period_millis">Time between samples (ms)</string>
+    <string name="sampling_period_millis">Time between samples</string>
     <string name="number_of_samples">Number of samples (10–250)</string>
     <string name="session_name">Session name</string>
     <string name="no_results_found">No recording results found!</string>
@@ -109,4 +109,5 @@
     <string name="battery_current">Battery current</string>
     <string name="battery_health">Battery health</string>
     <string name="battery_charge_discharge_cycles">Battery charge/discharge cycles</string>
+    <string name="android_might_change_frequency_limits_when_screen_off">Note that after you turn off your screen the Android system might reset these values to their defaults</string>
 </resources>

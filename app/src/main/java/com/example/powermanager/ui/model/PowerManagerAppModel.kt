@@ -40,7 +40,6 @@ import com.example.powermanager.udfs.ContinueUDFSBroadcastReceiver
 import com.example.powermanager.udfs.StopUDFSBroadcastReceiver
 import com.example.powermanager.udfs.UDFSManager
 import com.example.powermanager.ui.state.ControlScreenUiState
-import com.example.powermanager.ui.state.HomeScreenUiState
 import com.example.powermanager.ui.state.LiveChartsScreenUiState
 import com.example.powermanager.ui.state.RecordingScreensUiState
 import com.example.powermanager.utils.CORE_FREQUENCY_PATH
@@ -100,11 +99,6 @@ class PowerManagerAppModel(
 ) : AndroidViewModel(application) {
 
     // screens ui states
-
-    private val _homeScreenUiState : MutableStateFlow<HomeScreenUiState> = MutableStateFlow(
-        HomeScreenUiState()
-    )
-    val homeScreenUiState : StateFlow<HomeScreenUiState> = _homeScreenUiState.asStateFlow()
 
     private val _liveChartsScreenUiState : MutableStateFlow<LiveChartsScreenUiState> = MutableStateFlow(
         LiveChartsScreenUiState()
@@ -564,16 +558,6 @@ class PowerManagerAppModel(
     }
 
     // ================ state handling ======================= //
-
-    // home screen
-
-    fun changeHomeScreenInfoDialogState(newValue: Boolean) {
-        _homeScreenUiState.update { currentState ->
-            currentState.copy(
-                isCPULoadInfoDialogOpen = newValue
-            )
-        }
-    }
 
     // live charts screen
 

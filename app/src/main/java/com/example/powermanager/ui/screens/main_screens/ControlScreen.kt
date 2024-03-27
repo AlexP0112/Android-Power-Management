@@ -60,6 +60,7 @@ import com.example.powermanager.control.cpufreq.FIXED_FREQUENCY_GOVERNORS
 import com.example.powermanager.control.cpufreq.GOVERNOR_NAME_TO_DESCRIPTION_STRING_ID
 import com.example.powermanager.ui.model.PowerManagerAppModel
 import com.example.powermanager.ui.screens.common.ConfirmFileDeletionAlertDialog
+import com.example.powermanager.ui.screens.common.InfoDialog
 import com.example.powermanager.ui.screens.common.SectionHeader
 import com.example.powermanager.utils.CONFIRM_CPU_CONFIGURATION_DELETION_TEXT
 import com.example.powermanager.utils.isFileNameValid
@@ -89,6 +90,7 @@ fun ControlScreen(
         var isConfirmConfigurationDeletionDialogOpen by rememberSaveable { mutableStateOf(false) }
         var configurationName by rememberSaveable { mutableStateOf("") }
         val keyboardController = LocalSoftwareKeyboardController.current
+        var isCpuFrequenciesInfoDialogOpen by rememberSaveable { mutableStateOf(false) }
 
         val availableScalingGovernors : List<String> = model.getAvailableScalingGovernors()
         val totalNumberOfCores = model.getTotalNumberOfCores()
@@ -164,11 +166,8 @@ fun ControlScreen(
                 isCoreOnline = !uiState.disabledCores.contains(coreIndex)
             )
         }
-        
-        Text(
-            text = stringResource(id = R.string.set_max_frequency),
-            fontSize = 18.sp
-        )
+
+        SetFrequencyLimitsRow { isCpuFrequenciesInfoDialogOpen = true }
 
         // dropdown for each group of cores that belong to a policy
         cpuFreqPolicies.forEach { policy ->
@@ -277,6 +276,41 @@ fun ControlScreen(
                     isConfirmConfigurationDeletionDialogOpen = false
                 },
                 text = String.format(CONFIRM_CPU_CONFIGURATION_DELETION_TEXT, uiState.currentlySelectedCpuConfiguration)
+            )
+        }
+
+        if (isCpuFrequenciesInfoDialogOpen) {
+            InfoDialog(
+                textId = R.string.android_might_change_frequency_limits_when_screen_off,
+                cardHeight = 140.dp
+            ) {
+                isCpuFrequenciesInfoDialogOpen = false
+            }
+        }
+    }
+}
+
+@Composable
+fun SetFrequencyLimitsRow(
+    onIconButtonPressed : () -> Unit
+) {
+    Row (
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = stringResource(id = R.string.set_max_frequency),
+            fontSize = 18.sp
+        )
+
+        IconButton(onClick = onIconButtonPressed) {
+            Icon(
+                imageVector = Icons.Default.Info,
+                contentDescription = null,
+                modifier = Modifier
+                    .size(20.dp)
+                    .align(Alignment.CenterVertically)
             )
         }
     }

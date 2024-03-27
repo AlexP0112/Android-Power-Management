@@ -8,12 +8,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Checkbox
@@ -55,6 +57,7 @@ import androidx.compose.ui.unit.sp
 import com.example.powermanager.R
 import com.example.powermanager.ui.model.PowerManagerAppModel
 import com.example.powermanager.ui.screens.common.ConfirmFileDeletionAlertDialog
+import com.example.powermanager.ui.screens.common.InfoDialog
 import com.example.powermanager.ui.screens.common.SectionHeader
 import com.example.powermanager.utils.CONFIRM_RECORDING_DELETION_TEXT
 import com.example.powermanager.utils.DEFAULT_RECORDING_NUMBER_OF_SAMPLES
@@ -87,6 +90,7 @@ fun RecordingScreen(
 
         val uiState by model.recordingScreensUiState.collectAsState()
         var isConfirmDeletionDialogOpen by rememberSaveable { mutableStateOf(false) }
+        var isSamplingPeriodInfoDialogOpen by rememberSaveable { mutableStateOf(false) }
         var recordingSamplingPeriod by rememberSaveable { mutableLongStateOf(DEFAULT_RECORDING_SAMPLING_PERIOD_MILLIS) }
         var recordingNumberOfSamplesString by rememberSaveable { mutableStateOf(DEFAULT_RECORDING_NUMBER_OF_SAMPLES.toString()) }
         var recordingSessionName by rememberSaveable { mutableStateOf("") }
@@ -106,7 +110,8 @@ fun RecordingScreen(
             onSelectedNewValue = { newValue ->
                 recordingSamplingPeriod = newValue
             },
-            currentValue = recordingSamplingPeriod
+            currentValue = recordingSamplingPeriod,
+            onIconButtonPressed = { isSamplingPeriodInfoDialogOpen = true }
         )
 
         NumberOfSamplesRow(
@@ -212,6 +217,8 @@ fun RecordingScreen(
             )
         }
 
+        // ================= info dialogs =================== //
+
         if (isConfirmDeletionDialogOpen) {
             ConfirmFileDeletionAlertDialog(
                 onDismiss = { isConfirmDeletionDialogOpen = false },
@@ -221,6 +228,15 @@ fun RecordingScreen(
                 },
                 text = String.format(CONFIRM_RECORDING_DELETION_TEXT, uiState.currentlySelectedRecordingResult)
             )
+        }
+
+        if (isSamplingPeriodInfoDialogOpen) {
+            InfoDialog(
+                textId = R.string.sampling_period_additional_info,
+                cardHeight = 230.dp
+            ) {
+                isSamplingPeriodInfoDialogOpen = false
+            }
         }
     }
 }
@@ -391,7 +407,8 @@ fun StartRecordingButtonAndIndicatorRow(
 @Composable
 fun RecordingSamplingPeriodRow(
     onSelectedNewValue: (Long) -> Unit,
-    currentValue: Long
+    currentValue: Long,
+    onIconButtonPressed: () -> Unit
 ) {
     var dropdownExpanded by rememberSaveable { mutableStateOf(false) }
 
@@ -399,12 +416,27 @@ fun RecordingSamplingPeriodRow(
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 8.dp, end = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
     ){
-        Text(
+        Row (
             modifier = Modifier.weight(2f),
-            text = stringResource(R.string.sampling_period_millis)
-        )
+            horizontalArrangement = Arrangement.Start,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(R.string.sampling_period_millis)
+            )
+            IconButton(onClick = onIconButtonPressed) {
+                Icon(
+                    imageVector = Icons.Default.Info,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(20.dp)
+                        .align(Alignment.CenterVertically)
+                )
+            }
+        }
 
         Row(
             modifier = Modifier.weight(1f),
@@ -456,7 +488,6 @@ fun RecordingSamplingPeriodRow(
         }
     }
 }
-
 
 /*
  * A Row composable corresponding to a "Recent results" entry. It contains a text (the name of the

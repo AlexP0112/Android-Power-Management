@@ -18,8 +18,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -57,7 +59,7 @@ fun HomeScreen(
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        val uiState by model.homeScreenUiState.collectAsState()
+        var isCpuLoadInfoDialogOpen by rememberSaveable { mutableStateOf(false) }
 
         // ==============  battery and uptime section  ===================== //
         SectionHeader(
@@ -198,7 +200,7 @@ fun HomeScreen(
                     fontSize = 18.sp
                 )
                 IconButton(onClick = {
-                    model.changeHomeScreenInfoDialogState(true)
+                    isCpuLoadInfoDialogOpen = true
                 }) {
                     Icon(
                         imageVector = Icons.Default.Info,
@@ -239,12 +241,12 @@ fun HomeScreen(
             GoToOtherScreenButton(onClick = onGoToControlScreenButtonClicked, buttonTextStringID = R.string.go_to_control_screen)
         }
 
-        if (uiState.isCPULoadInfoDialogOpen) {
+        if (isCpuLoadInfoDialogOpen) {
             InfoDialog(
                 textId = R.string.cpu_load_explanation,
                 cardHeight = 220.dp
             ) {
-                model.changeHomeScreenInfoDialogState(false)
+                isCpuLoadInfoDialogOpen = false
             }
         }
     }
