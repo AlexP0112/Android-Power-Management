@@ -3,7 +3,6 @@ package com.example.powermanager.utils
 import org.junit.Test
 import kotlin.math.abs
 
-
 class ListUtilsTest {
 
     private val epsilon = 0.000001

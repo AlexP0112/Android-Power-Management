@@ -49,7 +49,7 @@ object LinuxCommandsUtils {
         return result
     }
 
-    fun getBytesSentAndReceivedByAllInterfacesFromFileContent(fileContent: String) : List<Long> {
+    fun getBytesSentAndReceivedByAllInternetInterfacesFromFileContent(fileContent: String) : List<Long> {
         var totalBytesReceived = 0L
         var totalBytesSent = 0L
 

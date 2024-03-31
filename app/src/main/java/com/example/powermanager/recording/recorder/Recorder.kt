@@ -11,7 +11,7 @@ import com.example.powermanager.recording.storage.RecordingsStorageManager
 import com.example.powermanager.utils.ConversionUtils.convertBytesToGigaBytes
 import com.example.powermanager.utils.ConversionUtils.convertMicroAmpsToMilliAmps
 import com.example.powermanager.utils.FormattingUtils.getDateTimeNiceString
-import com.example.powermanager.utils.LinuxCommandsUtils.getBytesSentAndReceivedByAllInterfacesFromFileContent
+import com.example.powermanager.utils.LinuxCommandsUtils.getBytesSentAndReceivedByAllInternetInterfacesFromFileContent
 import com.example.powermanager.utils.LinuxCommandsUtils.getLoadAverageFromUptimeCommandOutput
 import com.example.powermanager.utils.LinuxCommandsUtils.readProtectedFileContent
 import com.example.powermanager.utils.ListUtils.computeListAverage
@@ -159,7 +159,7 @@ object Recorder {
     private fun getBytesSentAndReceivedByAllInterfaces(): List<Long> {
         val fileContent = readProtectedFileContent(NETWORK_INTERFACES_STATS_PATH)
 
-        return getBytesSentAndReceivedByAllInterfacesFromFileContent(fileContent)
+        return getBytesSentAndReceivedByAllInternetInterfacesFromFileContent(fileContent)
     }
 
 }
