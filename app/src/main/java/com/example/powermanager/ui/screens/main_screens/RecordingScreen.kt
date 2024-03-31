@@ -63,8 +63,8 @@ import com.example.powermanager.utils.CONFIRM_RECORDING_DELETION_TEXT
 import com.example.powermanager.utils.DEFAULT_RECORDING_NUMBER_OF_SAMPLES
 import com.example.powermanager.utils.DEFAULT_RECORDING_SAMPLING_PERIOD_MILLIS
 import com.example.powermanager.utils.RECORDING_SAMPLING_PERIOD_POSSIBLE_VALUES
-import com.example.powermanager.utils.isFileNameValid
-import com.example.powermanager.utils.isRecordingNumberOfSamplesStringValid
+import com.example.powermanager.utils.ValidationUtils.isFileNameValid
+import com.example.powermanager.utils.ValidationUtils.isRecordingNumberOfSamplesStringValid
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable

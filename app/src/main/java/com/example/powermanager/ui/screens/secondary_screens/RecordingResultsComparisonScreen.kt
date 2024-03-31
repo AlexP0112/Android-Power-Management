@@ -31,9 +31,9 @@ import com.example.powermanager.recording.storage.RecordingResult
 import com.example.powermanager.ui.charts.static_charts.DoubleLineStaticChart
 import com.example.powermanager.ui.charts.utils.CustomAxisValuesOverrider
 import com.example.powermanager.ui.model.PowerManagerAppModel
-import com.example.powermanager.utils.getListMaximum
-import com.example.powermanager.utils.getListMinimum
-import com.example.powermanager.utils.getPrettyStringFromNumberOfBytes
+import com.example.powermanager.utils.FormattingUtils.getPrettyStringFromNumberOfBytes
+import com.example.powermanager.utils.ListUtils.getListMaximum
+import com.example.powermanager.utils.ListUtils.getListMinimum
 import kotlin.math.max
 import kotlin.math.min
 

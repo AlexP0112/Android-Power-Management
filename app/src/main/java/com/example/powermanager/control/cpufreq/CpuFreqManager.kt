@@ -6,12 +6,12 @@ import com.example.powermanager.utils.CHANGE_SCALING_GOVERNOR_FOR_POLICY_COMMAND
 import com.example.powermanager.utils.CHANGE_SCALING_MAX_FREQUENCY_FOR_POLICY_COMMAND
 import com.example.powermanager.utils.CPUFREQ_DIRECTORY_PATH
 import com.example.powermanager.utils.CURRENT_SCALING_GOVERNOR_PATH
+import com.example.powermanager.utils.ConversionUtils.convertKHzToGHz
+import com.example.powermanager.utils.LinuxCommandsUtils.readProtectedFileContent
 import com.example.powermanager.utils.NUMBER_OF_KILOHERTZ_IN_A_MEGAHERTZ
 import com.example.powermanager.utils.POLICY_MAX_FREQUENCY_PATH
 import com.example.powermanager.utils.RELATED_CPUS
 import com.example.powermanager.utils.SCALING_AVAILABLE_FREQUENCIES
-import com.example.powermanager.utils.convertKHzToGHz
-import com.example.powermanager.utils.readProtectedFileContent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File

@@ -1,8 +1,8 @@
 package com.example.powermanager.recording.storage
 
 import com.example.powermanager.utils.DOT_JSON
+import com.example.powermanager.utils.FormattingUtils.getPrettyStringFromNumberOfBytes
 import com.example.powermanager.utils.NO_VALUE_STRING
-import com.example.powermanager.utils.getPrettyStringFromNumberOfBytes
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import java.io.File

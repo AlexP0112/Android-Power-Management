@@ -6,9 +6,9 @@ import com.example.powermanager.utils.BATTERY_HEALTH_PATH
 import com.example.powermanager.utils.BATTERY_STATUS_PATH
 import com.example.powermanager.utils.BATTERY_TEMPERATURE_PATH
 import com.example.powermanager.utils.BATTERY_VOLTAGE_PATH
+import com.example.powermanager.utils.LinuxCommandsUtils.readProtectedFileContent
 import com.example.powermanager.utils.NUMBER_OF_MICROS_IN_AN_UNIT
 import com.example.powermanager.utils.NUMBER_OF_MICROS_IN_A_MILLI
-import com.example.powermanager.utils.readProtectedFileContent
 
 object BatteryDataProvider {
 

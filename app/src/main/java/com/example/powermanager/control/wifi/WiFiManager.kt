@@ -3,7 +3,7 @@ package com.example.powermanager.control.wifi
 import com.example.powermanager.utils.DISABLE_INTERFACE_COMMAND
 import com.example.powermanager.utils.ENABLE_INTERFACE_COMMAND
 import com.example.powermanager.utils.GET_ALL_WIFI_INTERFACES_COMMAND
-import com.example.powermanager.utils.getInterfacesFromIfConfigOutput
+import com.example.powermanager.utils.LinuxCommandsUtils.getInterfacesFromIfConfigOutput
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.BufferedReader

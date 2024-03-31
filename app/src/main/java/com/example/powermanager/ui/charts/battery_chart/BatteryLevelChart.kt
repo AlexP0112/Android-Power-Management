@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 import com.example.powermanager.data.battery.BatteryLevelTracker
 import com.example.powermanager.ui.charts.utils.CustomAxisValuesOverrider
 import com.example.powermanager.ui.charts.utils.rememberMarker
-import com.example.powermanager.utils.getHourAndMinuteFromLongTimestamp
+import com.example.powermanager.utils.FormattingUtils.getHourAndMinuteFromLongTimestamp
 import com.patrykandpatrick.vico.compose.axis.horizontal.rememberBottomAxis
 import com.patrykandpatrick.vico.compose.axis.vertical.rememberStartAxis
 import com.patrykandpatrick.vico.compose.chart.Chart

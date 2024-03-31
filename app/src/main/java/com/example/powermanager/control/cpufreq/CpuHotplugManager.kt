@@ -4,8 +4,8 @@ import com.example.powermanager.utils.CHANGE_CORE_STATE_COMMAND
 import com.example.powermanager.utils.CPUINFO_PATH
 import com.example.powermanager.utils.CPU_REGEX
 import com.example.powermanager.utils.DEVICES_SYSTEM_CPU_PATH
-import com.example.powermanager.utils.getOnlineCoresFromFileContent
-import com.example.powermanager.utils.readProtectedFileContent
+import com.example.powermanager.utils.LinuxCommandsUtils.getOnlineCoresFromFileContent
+import com.example.powermanager.utils.LinuxCommandsUtils.readProtectedFileContent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File

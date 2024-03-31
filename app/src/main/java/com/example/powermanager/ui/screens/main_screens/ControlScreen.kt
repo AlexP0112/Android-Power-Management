@@ -63,7 +63,7 @@ import com.example.powermanager.ui.screens.common.ConfirmFileDeletionAlertDialog
 import com.example.powermanager.ui.screens.common.InfoDialog
 import com.example.powermanager.ui.screens.common.SectionHeader
 import com.example.powermanager.utils.CONFIRM_CPU_CONFIGURATION_DELETION_TEXT
-import com.example.powermanager.utils.isFileNameValid
+import com.example.powermanager.utils.ValidationUtils.isFileNameValid
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
