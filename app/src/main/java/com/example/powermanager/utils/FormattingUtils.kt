@@ -29,7 +29,7 @@ object FormattingUtils {
         if (duration.toMinutes() % MINUTES_IN_AN_HOUR != 0L)
             result += "${duration.toMinutes() % MINUTES_IN_AN_HOUR}min"
 
-        return result
+        return result.trim()
     }
 
     fun getHourAndMinuteFromLongTimestamp(timestamp: Long): String {
