@@ -185,10 +185,20 @@ fun RecordingResultsComparisonScreen(
 
         Spacer(modifier = Modifier.height(10.dp))
 
+        Divider(
+            modifier = Modifier
+                .fillMaxSize(),
+            thickness = 0.75.dp,
+            color = MaterialTheme.colorScheme.secondary
+        )
+
+        Spacer(modifier = Modifier.height(10.dp))
+
         // battery level chart
         Text(
             modifier = Modifier.align(Alignment.CenterHorizontally),
-            text = stringResource(R.string.battery_level_mah)
+            text = stringResource(R.string.battery_level_mah),
+            fontWeight = FontWeight.Bold
         )
 
         DoubleLineStaticChart(
@@ -203,7 +213,8 @@ fun RecordingResultsComparisonScreen(
         // battery temperature chart
         Text(
             modifier = Modifier.align(Alignment.CenterHorizontally),
-            text = stringResource(R.string.battery_temperature_c)
+            text = stringResource(R.string.battery_temperature_c),
+            fontWeight = FontWeight.Bold
         )
 
         DoubleLineStaticChart(
@@ -218,7 +229,8 @@ fun RecordingResultsComparisonScreen(
         // memory chart
         Text(
             modifier = Modifier.align(Alignment.CenterHorizontally),
-            text = stringResource(R.string.memory_usage_gb)
+            text = stringResource(R.string.memory_usage_gb),
+            fontWeight = FontWeight.Bold
         )
 
         DoubleLineStaticChart(
@@ -233,7 +245,8 @@ fun RecordingResultsComparisonScreen(
         // CPU load chart
         Text(
             modifier = Modifier.align(Alignment.CenterHorizontally),
-            text = stringResource(R.string.cpu_load)
+            text = stringResource(R.string.cpu_load),
+            fontWeight = FontWeight.Bold
         )
 
         DoubleLineStaticChart(
@@ -249,7 +262,8 @@ fun RecordingResultsComparisonScreen(
         if (leftThreadCountValuesFloat.isNotEmpty() && rightThreadCountValuesFloat.isNotEmpty()) {
             Text(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
-                text = stringResource(R.string.total_number_of_threads)
+                text = stringResource(R.string.total_number_of_threads),
+                fontWeight = FontWeight.Bold
             )
 
             DoubleLineStaticChart(
@@ -294,7 +308,8 @@ fun ChartsLegend(
             Spacer(modifier = Modifier.width(20.dp))
 
             Text(
-                text = firstRecordingName
+                text = firstRecordingName,
+                fontWeight = FontWeight.Bold
             )
         }
 
@@ -314,7 +329,8 @@ fun ChartsLegend(
             Spacer(modifier = Modifier.width(20.dp))
 
             Text(
-                text = secondRecordingName
+                text = secondRecordingName,
+                fontWeight = FontWeight.Bold
             )
         }
     }

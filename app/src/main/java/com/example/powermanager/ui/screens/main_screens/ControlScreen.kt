@@ -56,8 +56,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.powermanager.R
 import com.example.powermanager.control.cpufreq.DEFAULT_GOVERNOR_STRING
-import com.example.powermanager.control.cpufreq.FIXED_FREQUENCY_GOVERNORS
 import com.example.powermanager.control.cpufreq.GOVERNOR_NAME_TO_DESCRIPTION_STRING_ID
+import com.example.powermanager.control.cpufreq.GOVERNOR_POWERSAVE
 import com.example.powermanager.ui.model.PowerManagerAppModel
 import com.example.powermanager.ui.screens.common.ConfirmFileDeletionAlertDialog
 import com.example.powermanager.ui.screens.common.InfoDialog
@@ -112,10 +112,8 @@ fun ControlScreen(
         // go to settings button
         GoToButton(
             goToFunction = goToAppSettings,
-            textID = R.string.enable
+            textID = R.string.enable_feature
         )
-
-        Spacer(modifier = Modifier.height(8.dp))
 
         // ================= display section ==================== //
         SectionHeader(sectionName = stringResource(R.string.display))
@@ -139,7 +137,8 @@ fun ControlScreen(
 
         Text(
             text = stringResource(R.string.select_scaling_governor),
-            fontSize = 18.sp
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold
         )
 
         availableScalingGovernors.forEach { scalingGovernor ->
@@ -155,7 +154,8 @@ fun ControlScreen(
 
         Text(
             text = stringResource(R.string.online_cpu_cores),
-            fontSize = 18.sp
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold
         )
 
         ( 0 until totalNumberOfCores).forEach { coreIndex ->
@@ -198,7 +198,7 @@ fun ControlScreen(
 
         GoToUDFSRow(
             goToUDFSScreen = openUDFSScreen,
-            isButtonEnabled = uiState.currentScalingGovernor !in FIXED_FREQUENCY_GOVERNORS
+            isButtonEnabled = uiState.currentScalingGovernor != GOVERNOR_POWERSAVE
         )
 
         Spacer(modifier = Modifier.height(10.dp))
@@ -282,7 +282,7 @@ fun ControlScreen(
         if (isCpuFrequenciesInfoDialogOpen) {
             InfoDialog(
                 textId = R.string.android_might_change_frequency_limits_when_screen_off,
-                cardHeight = 140.dp
+                cardHeight = 118.dp
             ) {
                 isCpuFrequenciesInfoDialogOpen = false
             }
@@ -301,7 +301,8 @@ fun SetFrequencyLimitsRow(
     ) {
         Text(
             text = stringResource(id = R.string.set_max_frequency),
-            fontSize = 18.sp
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold
         )
 
         IconButton(onClick = onIconButtonPressed) {
@@ -468,7 +469,8 @@ fun ControlScreenTitle() {
 fun SavedConfigurationsText() {
     Text(
         text = stringResource(R.string.saved_conf),
-        fontSize = 18.sp
+        fontSize = 18.sp,
+        fontWeight = FontWeight.Bold
     )
 }
 
@@ -501,7 +503,8 @@ fun DarkThemeText() {
 fun SaveCpuConfigurationText() {
     Text(
         text = stringResource(R.string.save_cpu_configuration),
-        fontSize = 18.sp
+        fontSize = 18.sp,
+        fontWeight = FontWeight.Bold
     )
 }
 

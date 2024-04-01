@@ -244,7 +244,7 @@ fun HomeScreen(
         if (isCpuLoadInfoDialogOpen) {
             InfoDialog(
                 textId = R.string.cpu_load_explanation,
-                cardHeight = 220.dp
+                cardHeight = 210.dp
             ) {
                 isCpuLoadInfoDialogOpen = false
             }

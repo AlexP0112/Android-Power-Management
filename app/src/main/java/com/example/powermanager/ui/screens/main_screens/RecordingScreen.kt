@@ -233,7 +233,7 @@ fun RecordingScreen(
         if (isSamplingPeriodInfoDialogOpen) {
             InfoDialog(
                 textId = R.string.sampling_period_additional_info,
-                cardHeight = 230.dp
+                cardHeight = 210.dp
             ) {
                 isSamplingPeriodInfoDialogOpen = false
             }

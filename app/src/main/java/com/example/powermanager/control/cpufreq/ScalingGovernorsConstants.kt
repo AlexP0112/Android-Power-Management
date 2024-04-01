@@ -12,8 +12,6 @@ const val GOVERNOR_SCHEDUTIL = "schedutil"
 
 const val DEFAULT_GOVERNOR_STRING = "(default)"
 
-val FIXED_FREQUENCY_GOVERNORS : List<String> = listOf(GOVERNOR_PERFORMANCE, GOVERNOR_POWERSAVE)
-
 // map from governor name to the ID of its description string
 val GOVERNOR_NAME_TO_DESCRIPTION_STRING_ID : Map<String, Int> = mapOf(
     GOVERNOR_PERFORMANCE to R.string.performance_governor_description,

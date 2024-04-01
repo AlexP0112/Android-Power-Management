@@ -167,14 +167,15 @@ fun RecordingResultViewScreen(
             color = MaterialTheme.colorScheme.secondary
         )
 
-        Spacer(modifier = Modifier.height(6.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 
         // charts
 
         // battery level chart
         Text(
             modifier = Modifier.align(Alignment.CenterHorizontally),
-            text = stringResource(R.string.battery_level_mah)
+            text = stringResource(R.string.battery_level_mah),
+            fontWeight = FontWeight.Bold
         )
 
         SingleLineStaticChart(
@@ -189,7 +190,8 @@ fun RecordingResultViewScreen(
         // battery temperature chart
         Text(
             modifier = Modifier.align(Alignment.CenterHorizontally),
-            text = stringResource(R.string.battery_temperature_c)
+            text = stringResource(R.string.battery_temperature_c),
+            fontWeight = FontWeight.Bold
         )
 
         SingleLineStaticChart(
@@ -204,7 +206,8 @@ fun RecordingResultViewScreen(
         // memory chart
         Text(
             modifier = Modifier.align(Alignment.CenterHorizontally),
-            text = stringResource(R.string.memory_usage_gb)
+            text = stringResource(R.string.memory_usage_gb),
+            fontWeight = FontWeight.Bold
         )
 
         SingleLineStaticChart(
@@ -219,7 +222,8 @@ fun RecordingResultViewScreen(
         // CPU load chart
         Text(
             modifier = Modifier.align(Alignment.CenterHorizontally),
-            text = stringResource(R.string.cpu_load)
+            text = stringResource(R.string.cpu_load),
+            fontWeight = FontWeight.Bold
         )
 
         SingleLineStaticChart(
@@ -235,7 +239,8 @@ fun RecordingResultViewScreen(
         if (numberOfThreadsValuesFloat.isNotEmpty()) {
             Text(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
-                text = stringResource(R.string.total_number_of_threads)
+                text = stringResource(R.string.total_number_of_threads),
+                fontWeight = FontWeight.Bold
             )
 
             SingleLineStaticChart(
