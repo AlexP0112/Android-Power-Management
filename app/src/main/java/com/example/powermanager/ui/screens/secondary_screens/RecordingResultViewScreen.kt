@@ -115,6 +115,14 @@ fun RecordingResultViewScreen(
         )
 
         Text(
+            text = "\u25cb Average battery temperature: ${String.format("%.1f \u00b0C", result.averageBatteryTemperature)}"
+        )
+
+        Text(
+            text = "\u25cb Peak battery temperature: ${String.format("%.1f \u00b0C", result.peakBatteryTemperature)}"
+        )
+
+        Text(
             text = "\u25cb Average memory usage: ${String.format("%.2f", result.averageMemoryUsed)}/${String.format("%.2f", totalMemoryGB)}GB (${String.format("%.1f", result.averageMemoryUsed * 100f / totalMemoryGB)}%)"
         )
 
@@ -175,6 +183,21 @@ fun RecordingResultViewScreen(
             customAxisValuesOverrider = CustomAxisValuesOverrider(
                 minYValue = getListMinimum(batteryChargeValuesFloat) - 1f,
                 maxYValue = getListMaximum(batteryChargeValuesFloat) + 1f
+            )
+        )
+
+        // battery temperature chart
+        Text(
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+            text = stringResource(R.string.battery_temperature_c)
+        )
+
+        SingleLineStaticChart(
+            chartLineColor = MaterialTheme.colorScheme.primary,
+            inputData = result.batteryTemperatureValues,
+            customAxisValuesOverrider = CustomAxisValuesOverrider(
+                minYValue = getListMinimum(result.batteryTemperatureValues) - 0.5f,
+                maxYValue = result.peakBatteryTemperature + 0.5f
             )
         )
 

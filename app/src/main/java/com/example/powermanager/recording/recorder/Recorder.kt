@@ -5,6 +5,7 @@ import android.app.ActivityManager
 import android.os.BatteryManager
 import android.os.PowerManager
 import android.util.Log
+import com.example.powermanager.data.battery.BatteryDataProvider
 import com.example.powermanager.preferences.LoadAverageTypes
 import com.example.powermanager.recording.storage.RecordingResult
 import com.example.powermanager.recording.storage.RecordingsStorageManager
@@ -53,6 +54,7 @@ object Recorder {
             val memoryUsedValues : MutableList<Float> = mutableListOf()
             val cpuLoadValues : MutableList<Float> = mutableListOf()
             val numberOfThreadsValues : MutableList<Int> = mutableListOf()
+            val batteryTemperatureValues : MutableList<Float> = mutableListOf()
 
             // acquire wake lock to keep the CPU on while sampling
             val wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, WAKELOCK_TAG)
@@ -70,6 +72,8 @@ object Recorder {
                     val batteryChargeCountMilliAmps =
                         convertMicroAmpsToMilliAmps(batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CHARGE_COUNTER))
                     batteryChargeValues.add(batteryChargeCountMilliAmps)
+                    val batteryTemperatureString = BatteryDataProvider.getBatteryTemperature()
+                    batteryTemperatureValues.add(batteryTemperatureString.split(" ")[0].toFloat())
 
                     // memory sampling
                     val info = ActivityManager.MemoryInfo()
@@ -112,12 +116,16 @@ object Recorder {
                 val averageMemoryUsage = computeListAverage(memoryUsedValues)
                 val averageCpuLoad = computeListAverage(cpuLoadValues)
 
+                val averageBatteryTemperature = computeListAverage(batteryTemperatureValues)
+                val peakBatteryTemperature = getListMaximum(batteryTemperatureValues)
+
                 val result = RecordingResult(
                     sessionName = sessionName,
                     timestamp = getDateTimeNiceString(),
                     samplingPeriodMillis = samplingPeriod,
                     numberOfSamples = sampleNumber,
                     batteryChargeValues = batteryChargeValues,
+                    batteryTemperatureValues = batteryTemperatureValues,
                     memoryUsedValues = memoryUsedValues,
                     cpuLoadValues = cpuLoadValues,
                     peakMemoryUsed = peakMemoryUsage,
@@ -126,6 +134,8 @@ object Recorder {
                     averageMemoryUsed = averageMemoryUsage,
                     peakCpuLoad = peakCpuLoad,
                     averageCpuLoad = averageCpuLoad,
+                    averageBatteryTemperature = averageBatteryTemperature,
+                    peakBatteryTemperature = peakBatteryTemperature,
                     numberOfThreadsValues = numberOfThreadsValues
                 )
 

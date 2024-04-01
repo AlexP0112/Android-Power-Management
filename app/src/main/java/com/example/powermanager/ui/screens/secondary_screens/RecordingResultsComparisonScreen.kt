@@ -75,6 +75,8 @@ fun RecordingResultsComparisonScreen(
         val maxBatteryLevel = max(getListMaximum(leftBatteryValuesFloat), getListMaximum(rightBatteryValuesFloat)) + 50f
         val minThreadCount = min(getListMinimum(leftThreadCountValuesFloat), getListMinimum(rightThreadCountValuesFloat)) - 50f
         val maxThreadCount = max(getListMaximum(leftThreadCountValuesFloat), getListMaximum(rightThreadCountValuesFloat)) + 50f
+        val minBatteryTemperature = min(getListMinimum(leftResult.batteryTemperatureValues), getListMinimum(rightResult.batteryTemperatureValues)) - 0.5f
+        val maxBatteryTemperature = max(leftResult.peakBatteryTemperature, rightResult.peakBatteryTemperature) + 0.5f
 
         // ====================== screen title ====================== //
         Text(
@@ -128,6 +130,10 @@ fun RecordingResultsComparisonScreen(
         // ============ cpu, memory and battery stats ========= //
 
         Text(text = "\u25cb Total battery discharge: $leftBatteryDischarge mAh vs $rightBatteryDischarge mAh")
+
+        Text(text = "\u25cb Average battery temperature: ${String.format("%.1f \u00b0C", leftResult.averageBatteryTemperature)} vs ${String.format("%.1f \u00b0C", rightResult.averageBatteryTemperature)}")
+
+        Text(text = "\u25cb Peak battery temperature: ${String.format("%.1f \u00b0C", leftResult.peakBatteryTemperature)} vs ${String.format("%.1f \u00b0C", rightResult.peakBatteryTemperature)}")
 
         Text(text = "\u25cb Average memory usage: ${String.format("%.2f", leftResult.averageMemoryUsed)} GB vs ${String.format("%.2f", rightResult.averageMemoryUsed)} GB")
 
@@ -191,6 +197,21 @@ fun RecordingResultsComparisonScreen(
             customAxisValuesOverrider = CustomAxisValuesOverrider(
                 minYValue = minBatteryLevel,
                 maxYValue = maxBatteryLevel
+            )
+        )
+
+        // battery temperature chart
+        Text(
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+            text = stringResource(R.string.battery_temperature_c)
+        )
+
+        DoubleLineStaticChart(
+            firstInput = leftResult.batteryTemperatureValues,
+            secondInput = rightResult.batteryTemperatureValues,
+            customAxisValuesOverrider = CustomAxisValuesOverrider(
+                minYValue = minBatteryTemperature,
+                maxYValue = maxBatteryTemperature
             )
         )
 
