@@ -91,6 +91,7 @@ fun ControlScreen(
         var configurationName by rememberSaveable { mutableStateOf("") }
         val keyboardController = LocalSoftwareKeyboardController.current
         var isCpuFrequenciesInfoDialogOpen by rememberSaveable { mutableStateOf(false) }
+        var isCoreDisablingInfoDialogOpen by rememberSaveable { mutableStateOf(false) }
 
         val availableScalingGovernors : List<String> = model.getAvailableScalingGovernors()
         val totalNumberOfCores = model.getTotalNumberOfCores()
@@ -152,10 +153,9 @@ fun ControlScreen(
 
         ScalingGovernorsExtraInfoRow(openScalingGovernorsScreen)
 
-        Text(
-            text = stringResource(R.string.online_cpu_cores),
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold
+        TextAndInfoButtonRow(
+            onIconButtonPressed = { isCoreDisablingInfoDialogOpen = true },
+            textID = R.string.online_cpu_cores
         )
 
         ( 0 until totalNumberOfCores).forEach { coreIndex ->
@@ -167,7 +167,10 @@ fun ControlScreen(
             )
         }
 
-        SetFrequencyLimitsRow { isCpuFrequenciesInfoDialogOpen = true }
+        TextAndInfoButtonRow(
+            onIconButtonPressed = { isCpuFrequenciesInfoDialogOpen = true},
+            textID = R.string.set_max_frequency
+        )
 
         // dropdown for each group of cores that belong to a policy
         cpuFreqPolicies.forEach { policy ->
@@ -287,12 +290,22 @@ fun ControlScreen(
                 isCpuFrequenciesInfoDialogOpen = false
             }
         }
+
+        if (isCoreDisablingInfoDialogOpen) {
+            InfoDialog(
+                textId = R.string.core_disabling_note,
+                cardHeight = 140.dp
+            ) {
+                isCoreDisablingInfoDialogOpen = false
+            }
+        }
     }
 }
 
 @Composable
-fun SetFrequencyLimitsRow(
-    onIconButtonPressed : () -> Unit
+fun TextAndInfoButtonRow(
+    onIconButtonPressed : () -> Unit,
+    textID: Int
 ) {
     Row (
         modifier = Modifier.fillMaxWidth(),
@@ -300,7 +313,7 @@ fun SetFrequencyLimitsRow(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
-            text = stringResource(id = R.string.set_max_frequency),
+            text = stringResource(id = textID),
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold
         )

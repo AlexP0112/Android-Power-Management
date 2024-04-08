@@ -63,7 +63,7 @@ object CpuFreqManager {
 
     /*
      * This function looks inside `/sys/devices/system/cpu/cpufreq/policyX/related_cpus` files
-     * and chooses the first half of the cores listed there as master cores
+     * and chooses the first core listed there as master core
      */
     fun determineMasterCores(): List<Int> {
         val result : MutableList<Int> = mutableListOf()
@@ -77,11 +77,8 @@ object CpuFreqManager {
                 .split("\\s+".toRegex())
                 .map { it.toInt() }
 
-            if (cpus.size == 1 || cpus.size == 2) {
+            if (cpus.isNotEmpty())
                 result.add(cpus[0])
-            } else if (cpus.size > 2) {
-                result.addAll(cpus.dropLast(cpus.size / 2))
-            }
         }
 
         result.sort()
