@@ -284,8 +284,8 @@ fun ControlScreen(
 
         if (isCpuFrequenciesInfoDialogOpen) {
             InfoDialog(
-                textId = R.string.android_might_change_frequency_limits_when_screen_off,
-                cardHeight = 118.dp
+                textId = R.string.cpu_frequencies_explanation,
+                cardHeight = 160.dp
             ) {
                 isCpuFrequenciesInfoDialogOpen = false
             }

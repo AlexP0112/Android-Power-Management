@@ -12,6 +12,7 @@ import androidx.activity.compose.setContent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.powermanager.control.cpufreq.ScreenOnBroadcastReceiver
 import com.example.powermanager.control.wifi.DeviceIdleModeChangedBroadcastReceiver
 import com.example.powermanager.data.battery.BatteryChangedBroadcastReceiver
 import com.example.powermanager.ui.main.PowerManagerApp
@@ -65,6 +66,9 @@ class MainActivity : ComponentActivity() {
 
         // register receiver for device idle mode status change
         applicationContext.registerReceiver(DeviceIdleModeChangedBroadcastReceiver(), IntentFilter(PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED))
+
+        // register receiver for screen on broadcast
+        applicationContext.registerReceiver(ScreenOnBroadcastReceiver(), IntentFilter(Intent.ACTION_SCREEN_ON))
     }
 
 }

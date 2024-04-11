@@ -110,6 +110,6 @@
     <string name="battery_current">Battery current</string>
     <string name="battery_health">Battery health</string>
     <string name="battery_charge_discharge_cycles">Battery charge/discharge cycles</string>
-    <string name="android_might_change_frequency_limits_when_screen_off">Note that after you turn off your screen the Android system might reset these values to their defaults</string>
+    <string name="cpu_frequencies_explanation">These limits will apply to multiple cores at the same time, since the cores are grouped into clusters which operate at the same frequency.</string>
     <string name="battery_temperature_c">Battery temperature (°C)</string>
 </resources>

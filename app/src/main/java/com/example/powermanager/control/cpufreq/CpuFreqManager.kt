@@ -20,6 +20,12 @@ import java.nio.file.Paths
 
 object CpuFreqManager {
 
+    private var onScreenOn : () -> Unit = {}
+
+    fun setScreenOnCallback(cb : () -> Unit) {
+        onScreenOn = cb
+    }
+
     fun getCurrentScalingGovernor() : String {
         return readProtectedFileContent(CURRENT_SCALING_GOVERNOR_PATH).trim()
     }
@@ -173,6 +179,10 @@ object CpuFreqManager {
                 CpuHotplugManager.changeCoreState(coreIndex, coreIndex in configuration.onlineCores)
             }
         }
+    }
+
+    fun resetFrequencyLimitsOnScreenOn() {
+        onScreenOn()
     }
 
 }

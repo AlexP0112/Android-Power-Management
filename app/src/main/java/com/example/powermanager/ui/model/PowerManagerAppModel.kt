@@ -164,6 +164,7 @@ class PowerManagerAppModel(
         coreToPolicy = CpuFreqManager.getCoreToPolicyMap(cpuFreqPolicies)
 
         WiFiManager.initialize(this::isAutomaticWifiDisablingEnabled)
+        CpuFreqManager.setScreenOnCallback(this::reapplyFrequencyLimits)
 
         // initialize the user preferences
         viewModelScope.launch {
@@ -175,7 +176,7 @@ class PowerManagerAppModel(
             onPreferenceValueChanged(NUMBER_OF_RECORDINGS_LISTED_ID, numberOfRecordingsListedLimit.toString())
         }
 
-        // initialize state
+        // initialize screen states
         val numberOfRecordingsListedLimit = PreferenceValueAdaptor.preferenceStringValueToActualValue(
             preferenceID = NUMBER_OF_RECORDINGS_LISTED_ID,
             preferenceValueAsString = getPreferenceValue(NUMBER_OF_RECORDINGS_LISTED_ID)) as Int
@@ -940,6 +941,20 @@ class PowerManagerAppModel(
         return PreferenceValueAdaptor.preferenceStringValueToActualValue(
             preferenceID = AUTOMATIC_WIFI_DISABLING_ID,
             preferenceValueAsString = getPreferenceValue(AUTOMATIC_WIFI_DISABLING_ID)) as Boolean
+    }
+
+    private fun reapplyFrequencyLimits() {
+        viewModelScope.launch {
+            controlScreenUiState.value.policyToFrequencyLimitMHz.forEach { (policyName, limitMHz) ->
+                val limitGHz = convertKHzToGHz(limitMHz * NUMBER_OF_KILOHERTZ_IN_A_MEGAHERTZ)
+
+                if (limitGHz != cpuFreqPolicies[policyName]!!.maximumFrequencyGhz)
+                    CpuFreqManager.changeMaxFrequencyForPolicy(
+                        policyName = policyName,
+                        maxFrequencyKhz = limitMHz * NUMBER_OF_KILOHERTZ_IN_A_MEGAHERTZ
+                    )
+            }
+        }
     }
 
 }
