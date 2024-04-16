@@ -8,7 +8,7 @@ class ListUtilsTest {
     private val epsilon = 0.000001
 
     @Test
-    fun `list average test 1`() {
+    fun `list average even length`() {
         val input = listOf(1.3f, 4.5f, 3.8f, 10.12f)
         val expected = 4.93f
 
@@ -17,7 +17,7 @@ class ListUtilsTest {
     }
 
     @Test
-    fun `list average test 2`() {
+    fun `list average odd length`() {
         val input = listOf(1.3f, 4.5f, 3.8f, 10.12f, 76.2f)
         val expected = 19.184f
 
@@ -26,7 +26,15 @@ class ListUtilsTest {
     }
 
     @Test
-    fun `list maximum test 1`() {
+    fun `list average empty list`() {
+        val expected = 0f
+
+        val result = ListUtils.computeListAverage(listOf())
+        assert(result == expected)
+    }
+
+    @Test
+    fun `list maximum even length`() {
         val input = listOf(1.3f, 4.5f, 3.8f, 10.12f)
         val expected = 10.12f
 
@@ -35,7 +43,7 @@ class ListUtilsTest {
     }
 
     @Test
-    fun `list maximum test 2`() {
+    fun `list maximum odd length`() {
         val input = listOf(1.3f, 4.5f, 89.4f, 3.8f, 10.12f)
         val expected = 89.4f
 
@@ -44,7 +52,15 @@ class ListUtilsTest {
     }
 
     @Test
-    fun `list minimum test 1`() {
+    fun `list maximum empty list`() {
+        val expected = 0f
+
+        val result = ListUtils.getListMaximum(listOf())
+        assert(result == expected)
+    }
+
+    @Test
+    fun `list minimum even length`() {
         val input = listOf(1.3f, 3.8f, 1.08f, 10.12f)
         val expected = 1.08f
 
@@ -53,11 +69,19 @@ class ListUtilsTest {
     }
 
     @Test
-    fun `list minimum test 2`() {
+    fun `list minimum odd length`() {
         val input = listOf(5.3f, 4.5f, 89.4f, 3.8f, 10.12f)
         val expected = 3.8f
 
         val result = ListUtils.getListMinimum(input)
         assert(expected == result)
+    }
+
+    @Test
+    fun `list minimum empty list`() {
+        val expected = 0f
+
+        val result = ListUtils.getListMinimum(listOf())
+        assert(result == expected)
     }
 }

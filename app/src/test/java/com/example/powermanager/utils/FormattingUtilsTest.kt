@@ -13,6 +13,33 @@ class FormattingUtilsTest {
     }
 
     @Test
+    fun `format duration minutes seconds`() {
+        val duration = Duration.ofMinutes(1) + Duration.ofSeconds(24)
+        val expected = "1min"
+        val result = FormattingUtils.formatDuration(duration)
+
+        assert(expected == result)
+    }
+
+    @Test
+    fun `format duration minutes seconds millis`() {
+        val duration = Duration.ofMinutes(10) + Duration.ofSeconds(16) + Duration.ofMillis(450)
+        val expected = "10min"
+        val result = FormattingUtils.formatDuration(duration)
+
+        assert(expected == result)
+    }
+
+    @Test
+    fun `format duration less than a minute`() {
+        val duration = Duration.ofSeconds(25)
+        val expected = "25s"
+        val result = FormattingUtils.formatDuration(duration)
+
+        assert(expected == result)
+    }
+
+    @Test
     fun `format duration containing only minutes`() {
         val duration = Duration.ofMinutes(2)
         val expected = "2min"
@@ -77,6 +104,22 @@ class FormattingUtilsTest {
     fun `convert size bytes`() {
         val expected = "1013B"
         val result = FormattingUtils.getPrettyStringFromNumberOfBytes(1013L)
+
+        assert(expected == result)
+    }
+
+    @Test
+    fun `convert size bytes 2`() {
+        val expected = "1023B"
+        val result = FormattingUtils.getPrettyStringFromNumberOfBytes(1023L)
+
+        assert(expected == result)
+    }
+
+    @Test
+    fun `convert size one kilo`() {
+        val expected = "1.0KB"
+        val result = FormattingUtils.getPrettyStringFromNumberOfBytes(1024L)
 
         assert(expected == result)
     }

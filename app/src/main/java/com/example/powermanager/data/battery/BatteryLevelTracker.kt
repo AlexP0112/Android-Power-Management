@@ -10,6 +10,7 @@ data class BatteryLevelInfo(
 )
 
 object BatteryLevelTracker {
+
     private var records: MutableList<BatteryLevelInfo> = mutableListOf()
 
     fun addRecord(info: BatteryLevelInfo) {
@@ -69,6 +70,11 @@ object BatteryLevelTracker {
         result[result.size - 1].level = finalRecords[finalRecords.size - 1].level
 
         return result
+    }
+
+    // only for testing purposes
+    fun clearRecords() {
+        records.clear()
     }
 
 }

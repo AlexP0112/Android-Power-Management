@@ -29,6 +29,9 @@ object FormattingUtils {
         if (duration.toMinutes() % MINUTES_IN_AN_HOUR != 0L)
             result += "${duration.toMinutes() % MINUTES_IN_AN_HOUR}min"
 
+        if (result.isEmpty())
+            return "${duration.seconds}s"
+
         return result.trim()
     }
 

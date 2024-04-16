@@ -3,6 +3,9 @@ package com.example.powermanager.utils
 object ListUtils {
 
     fun computeListAverage(list : List<Float>) : Float {
+        if (list.isEmpty())
+            return 0f
+
         var sum = 0f
 
         list.forEach {

@@ -5,8 +5,9 @@ import org.junit.Test
 
 class LinuxCommandsUtilsTest {
 
-    private val uptimeCommandExampleOutput  = "00:01:31 up 19 days, 13:02,  0 users,  load average: 1.29, 3.42, 31.83"
-    private val ifconfigWlanExampleOutput   = "wlan0     Link encap:UNSPEC\nwlan1     Link encap:UNSPEC\n"
+    private val uptimeCommandExampleOutput      = "00:01:31 up 19 days, 13:02,  0 users,  load average: 1.29, 3.42, 31.83"
+    private val ifconfigWlanExampleOutput       = "wlan0     Link encap:UNSPEC\nwlan1     Link encap:UNSPEC\n"
+    private val ifconfigWlanExampleOutput2      = "wlan0     Link encap:UNSPEC\nwlan1     Link encap:UNSPEC\nwlan2      Link encap:UNSPEC\n"
 
     @Test
     fun `load average from uptime command last minute`() {
@@ -42,9 +43,17 @@ class LinuxCommandsUtilsTest {
     }
 
     @Test
-    fun `wlan interfaces parsing from ifconfig command output`() {
+    fun `wlan interfaces parsing from ifconfig command output 2 interfaces`() {
         val expected = listOf("wlan0", "wlan1")
         val result = LinuxCommandsUtils.getInterfacesFromIfConfigOutput(ifconfigWlanExampleOutput)
+
+        assert(expected == result)
+    }
+
+    @Test
+    fun `wlan interfaces parsing from ifconfig command output 3 interfaces`() {
+        val expected = listOf("wlan0", "wlan1", "wlan2")
+        val result = LinuxCommandsUtils.getInterfacesFromIfConfigOutput(ifconfigWlanExampleOutput2)
 
         assert(expected == result)
     }
