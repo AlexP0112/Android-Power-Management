@@ -36,14 +36,17 @@ object LinuxCommandsUtils {
 
         fileContent
             .trim()
-            .split("\n")
-            .filter { line ->
-                line.startsWith(PROCESSOR)
-            }
-            .forEach { processorLine ->
-                // this is a line that looks like this: "processor       : <index>"
-                val parts = processorLine.split("\\s+".toRegex())
-                result.add(parts[2].toInt())
+            .split(",")
+            .forEach {
+                if (it.contains("-")) {
+                    val parts = it.split("-")
+                    val lowerBound = parts[0].toInt()
+                    val upperBound = parts[1].toInt()
+
+                    result.addAll(lowerBound..upperBound)
+                } else {
+                    result.add(it.toInt())
+                }
             }
 
         return result

@@ -1,4 +1,4 @@
-package com.example.powermanager.control.storage
+package com.example.powermanager.control.cpu.storage
 
 import com.example.powermanager.utils.DOT_JSON
 import com.example.powermanager.utils.FormattingUtils.getPrettyStringFromNumberOfBytes

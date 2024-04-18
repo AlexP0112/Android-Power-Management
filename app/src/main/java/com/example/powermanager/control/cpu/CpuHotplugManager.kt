@@ -1,11 +1,11 @@
-package com.example.powermanager.control.cpufreq
+package com.example.powermanager.control.cpu
 
 import com.example.powermanager.utils.CHANGE_CORE_STATE_COMMAND
-import com.example.powermanager.utils.CPUINFO_PATH
 import com.example.powermanager.utils.CPU_REGEX
 import com.example.powermanager.utils.DEVICES_SYSTEM_CPU_PATH
 import com.example.powermanager.utils.LinuxCommandsUtils.getOnlineCoresFromFileContent
 import com.example.powermanager.utils.LinuxCommandsUtils.readProtectedFileContent
+import com.example.powermanager.utils.ONLINE_CORES_PATH
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -34,7 +34,7 @@ object CpuHotplugManager {
 
     // returns a list of active cores indices like [0, 1, 3]
     fun getOnlineCores(): List<Int> {
-        val fileContent = readProtectedFileContent(CPUINFO_PATH)
+        val fileContent = readProtectedFileContent(ONLINE_CORES_PATH)
 
         return getOnlineCoresFromFileContent(fileContent)
     }

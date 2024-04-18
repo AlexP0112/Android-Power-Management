@@ -1,4 +1,4 @@
-package com.example.powermanager.control.cpufreq
+package com.example.powermanager.control.cpu
 
 import android.content.BroadcastReceiver
 import android.content.Context

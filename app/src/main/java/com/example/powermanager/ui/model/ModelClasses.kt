@@ -25,6 +25,7 @@ data class HomeScreenInfo(
     val systemUptimeString : String = NO_VALUE_STRING,
     val numberOfProcesses : Int = 0,
     val numberOfThreads : Int = 0,
+    val scalingGovernor : String = NO_VALUE_STRING,
     val onlineCores : List<Int> = listOf()
 )
 

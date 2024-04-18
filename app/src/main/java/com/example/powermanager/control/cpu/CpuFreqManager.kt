@@ -1,6 +1,6 @@
-package com.example.powermanager.control.cpufreq
+package com.example.powermanager.control.cpu
 
-import com.example.powermanager.control.storage.CpuConfiguration
+import com.example.powermanager.control.cpu.storage.CpuConfiguration
 import com.example.powermanager.utils.AVAILABLE_SCALING_GOVERNORS_PATH
 import com.example.powermanager.utils.CHANGE_SCALING_GOVERNOR_FOR_POLICY_COMMAND
 import com.example.powermanager.utils.CHANGE_SCALING_MAX_FREQUENCY_FOR_POLICY_COMMAND

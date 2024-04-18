@@ -55,9 +55,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.powermanager.R
-import com.example.powermanager.control.cpufreq.DEFAULT_GOVERNOR_STRING
-import com.example.powermanager.control.cpufreq.GOVERNOR_NAME_TO_DESCRIPTION_STRING_ID
-import com.example.powermanager.control.cpufreq.GOVERNOR_POWERSAVE
+import com.example.powermanager.control.cpu.DEFAULT_GOVERNOR_STRING
+import com.example.powermanager.control.cpu.GOVERNOR_NAME_TO_DESCRIPTION_STRING_ID
+import com.example.powermanager.control.cpu.GOVERNOR_POWERSAVE
 import com.example.powermanager.ui.model.PowerManagerAppModel
 import com.example.powermanager.ui.screens.common.ConfirmFileDeletionAlertDialog
 import com.example.powermanager.ui.screens.common.InfoDialog

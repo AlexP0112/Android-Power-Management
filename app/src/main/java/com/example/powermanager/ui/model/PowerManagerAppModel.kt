@@ -14,11 +14,11 @@ import androidx.core.content.FileProvider
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.powermanager.R
-import com.example.powermanager.control.cpufreq.CpuFreqManager
-import com.example.powermanager.control.cpufreq.CpuFreqPolicy
-import com.example.powermanager.control.cpufreq.CpuHotplugManager
-import com.example.powermanager.control.storage.CpuConfiguration
-import com.example.powermanager.control.storage.CpuConfigurationsStorageManager
+import com.example.powermanager.control.cpu.CpuFreqManager
+import com.example.powermanager.control.cpu.CpuFreqPolicy
+import com.example.powermanager.control.cpu.CpuHotplugManager
+import com.example.powermanager.control.cpu.storage.CpuConfiguration
+import com.example.powermanager.control.cpu.storage.CpuConfigurationsStorageManager
 import com.example.powermanager.control.wifi.WiFiManager
 import com.example.powermanager.data.battery.BatteryDataProvider
 import com.example.powermanager.preferences.AUTOMATIC_WIFI_DISABLING_ID
@@ -53,11 +53,13 @@ import com.example.powermanager.utils.FormattingUtils.formatDuration
 import com.example.powermanager.utils.GET_NUMBER_OF_PROCESSES_COMMAND
 import com.example.powermanager.utils.GET_NUMBER_OF_THREADS_COMMAND
 import com.example.powermanager.utils.JSON_MIME_TYPE
+import com.example.powermanager.utils.LinuxCommandsUtils
 import com.example.powermanager.utils.LinuxCommandsUtils.determineSystemBootTimestamp
 import com.example.powermanager.utils.LinuxCommandsUtils.getLoadAverageFromUptimeCommandOutput
 import com.example.powermanager.utils.MILLIS_IN_A_SECOND
 import com.example.powermanager.utils.NOTIFICATION_CHANNEL_ID
 import com.example.powermanager.utils.NUMBER_OF_KILOHERTZ_IN_A_MEGAHERTZ
+import com.example.powermanager.utils.ONLINE_CORES_PATH
 import com.example.powermanager.utils.POLICY_CURRENT_FREQUENCY_PATH
 import com.example.powermanager.utils.RECORDING_FINISHED_NOTIFICATION_ID
 import com.example.powermanager.utils.RECORDING_FINISHED_NOTIFICATION_TEXT
@@ -235,7 +237,8 @@ class PowerManagerAppModel(
                 preferenceValueAsString = getPreferenceValue(LOAD_AVERAGE_TYPE_ID)) as LoadAverageTypes
 
             // cpu info
-            val onlineCores = CpuHotplugManager.getOnlineCores()
+            val onlineCoresString = LinuxCommandsUtils.readProtectedFileContent(ONLINE_CORES_PATH)
+            val onlineCores = LinuxCommandsUtils.getOnlineCoresFromFileContent(onlineCoresString)
             val policyToCurrentFrequencyKhz : MutableMap<String, Int> = mutableMapOf()
 
             // determine current frequency for each policy
@@ -296,6 +299,7 @@ class PowerManagerAppModel(
                     systemUptimeString = uptimeString,
                     numberOfProcesses = numberOfProcesses,
                     numberOfThreads = numberOfThreads,
+                    scalingGovernor = controlScreenUiState.value.currentScalingGovernor,
                     onlineCores = onlineCores
                 )
             )

@@ -166,10 +166,16 @@ fun HomeScreen(
             rightText = model.getTotalNumberOfCores().toString()
         )
 
-        // number of online cores
+        // online cores
         SectionMember(
-            leftText = stringResource(R.string.number_of_online_cores),
+            leftText = stringResource(R.string.online_cores),
             rightText = homeScreenInfo.value.onlineCores.size.toString()
+        )
+
+        // scaling governor
+        SectionMember(
+            leftText = stringResource(R.string.scaling_governor),
+            rightText = homeScreenInfo.value.scalingGovernor
         )
 
         Spacer(modifier = Modifier.height(10.dp))
@@ -181,7 +187,7 @@ fun HomeScreen(
 
             SectionMember(
                 leftText = "Cpu${coreIndex} frequency",
-                rightText = "$coreFrequency GHz"
+                rightText = "${String.format("%.3f", coreFrequency)} GHz"
             )
         }
 

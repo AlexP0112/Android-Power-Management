@@ -61,7 +61,7 @@ class LinuxCommandsUtilsTest {
     @Test
     fun `online cores from proc cpuinfo file content all cores active`() {
         val expected = listOf(0, 1, 2, 3, 4, 5, 6, 7)
-        val result = LinuxCommandsUtils.getOnlineCoresFromFileContent(ExampleFileContents.PROC_CPUINFO_FILE_CONTENT_EXAMPLE_ALL_CORES_ENABLED)
+        val result = LinuxCommandsUtils.getOnlineCoresFromFileContent("0-7")
 
         assert(expected == result)
     }
@@ -69,7 +69,15 @@ class LinuxCommandsUtilsTest {
     @Test
     fun `online cores from proc cpuinfo file content some cores disabled`() {
         val expected = listOf(0, 1, 2, 4, 6)
-        val result = LinuxCommandsUtils.getOnlineCoresFromFileContent(ExampleFileContents.PROC_CPUINFO_FILE_CONTENT_EXAMPLE_THREE_CORES_DISABLED)
+        val result = LinuxCommandsUtils.getOnlineCoresFromFileContent("0-2,4,6")
+
+        assert(expected == result)
+    }
+
+    @Test
+    fun `online cores from proc cpuinfo file content some cores disabled 2`() {
+        val expected = listOf(0, 1, 2, 4, 5, 6)
+        val result = LinuxCommandsUtils.getOnlineCoresFromFileContent("0-2,4-6")
 
         assert(expected == result)
     }

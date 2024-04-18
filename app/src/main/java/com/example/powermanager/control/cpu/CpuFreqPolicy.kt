@@ -1,4 +1,4 @@
-package com.example.powermanager.control.cpufreq
+package com.example.powermanager.control.cpu
 
 data class CpuFreqPolicy(
     val name : String,

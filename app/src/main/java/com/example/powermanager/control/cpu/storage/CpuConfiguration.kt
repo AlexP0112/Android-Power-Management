@@ -1,4 +1,4 @@
-package com.example.powermanager.control.storage
+package com.example.powermanager.control.cpu.storage
 
 data class CpuConfiguration(
     val name: String,
