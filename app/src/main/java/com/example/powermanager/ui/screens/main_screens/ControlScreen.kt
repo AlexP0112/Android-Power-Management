@@ -57,7 +57,6 @@ import androidx.compose.ui.unit.sp
 import com.example.powermanager.R
 import com.example.powermanager.control.cpu.DEFAULT_GOVERNOR_STRING
 import com.example.powermanager.control.cpu.GOVERNOR_POWERSAVE
-import com.example.powermanager.control.cpu.GOVERNOR_TEO
 import com.example.powermanager.control.cpu.SCALING_GOVERNOR_NAME_TO_DESCRIPTION_STRING_ID
 import com.example.powermanager.ui.model.PowerManagerAppModel
 import com.example.powermanager.ui.screens.common.ConfirmFileDeletionAlertDialog
@@ -648,7 +647,7 @@ fun CpuIdleGovernorRow(
         )
 
         Text(
-            text = "$governorName ${if (governorName == GOVERNOR_TEO) DEFAULT_GOVERNOR_STRING else ""}"
+            text = governorName
         )
     }
 }
