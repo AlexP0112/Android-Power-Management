@@ -169,13 +169,19 @@ fun HomeScreen(
         // online cores
         SectionMember(
             leftText = stringResource(R.string.online_cores),
-            rightText = homeScreenInfo.value.onlineCores.size.toString()
+            rightText = homeScreenInfo.value.onlineCoresString
         )
 
         // scaling governor
         SectionMember(
             leftText = stringResource(R.string.scaling_governor),
             rightText = homeScreenInfo.value.scalingGovernor
+        )
+
+        // cpuidle governor
+        SectionMember(
+            leftText = stringResource(R.string.cpuidle_governor),
+            rightText = homeScreenInfo.value.cpuIdleGovernor
         )
 
         Spacer(modifier = Modifier.height(10.dp))

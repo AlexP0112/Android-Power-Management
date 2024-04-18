@@ -48,12 +48,14 @@ import com.example.powermanager.ui.screens.main_screens.LiveChartsScreen
 import com.example.powermanager.ui.screens.main_screens.RecordingScreen
 import com.example.powermanager.ui.screens.main_screens.SettingsScreen
 import com.example.powermanager.ui.screens.secondary_screens.CpuConfigurationFileInspectScreen
+import com.example.powermanager.ui.screens.secondary_screens.CpuIdleExplanationScreen
 import com.example.powermanager.ui.screens.secondary_screens.RecordingResultFileInspectScreen
 import com.example.powermanager.ui.screens.secondary_screens.RecordingResultViewScreen
 import com.example.powermanager.ui.screens.secondary_screens.RecordingResultsComparisonScreen
 import com.example.powermanager.ui.screens.secondary_screens.ScalingGovernorsExplanationScreen
 import com.example.powermanager.ui.screens.secondary_screens.UDFSScreen
 import com.example.powermanager.utils.CONTROL_SCREEN_NAME
+import com.example.powermanager.utils.CPUIDLE_EXPLANATION_SCREEN_NAME
 import com.example.powermanager.utils.CPU_CONFIGURATION_INSPECT_SCREEN_NAME
 import com.example.powermanager.utils.HOME_SCREEN_NAME
 import com.example.powermanager.utils.LIVE_CHARTS_SCREEN_NAME
@@ -196,8 +198,11 @@ fun ScreensNavHost(
                 topPadding = topPadding,
                 goToDisplaySettings = goToDisplaySettings,
                 model = model,
-                openScalingGovernorsScreen = {
+                openScalingGovernorsExplanationScreen = {
                     navController.navigate(SCALING_GOVERNORS_EXPLANATION_SCREEN_NAME)
+                },
+                openCpuIdleExplanationScreen = {
+                    navController.navigate(CPUIDLE_EXPLANATION_SCREEN_NAME)
                 },
                 openCpuConfigurationScreen = {
                     navController.navigate(CPU_CONFIGURATION_INSPECT_SCREEN_NAME)
@@ -281,6 +286,27 @@ fun ScreensNavHost(
             },
         ) {
             ScalingGovernorsExplanationScreen(
+                topPadding = topPadding
+            )
+        }
+
+        // Cpuidle details screen
+        composable(
+            route = CPUIDLE_EXPLANATION_SCREEN_NAME,
+            enterTransition = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                    animationSpec = tween(250)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                    animationSpec = tween(250)
+                )
+            },
+        ) {
+            CpuIdleExplanationScreen(
                 topPadding = topPadding
             )
         }

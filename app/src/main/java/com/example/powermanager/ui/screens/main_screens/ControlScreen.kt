@@ -56,8 +56,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.powermanager.R
 import com.example.powermanager.control.cpu.DEFAULT_GOVERNOR_STRING
-import com.example.powermanager.control.cpu.GOVERNOR_NAME_TO_DESCRIPTION_STRING_ID
 import com.example.powermanager.control.cpu.GOVERNOR_POWERSAVE
+import com.example.powermanager.control.cpu.GOVERNOR_TEO
+import com.example.powermanager.control.cpu.SCALING_GOVERNOR_NAME_TO_DESCRIPTION_STRING_ID
 import com.example.powermanager.ui.model.PowerManagerAppModel
 import com.example.powermanager.ui.screens.common.ConfirmFileDeletionAlertDialog
 import com.example.powermanager.ui.screens.common.InfoDialog
@@ -71,7 +72,8 @@ fun ControlScreen(
     topPadding: Dp,
     goToDisplaySettings: () -> Unit,
     model: PowerManagerAppModel,
-    openScalingGovernorsScreen: () -> Unit,
+    openScalingGovernorsExplanationScreen: () -> Unit,
+    openCpuIdleExplanationScreen: () -> Unit,
     openCpuConfigurationScreen: () -> Unit,
     openUDFSScreen: () -> Unit,
     goToAppSettings: () -> Unit
@@ -94,6 +96,7 @@ fun ControlScreen(
         var isCoreDisablingInfoDialogOpen by rememberSaveable { mutableStateOf(false) }
 
         val availableScalingGovernors : List<String> = model.getAvailableScalingGovernors()
+        val availableCpuIdleGovernors : List<String> = model.getAvailableCpuIdleGovernors()
         val totalNumberOfCores = model.getTotalNumberOfCores()
         val cpuFreqPolicies = model.getCpuFreqPolicies()
         val masterCores = model.getMasterCores()
@@ -151,7 +154,30 @@ fun ControlScreen(
             }
         }
 
-        ScalingGovernorsExtraInfoRow(openScalingGovernorsScreen)
+        ExtraInfoRow(
+            textID = R.string.scaling_governors_more_info_text,
+            openExtraInfoScreen = openScalingGovernorsExplanationScreen
+        )
+
+        Text(
+            text = stringResource(R.string.select_cpuidle_governor),
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold
+        )
+
+        availableCpuIdleGovernors.forEach { cpuIdleGovernor ->
+            CpuIdleGovernorRow(
+                governorName = cpuIdleGovernor,
+                isSelected = cpuIdleGovernor == uiState.currentCpuIdleGovernor)
+            {
+                model.changeCpuIdleGovernor(cpuIdleGovernor)
+            }
+        }
+
+        ExtraInfoRow(
+            textID = R.string.cpuidle_more_info_text,
+            openExtraInfoScreen = openCpuIdleExplanationScreen
+        )
 
         TextAndInfoButtonRow(
             onIconButtonPressed = { isCoreDisablingInfoDialogOpen = true },
@@ -331,21 +357,23 @@ fun TextAndInfoButtonRow(
 }
 
 @Composable
-fun ScalingGovernorsExtraInfoRow(
-    openScalingGovernorsScreen: () -> Unit
+fun ExtraInfoRow(
+    textID: Int,
+    openExtraInfoScreen: () -> Unit
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(start = 6.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
-            text = stringResource(R.string.scaling_governors_more_info_text),
+            text = stringResource(textID),
             fontSize = 14.sp
         )
 
-        IconButton(onClick = openScalingGovernorsScreen) {
+        IconButton(onClick = openExtraInfoScreen) {
             Icon(
                 imageVector = Icons.Default.Info,
                 contentDescription = null,
@@ -595,7 +623,32 @@ fun ScalingGovernorRow(
         )
 
         Text(
-            text = "$governorName ${if (!GOVERNOR_NAME_TO_DESCRIPTION_STRING_ID.containsKey(governorName)) DEFAULT_GOVERNOR_STRING else ""}"
+            text = "$governorName ${if (!SCALING_GOVERNOR_NAME_TO_DESCRIPTION_STRING_ID.containsKey(governorName)) DEFAULT_GOVERNOR_STRING else ""}"
+        )
+    }
+}
+
+/*
+ * A Row that corresponds to a Cpuidle governor. It contains a radio button and the name of the governor
+ */
+@Composable
+fun CpuIdleGovernorRow(
+    governorName: String,
+    isSelected: Boolean,
+    onSelected: () -> Unit
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        RadioButton(
+            selected = isSelected,
+            onClick = onSelected,
+            colors = RadioButtonDefaults.colors()
+        )
+
+        Text(
+            text = "$governorName ${if (governorName == GOVERNOR_TEO) DEFAULT_GOVERNOR_STRING else ""}"
         )
     }
 }

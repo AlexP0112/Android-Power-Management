@@ -1,5 +1,6 @@
 package com.example.powermanager.control.cpu
 
+import com.example.powermanager.control.cpu.CpuIdleManager.changeCpuIdleGovernor
 import com.example.powermanager.control.cpu.storage.CpuConfiguration
 import com.example.powermanager.utils.AVAILABLE_SCALING_GOVERNORS_PATH
 import com.example.powermanager.utils.CHANGE_SCALING_GOVERNOR_FOR_POLICY_COMMAND
@@ -168,6 +169,9 @@ object CpuFreqManager {
         withContext(Dispatchers.IO) {
             // first change scaling governor
             changeScalingGovernor(configuration.scalingGovernor, policyNames)
+
+            // then change cpuidle governor
+            changeCpuIdleGovernor(configuration.cpuIdleGovernor)
 
             // then set frequency limits
             configuration.policyToFrequencyLimitMHz.forEach { (policyName, limitMHz) ->

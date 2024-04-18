@@ -26,6 +26,8 @@ data class HomeScreenInfo(
     val numberOfProcesses : Int = 0,
     val numberOfThreads : Int = 0,
     val scalingGovernor : String = NO_VALUE_STRING,
+    val cpuIdleGovernor : String = NO_VALUE_STRING,
+    val onlineCoresString : String = NO_VALUE_STRING,
     val onlineCores : List<Int> = listOf()
 )
 

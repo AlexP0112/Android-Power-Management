@@ -16,10 +16,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.powermanager.R
-import com.example.powermanager.control.cpu.SCALING_GOVERNOR_NAME_TO_DESCRIPTION_STRING_ID
+import com.example.powermanager.control.cpu.CPUIDLE_GOVERNOR_NAME_TO_DESCRIPTION_STRING_ID
 
 @Composable
-fun ScalingGovernorsExplanationScreen(
+fun CpuIdleExplanationScreen(
     topPadding: Dp,
 ) {
     Column(
@@ -33,11 +33,11 @@ fun ScalingGovernorsExplanationScreen(
             .verticalScroll(rememberScrollState())
     ) {
         Text(
-            text = stringResource(id = R.string.scaling_governors_explanation),
+            text = stringResource(id = R.string.cpuidle_explanation),
             fontSize = 17.sp
         )
-        
-        SCALING_GOVERNOR_NAME_TO_DESCRIPTION_STRING_ID.forEach { (name, descriptionId) ->
+
+        CPUIDLE_GOVERNOR_NAME_TO_DESCRIPTION_STRING_ID.forEach { (name, descriptionId) ->
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(

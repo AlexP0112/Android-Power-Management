@@ -2,6 +2,7 @@ package com.example.powermanager.control.cpu
 
 import com.example.powermanager.R
 
+// known scaling governors
 const val GOVERNOR_PERFORMANCE = "performance"
 const val GOVERNOR_POWERSAVE = "powersave"
 const val GOVERNOR_ONDEMAND = "ondemand"
@@ -10,10 +11,14 @@ const val GOVERNOR_CONSERVATIVE = "conservative"
 const val GOVERNOR_INTERACTIVE = "interactive"
 const val GOVERNOR_SCHEDUTIL = "schedutil"
 
+// known Cpuidle governors
+const val GOVERNOR_MENU = "menu"
+const val GOVERNOR_TEO = "teo"
+
 const val DEFAULT_GOVERNOR_STRING = "(default)"
 
-// map from governor name to the ID of its description string
-val GOVERNOR_NAME_TO_DESCRIPTION_STRING_ID : Map<String, Int> = mapOf(
+// map from scaling governor name to the ID of its description string
+val SCALING_GOVERNOR_NAME_TO_DESCRIPTION_STRING_ID : Map<String, Int> = mapOf(
     GOVERNOR_PERFORMANCE to R.string.performance_governor_description,
     GOVERNOR_POWERSAVE to R.string.powersave_governor_description,
     GOVERNOR_ONDEMAND to R.string.ondemand_governor_description,
@@ -21,6 +26,12 @@ val GOVERNOR_NAME_TO_DESCRIPTION_STRING_ID : Map<String, Int> = mapOf(
     GOVERNOR_CONSERVATIVE to R.string.conservative_governor_description,
     GOVERNOR_SCHEDUTIL to R.string.schedutil_governor_description,
     GOVERNOR_INTERACTIVE to R.string.interactive_governor_description
+)
+
+// map from Cpuidle governor name to the ID of its description string
+val CPUIDLE_GOVERNOR_NAME_TO_DESCRIPTION_STRING_ID : Map<String, Int> = mapOf(
+    GOVERNOR_MENU to R.string.menu_governor_description,
+    GOVERNOR_TEO to R.string.teo_governor_description
 )
 
 // map from a number that represents the number of possible frequencies for a policy to a list

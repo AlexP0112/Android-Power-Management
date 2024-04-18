@@ -38,14 +38,16 @@ object LinuxCommandsUtils {
             .trim()
             .split(",")
             .forEach {
-                if (it.contains("-")) {
-                    val parts = it.split("-")
+                val str = it.trim()
+
+                if (str.contains("-")) {
+                    val parts = str.split("-")
                     val lowerBound = parts[0].toInt()
                     val upperBound = parts[1].toInt()
 
                     result.addAll(lowerBound..upperBound)
                 } else {
-                    result.add(it.toInt())
+                    result.add(str.toInt())
                 }
             }
 

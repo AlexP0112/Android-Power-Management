@@ -17,6 +17,7 @@ import com.example.powermanager.R
 import com.example.powermanager.control.cpu.CpuFreqManager
 import com.example.powermanager.control.cpu.CpuFreqPolicy
 import com.example.powermanager.control.cpu.CpuHotplugManager
+import com.example.powermanager.control.cpu.CpuIdleManager
 import com.example.powermanager.control.cpu.storage.CpuConfiguration
 import com.example.powermanager.control.cpu.storage.CpuConfigurationsStorageManager
 import com.example.powermanager.control.wifi.WiFiManager
@@ -53,9 +54,10 @@ import com.example.powermanager.utils.FormattingUtils.formatDuration
 import com.example.powermanager.utils.GET_NUMBER_OF_PROCESSES_COMMAND
 import com.example.powermanager.utils.GET_NUMBER_OF_THREADS_COMMAND
 import com.example.powermanager.utils.JSON_MIME_TYPE
-import com.example.powermanager.utils.LinuxCommandsUtils
 import com.example.powermanager.utils.LinuxCommandsUtils.determineSystemBootTimestamp
 import com.example.powermanager.utils.LinuxCommandsUtils.getLoadAverageFromUptimeCommandOutput
+import com.example.powermanager.utils.LinuxCommandsUtils.getOnlineCoresFromFileContent
+import com.example.powermanager.utils.LinuxCommandsUtils.readProtectedFileContent
 import com.example.powermanager.utils.MILLIS_IN_A_SECOND
 import com.example.powermanager.utils.NOTIFICATION_CHANNEL_ID
 import com.example.powermanager.utils.NUMBER_OF_KILOHERTZ_IN_A_MEGAHERTZ
@@ -118,6 +120,7 @@ class PowerManagerAppModel(
     private val totalNumberOfCores : Int
     private val systemBootTimestamp : Long
     private val availableScalingGovernors : List<String>
+    private val availableCpuidleGovernors : List<String>
     private val masterCores : List<Int>
     // map from policy name to its characteristics
     private val cpuFreqPolicies : Map<String, CpuFreqPolicy>
@@ -159,6 +162,7 @@ class PowerManagerAppModel(
         systemBootTimestamp = determineSystemBootTimestamp()
 
         availableScalingGovernors = CpuFreqManager.getAvailableScalingGovernors()
+        availableCpuidleGovernors = CpuIdleManager.getAvailableGovernors()
         masterCores = CpuFreqManager.determineMasterCores()
 
         totalNumberOfCores = CpuHotplugManager.determineTotalNumberOfCPUCores()
@@ -190,6 +194,7 @@ class PowerManagerAppModel(
         _controlScreenUiState = MutableStateFlow(
             ControlScreenUiState(
             currentScalingGovernor = CpuFreqManager.getCurrentScalingGovernor(),
+            currentCpuIdleGovernor = CpuIdleManager.getCurrentGovernor(),
             savedConfigurations = CpuConfigurationsStorageManager.getSavedCpuConfigurationsNames(cpuConfigurationsDirectory),
             disabledCores = disabledCores,
             policyToFrequencyLimitMHz = policyToFrequencyLimitMHz
@@ -219,6 +224,10 @@ class PowerManagerAppModel(
         return availableScalingGovernors
     }
 
+    fun getAvailableCpuIdleGovernors() : List<String> {
+        return availableCpuidleGovernors
+    }
+
     fun getMasterCores() : List<Int> {
         return masterCores
     }
@@ -237,8 +246,8 @@ class PowerManagerAppModel(
                 preferenceValueAsString = getPreferenceValue(LOAD_AVERAGE_TYPE_ID)) as LoadAverageTypes
 
             // cpu info
-            val onlineCoresString = LinuxCommandsUtils.readProtectedFileContent(ONLINE_CORES_PATH)
-            val onlineCores = LinuxCommandsUtils.getOnlineCoresFromFileContent(onlineCoresString)
+            val onlineCoresString = readProtectedFileContent(ONLINE_CORES_PATH).trim()
+            val onlineCores = getOnlineCoresFromFileContent(onlineCoresString)
             val policyToCurrentFrequencyKhz : MutableMap<String, Int> = mutableMapOf()
 
             // determine current frequency for each policy
@@ -300,6 +309,8 @@ class PowerManagerAppModel(
                     numberOfProcesses = numberOfProcesses,
                     numberOfThreads = numberOfThreads,
                     scalingGovernor = controlScreenUiState.value.currentScalingGovernor,
+                    cpuIdleGovernor = controlScreenUiState.value.currentCpuIdleGovernor,
+                    onlineCoresString = onlineCoresString,
                     onlineCores = onlineCores
                 )
             )
@@ -684,6 +695,18 @@ class PowerManagerAppModel(
         }
     }
 
+    fun changeCpuIdleGovernor(newGovernor: String) {
+        _controlScreenUiState.update { currentState ->
+            currentState.copy(
+                currentCpuIdleGovernor = newGovernor
+            )
+        }
+
+        viewModelScope.launch {
+            CpuIdleManager.changeCpuIdleGovernor(newGovernor)
+        }
+    }
+
     fun selectCpuConfiguration(configurationName : String) {
         _controlScreenUiState.update { currentState ->
             currentState.copy(
@@ -722,6 +745,7 @@ class PowerManagerAppModel(
             currentState.copy(
                 disabledCores = disabledCores,
                 currentScalingGovernor = configuration.scalingGovernor,
+                currentCpuIdleGovernor = configuration.cpuIdleGovernor,
                 policyToFrequencyLimitMHz = configuration.policyToFrequencyLimitMHz
             )
         }
@@ -748,6 +772,7 @@ class PowerManagerAppModel(
         val currentConfiguration = CpuConfiguration(
             name = configurationName,
             scalingGovernor = controlScreenUiState.value.currentScalingGovernor,
+            cpuIdleGovernor = controlScreenUiState.value.currentCpuIdleGovernor,
             onlineCores = onlineCores,
             policyToFrequencyLimitMHz = controlScreenUiState.value.policyToFrequencyLimitMHz
         )

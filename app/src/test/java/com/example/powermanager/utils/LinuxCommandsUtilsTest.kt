@@ -83,6 +83,14 @@ class LinuxCommandsUtilsTest {
     }
 
     @Test
+    fun `online cores from proc cpuinfo file content maximum number of cores disabled`() {
+        val expected = listOf(0, 4, 6)
+        val result = LinuxCommandsUtils.getOnlineCoresFromFileContent("0,4,6")
+
+        assert(expected == result)
+    }
+
+    @Test
     fun `network stats from proc net dev`() {
         val expected = listOf(2057537163L, 187758831L)
         val result = LinuxCommandsUtils.getBytesSentAndReceivedByAllInternetInterfacesFromFileContent(ExampleFileContents.PROC_NET_DEV_FILE_CONTENT_EXAMPLE)
